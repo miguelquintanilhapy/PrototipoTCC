@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrototipoTCC", "PrototipoTCC.csproj", "{3895280A-846F-4D8F-B944-16DB4C21F8B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAD", "..\PrototipoTCC-main\SAD\SAD.csproj", "{5A0C7485-99B2-4BE3-8CF6-A658FF6D1099}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3895280A-846F-4D8F-B944-16DB4C21F8B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3895280A-846F-4D8F-B944-16DB4C21F8B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3895280A-846F-4D8F-B944-16DB4C21F8B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3895280A-846F-4D8F-B944-16DB4C21F8B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A0C7485-99B2-4BE3-8CF6-A658FF6D1099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A0C7485-99B2-4BE3-8CF6-A658FF6D1099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A0C7485-99B2-4BE3-8CF6-A658FF6D1099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A0C7485-99B2-4BE3-8CF6-A658FF6D1099}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2589EE46-E30A-4503-AA72-3B9E030D0BF3}
+	EndGlobalSection
+EndGlobal

@@ -78,7 +78,7 @@
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="Cliente" Style="{StaticResource LabelCaption}"/>
                                     <TextBox Text="{Binding Cliente, UpdateSourceTrigger=PropertyChanged}"
-                                             gti Style="{StaticResource ModernTextBox}" MaxLength="100"/>
+                                             Style="{StaticResource ModernTextBox}" MaxLength="100"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2">

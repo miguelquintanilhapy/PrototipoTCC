@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Fonts\" />
+    <Folder Include="resources\" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Fonts\Outfit-Regular.ttf" />
+		<Resource Include="Fonts\Outfit-Medium.ttf" />
+		<Resource Include="Fonts\Outfit-SemiBold.ttf" />
+		<Resource Include="Fonts\Outfit-Bold.ttf" />
+		<Resource Include="Fonts\GeistMono-Regular.ttf" />
+		<Resource Include="Fonts\GeistMono-Medium.ttf" />
+		<Resource Include="Fonts\GeistMono-SemiBold.ttf" />
+	</ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.6" />
+    <PackageReference Include="MySql.Data" Version="9.6.0" />
+    <PackageReference Include="QuestPDF" Version="2026.2.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

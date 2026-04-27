@@ -1,0 +1,54 @@
+﻿<Window x:Class="magal.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MAGAL - Sistema de Precificação" Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen" Background="#F8FAFC">
+
+    <Window.Resources>
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="20,0,0,0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1E293B"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Background="#0F172A" Grid.Column="0">
+            <StackPanel Margin="0">
+                <TextBlock Text="SAD AERO" Foreground="#3B82F6" FontSize="26" FontWeight="Bold" 
+                           Margin="10,40,10,20" HorizontalAlignment="Center"/>
+
+                <Button Content="Dashboard" Style="{StaticResource MenuButtonStyle}"/>
+
+                <Button x:Name="BtnOrcamentos" 
+                        Content="Novo Orçamento" 
+                        Style="{StaticResource MenuButtonStyle}"
+                        Click="BtnOrcamentos_Click"/>
+
+                <Button Content="Clientes" Style="{StaticResource MenuButtonStyle}"/>
+                <Button Content="Funcionários" Style="{StaticResource MenuButtonStyle}"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="15">
+            <ContentControl x:Name="MainContent"/>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,4 +1,4 @@
-﻿using QuestPDF.Fluent;
+using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using magal.Models;
@@ -65,10 +65,10 @@ namespace magal.Services
                         });
                     });
 
-                    // --- CONTEÚDO ---
+                    // CONTEÚDO 
                     page.Content().PaddingTop(16).Column(col =>
                     {
-                        // 1. TABELA DE MÃO DE OBRA
+                        //TABELA DE MÃO DE OBRA
                         col.Item().Text("1. COMPOSIÇÃO DE MÃO DE OBRA E ETAPAS")
                             .FontSize(9).Bold().FontColor("#555555");
 
@@ -96,7 +96,7 @@ namespace magal.Services
                             }
                         });
 
-                        // 2. TABELA DE CUSTOS EXTRAS
+                        //TABELA DE CUSTOS 
                         if (custosExtras != null && custosExtras.Any())
                         {
                             col.Item().Text("2. EQUIPAMENTOS, LICENÇAS E CUSTOS ADICIONAIS")
@@ -119,13 +119,13 @@ namespace magal.Services
                                 {
                                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(custo.Nome).FontSize(9);
                                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(custo.Categoria).FontSize(9);
-                                    // CORRIGIDO: Removido parâmetro de .Bold()
+                                
                                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignRight().Text(custo.Valor.ToString("C2", _ptBR)).FontSize(9).Bold();
                                 }
                             });
                         }
 
-                        // --- RESUMO FINANCEIRO ---
+                        // RESUMO FINANCEIRO 
                         col.Item().PaddingTop(30).Row(row =>
                         {
                             row.RelativeItem();
@@ -142,7 +142,7 @@ namespace magal.Services
                                         var bg = destaque ? "#1E3A5F" : "#FFFFFF";
                                         var fg = destaque ? "#FFFFFF" : "#333333";
 
-                                        // Função interna para evitar repetição e erros de tipo
+                                         
                                         void CriarCelula(string texto, bool centralizar = false, bool alinharDireita = false)
                                         {
                                             var container = t.Cell().Background(bg).Padding(6);
@@ -150,10 +150,9 @@ namespace magal.Services
                                             if (centralizar) container = container.AlignCenter();
                                             if (alinharDireita) container = container.AlignRight();
 
-                                            // O segredo: Guardamos o descritor do texto em uma variável
                                             var textoFormatado = container.Text(texto).FontSize(9).FontColor(fg);
 
-                                            // Se for destaque, aplicamos o Bold diretamente no descritor de texto
+
                                             if (destaque) textoFormatado.Bold();
                                         }
 
@@ -171,7 +170,7 @@ namespace magal.Services
                         });
                     });
 
-                    // --- RODAPÉ ---
+                    // RODAPÉ
                     page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(row =>
                     {
                         row.RelativeItem().Text("Aero Concepts — Tecnologia em Engenharia Aeronáutica").FontSize(7).FontColor("#AAAAAA");

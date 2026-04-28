@@ -8,7 +8,6 @@ namespace magal.Data.Repositories
 {
     public class ProjetoRepository
     {
-        // Agora aceita o Projeto e a lista de Custos Extras da Aero Concepts
         public void SalvarProjetoCompleto(Projeto projeto, List<Custo> custosExtras)
         {
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
@@ -18,13 +17,13 @@ namespace magal.Data.Repositories
                 {
                     try
                     {
-                        // 1. INSERIR O PROJETO (Apenas uma vez!)
+                        //INSERIR O PROJETO
                         using (var cmd = new MySqlCommand(@"INSERT INTO projeto (nome, id_cliente, id_usuario, data_criacao) 
                                                           VALUES (@nome, @idCliente, @idUsuario, @data);", conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@nome", projeto.Nome);
                             cmd.Parameters.AddWithValue("@idCliente", projeto.Cliente?.Id ?? (object)DBNull.Value);
-                            cmd.Parameters.AddWithValue("@idUsuario", 1); // Usuário padrão Aero Concepts
+                            cmd.Parameters.AddWithValue("@idUsuario", 1); 
                             cmd.Parameters.AddWithValue("@data", DateTime.Now);
 
                             cmd.ExecuteNonQuery();
@@ -34,7 +33,7 @@ namespace magal.Data.Repositories
                             projeto.Id = Convert.ToInt32(cmd.ExecuteScalar());
                         }
 
-                        // 2. INSERIR O ORÇAMENTO
+                        //INSERIR O ORÇAMENTO
                         using (var cmd = new MySqlCommand(@"INSERT INTO orcamento (id_projeto, custo_base, percentual_impostos, margem_percentual, valor_final) 
                                                           VALUES (@idProj, @custo, @imp, @marg, @final);", conn, transaction))
                         {
@@ -46,7 +45,7 @@ namespace magal.Data.Repositories
                             cmd.ExecuteNonQuery();
                         }
 
-                        // 3. INSERIR AS TAREFAS (Mão de Obra)
+                        //INSERIR AS TAREFAS (Mão de Obra)
                         foreach (var tarefa in projeto.Tarefas)
                         {
                             using (var cmd = new MySqlCommand(@"INSERT INTO tarefa (id_projeto, descricao, id_funcionario, horas_estimadas, status) 
@@ -61,7 +60,7 @@ namespace magal.Data.Repositories
                             }
                         }
 
-                        // 4. INSERIR OS CUSTOS EXTRAS (Equipamentos, Licenças, etc.)
+                        //INSERIR OS CUSTOS EXTRAS 
                         foreach (var custo in custosExtras)
                         {
                             using (var cmd = new MySqlCommand(@"INSERT INTO custo (id_projeto, nome, categoria, tipo, valor, unidade) 

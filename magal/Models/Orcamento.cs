@@ -54,27 +54,18 @@ namespace magal.Models
 
         public DateTime DataCriacao { get; set; } = DateTime.Now;
 
-        /// <summary>
-        /// Realiza o cálculo matemático completo da proposta Aero Concepts
-        /// </summary>
         public void CalcularTotal(List<Tarefa> tarefas, List<Custo> custosExtras)
         {
             if (tarefas == null || custosExtras == null) return;
 
-            // 1. Soma Mão de Obra + Soma de Equipamentos/Licenças/etc
             decimal totalMaoDeObra = tarefas.Sum(t => t.CustoReal);
             decimal totalCustosExtras = custosExtras.Sum(c => c.Valor);
-
             decimal novoCustoBase = totalMaoDeObra + totalCustosExtras;
-
-            // 2. Cálculos de Margem e Imposto
             decimal margem = novoCustoBase * (MargemPercentual / 100);
             decimal valorComMargem = novoCustoBase + margem;
             decimal valorImpostos = valorComMargem * (PercentualImpostos / 100);
             decimal novoValorFinal = valorComMargem + valorImpostos;
 
-            // 3. Atualiza propriedades com trava de segurança (evita StackOverflow)
-            if (_custoBase != novoCustoBase)
             {
                 _custoBase = novoCustoBase;
                 OnPropertyChanged(nameof(CustoBase));
@@ -86,7 +77,7 @@ namespace magal.Models
                 OnPropertyChanged(nameof(ValorFinal));
             }
         }
-        // Propriedades auxiliares para o PDF não precisar de fazer contas
+    
         public decimal ValorMargem => CustoBase * (MargemPercentual / 100);
         public decimal ValorImpostos => (CustoBase + ValorMargem) * (PercentualImpostos / 100);
     }

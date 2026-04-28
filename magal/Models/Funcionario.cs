@@ -16,9 +16,10 @@ namespace magal.Models
 
         public override string ToString()
         {
-            return Nome; 
+            return Nome;
         }
-        
+
+
         public string Iniciais
         {
             get

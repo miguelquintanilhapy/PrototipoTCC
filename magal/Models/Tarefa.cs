@@ -46,15 +46,12 @@ public class Tarefa : BaseModel
         }
     }
 
-    public decimal HorasReais { get; set; } // Mantido para controle futuro
+    public decimal HorasReais { get; set; } 
 
-    // Subtotal da linha no Orçamento
     public decimal CustoReal
     {
         get
         {
-            // Prioriza o custo do Cargo (conforme sua regra), 
-            // se não houver, usa o custo direto do funcionário.
             decimal valorHora = Funcionario?.Cargo?.CustoMedioHora ?? Funcionario?.CustoHora ?? 0;
             return HorasEstimadas * valorHora;
         }

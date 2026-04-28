@@ -15,7 +15,6 @@ namespace magal.Data.Repositories
             {
                 using (var conn = DbConnectionFactory.CreateConnection())
                 {
-                    // Query usando AS para padronizar os nomes que o C# vai ler
                     string query = @"SELECT f.id_funcionario AS Id, 
                         f.nome AS Nome, 
                         f.id_cargo AS CargoId, 

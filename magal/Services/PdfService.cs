@@ -26,7 +26,7 @@ namespace magal.Services
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
 
-                    // --- CABEÇALHO ---
+                    // CABEÇALHO
                     page.Header().Column(col =>
                     {
                         col.Item().Background("#1E3A5F").Padding(16).Row(row =>
@@ -65,7 +65,7 @@ namespace magal.Services
                         });
                     });
 
-                    // CONTEÚDO 
+                    // CONTEÚDO
                     page.Content().PaddingTop(16).Column(col =>
                     {
                         //TABELA DE MÃO DE OBRA
@@ -91,12 +91,11 @@ namespace magal.Services
                                 table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(item.Funcionario?.Nome ?? "N/D").FontSize(9);
                                 table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignCenter().Text($"{item.HorasEstimadas:0.#}h").FontSize(9);
                                 table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignRight().Text((item.Funcionario?.Cargo?.CustoMedioHora ?? 0).ToString("C2", _ptBR)).FontSize(9);
-                                // CORRIGIDO: Removido parâmetro de .Bold()
                                 table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignRight().Text(item.CustoReal.ToString("C2", _ptBR)).FontSize(9).Bold();
                             }
                         });
 
-                        //TABELA DE CUSTOS 
+                        //TABELA DE CUSTOS EXTRAS
                         if (custosExtras != null && custosExtras.Any())
                         {
                             col.Item().Text("2. EQUIPAMENTOS, LICENÇAS E CUSTOS ADICIONAIS")
@@ -119,13 +118,12 @@ namespace magal.Services
                                 {
                                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(custo.Nome).FontSize(9);
                                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(custo.Categoria).FontSize(9);
-                                
                                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignRight().Text(custo.Valor.ToString("C2", _ptBR)).FontSize(9).Bold();
                                 }
                             });
                         }
 
-                        // RESUMO FINANCEIRO 
+                        //RESUMO FINANCEIRO
                         col.Item().PaddingTop(30).Row(row =>
                         {
                             row.RelativeItem();
@@ -149,10 +147,7 @@ namespace magal.Services
 
                                             if (centralizar) container = container.AlignCenter();
                                             if (alinharDireita) container = container.AlignRight();
-
                                             var textoFormatado = container.Text(texto).FontSize(9).FontColor(fg);
-
-
                                             if (destaque) textoFormatado.Bold();
                                         }
 
@@ -170,7 +165,7 @@ namespace magal.Services
                         });
                     });
 
-                    // RODAPÉ
+                    //RODAPÉ
                     page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(row =>
                     {
                         row.RelativeItem().Text("Aero Concepts — Tecnologia em Engenharia Aeronáutica").FontSize(7).FontColor("#AAAAAA");

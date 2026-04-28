@@ -15,8 +15,6 @@ namespace magal.Data.Repositories
             {
                 using (var conn = DbConnectionFactory.CreateConnection())
                 {
-                    // Query atualizada com TODAS as colunas do seu DER
-                    // Usamos o AS para converter o snake_case do banco para o PascalCase do C#
                     string query = @"SELECT id_cliente AS Id, 
                                             nome AS Nome, 
                                             tipo AS Tipo, 
@@ -36,16 +34,13 @@ namespace magal.Data.Repositories
                             {
                                 var cliente = new Cliente();
 
-                                // Mapeamento seguro usando GetOrdinal
                                 cliente.Id = reader.GetInt32(reader.GetOrdinal("Id"));
                                 cliente.Nome = reader.IsDBNull(reader.GetOrdinal("Nome")) ? "" : reader.GetString(reader.GetOrdinal("Nome"));
                                 cliente.Tipo = reader.IsDBNull(reader.GetOrdinal("Tipo")) ? "" : reader.GetString(reader.GetOrdinal("Tipo"));
 
-                                // CPF/CNPJ (conforme seu novo Model)
                                 int colCpfCnpj = reader.GetOrdinal("CpfCnpj");
                                 cliente.CpfCnpj = reader.IsDBNull(colCpfCnpj) ? "" : reader.GetString(colCpfCnpj);
 
-                                // Novos campos do DER
                                 int colCidade = reader.GetOrdinal("Cidade");
                                 cliente.Cidade = reader.IsDBNull(colCidade) ? "" : reader.GetString(colCidade);
 

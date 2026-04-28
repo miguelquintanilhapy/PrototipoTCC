@@ -33,11 +33,10 @@ namespace magal.ViewModels
         };
 
         public bool BotaoAtivo => !_processando;
-
         public RelayCommand AdicionarTarefaCommand { get; }
         public RelayCommand DeletarTarefaCommand { get; } 
         public RelayCommand AdicionarCustoCommand { get; }
-        public RelayCommand DeletarCustoCommand { get; } 
+        public RelayCommand DeletarCustoCommand { get; }  
         public RelayCommand GerarPdfCommand { get; }
 
         public OrcamentoViewModel()
@@ -45,7 +44,6 @@ namespace magal.ViewModels
             NovoProjeto();
             CarregarDadosIniciais();
 
-           
             AdicionarTarefaCommand = new RelayCommand(_ => AdicionarTarefa());
             DeletarTarefaCommand = new RelayCommand(param => DeletarTarefa(param as Tarefa));
 

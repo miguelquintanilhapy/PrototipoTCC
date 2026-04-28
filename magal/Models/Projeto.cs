@@ -7,12 +7,9 @@ namespace magal.Models
     {
         public int Id { get; set; }
         public int UsuarioId { get; set; }
-        public int ClienteId { get; set; } // FK no banco
+        public int ClienteId { get; set; } 
 
-        // --- ESTA É A LINHA QUE ESTÁ FALTANDO ---
         public Cliente Cliente { get; set; }
-        // ----------------------------------------
-
         public string Nome { get; set; }
         public string Tipo { get; set; }
         public string Status { get; set; }

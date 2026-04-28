@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="magal.Views.OrcamentoView"
+<UserControl x:Class="magal.Views.OrcamentoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -172,9 +172,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ══════════════════════════════════════════════
-             HEADER
-        ══════════════════════════════════════════════ -->
+        <!-- HEADER -->
         <Grid Grid.Row="0" Margin="0,0,0,24">
 
             <!-- Título -->
@@ -221,13 +219,11 @@
             </Border>
         </Grid>
 
-        <!-- ══════════════════════════════════════════════
-             SEÇÕES
-        ══════════════════════════════════════════════ -->
+        <!--SEÇÕES-->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
 
-                <!-- ─── SEÇÃO 1: MÃO DE OBRA ─────────────────── -->
+                <!--SEÇÃO 1: MÃO DE OBRA  -->
                 <Border Background="White" CornerRadius="16" Margin="0,0,0,16"
         BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                     <StackPanel>
@@ -327,7 +323,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- ─── SEÇÃO 2: EQUIPAMENTOS ─────────────────── -->
+                <!--  SEÇÃO 2: EQUIPAMENTOS  -->
                 <Border Background="White" CornerRadius="16" Margin="0,0,0,8"
         BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                     <StackPanel>
@@ -423,9 +419,9 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- ══════════════════════════════════════════════
+        <!-- 
              RODAPÉ — TOTAIS E FINALIZAR
-        ══════════════════════════════════════════════ -->
+         -->
         <Grid Grid.Row="2" Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

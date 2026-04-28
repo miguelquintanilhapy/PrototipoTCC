@@ -1,4 +1,4 @@
-﻿using QuestPDF.Fluent;
+using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using magal.Models;
@@ -140,7 +140,7 @@ namespace magal.Services
                                         var bg = destaque ? "#1E3A5F" : "#FFFFFF";
                                         var fg = destaque ? "#FFFFFF" : "#333333";
 
-                                        // Função interna para evitar repetição e erros de tipo
+                                         
                                         void CriarCelula(string texto, bool centralizar = false, bool alinharDireita = false)
                                         {
                                             var container = t.Cell().Background(bg).Padding(6);

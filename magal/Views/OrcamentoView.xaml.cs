@@ -1,4 +1,4 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 using magal.ViewModels;
 
 namespace magal.Views
@@ -7,8 +7,8 @@ namespace magal.Views
     {
         public OrcamentoView()
         {
-            InitializeComponent(); // Verifique se tem o ; aqui
-            this.DataContext = new OrcamentoViewModel(); // E aqui
+            InitializeComponent(); 
+            this.DataContext = new OrcamentoViewModel();
         }
     }
 }

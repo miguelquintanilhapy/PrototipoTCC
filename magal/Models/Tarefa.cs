@@ -81,6 +81,7 @@ namespace magal.Models
         {
             get => _horas_reais;
             set { if (_horas_reais == value) return; _horas_reais = value; OnPropertyChanged(); }
+        }
         
         public decimal custo_real
         {

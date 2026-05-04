@@ -81,14 +81,12 @@ namespace magal.Models
         {
             get => _horas_reais;
             set { if (_horas_reais == value) return; _horas_reais = value; OnPropertyChanged(); }
-        }
-
-        // Propriedade calculada: não precisa de variável privada, pois depende de outras
+        
         public decimal custo_real
         {
             get
             {
-                // Se o funcionário for nulo, retorna 0 imediatamente sem processar nada
+
                 if (Funcionario == null) return 0;
 
                 decimal valorHora = Funcionario.custo_hora > 0

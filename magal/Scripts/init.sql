@@ -145,3 +145,19 @@ INSERT IGNORE INTO funcionario (id_funcionario, id_cargo, nome, custo_hora, tipo
 
 INSERT IGNORE INTO usuario (id_usuario, nome, email, senha, status) VALUES 
 (1, 'Admin', 'admin@aeroconcepts.com', 'admin123', 'Ativo');
+
+-- --- INSERÇÃO DE CLIENTES ATUALIZADOS ---
+INSERT IGNORE INTO cliente (nome, tipo, cidade, estado, contato) VALUES 
+('Funcate', 'Jurídica', 'São José dos Campos', 'SP', 'Contato Comercial'),
+('Voith', 'Jurídica', 'São Paulo', 'SP', 'Departamento de Projetos'),
+('Arauco', 'Jurídica', 'Curitiba', 'PR', 'Suprimentos'),
+('EESC', 'Institucional', 'São Carlos', 'SP', 'Diretoria Técnica'),
+('International Paper', 'Jurídica', 'Mogi Guaçu', 'SP', 'Engenharia'),
+('Suzano', 'Jurídica', 'Salvador', 'BA', 'Gestão de Contratos'),
+('Klabin', 'Jurídica', 'Telêmaco Borba', 'PR', 'Planejamento'),
+('FAB', 'Governo', 'Brasília', 'DF', 'Comando da Aeronáutica'),
+('IAE', 'Governo', 'São José dos Campos', 'SP', 'Diretoria IAE'),
+('Birla Carbon', 'Jurídica', 'Cubatão', 'SP', 'Manutenção Industrial'),
+('Rhodia', 'Jurídica', 'Paulínia', 'SP', 'Compras Técnicas'),
+('Raizen', 'Jurídica', 'Piracicaba', 'SP', 'Projetos Estratégicos'),
+('DCTA', 'Governo', 'São José dos Campos', 'SP', 'Secretaria de Tecnologia');

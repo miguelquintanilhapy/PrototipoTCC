@@ -15,7 +15,7 @@ namespace magal.Data.Repositories
             {
                 using (var conn = DbConnectionFactory.CreateConnection())
                 {
-                    // Query limpa: busca exatamente os nomes das colunas do banco
+                    // Query : busca os nomes das colunas do banco
                     string query = @"SELECT id_cliente, 
                                             nome, 
                                             tipo, 
@@ -33,7 +33,7 @@ namespace magal.Data.Repositories
                         {
                             while (reader.Read())
                             {
-                                // Mapeando do banco (snake_case) para o Model (snake_case)
+                                // Mapeando do banco
                                 var cliente = new Cliente
                                 {
                                     id_cliente = reader.GetInt32(reader.GetOrdinal("id_cliente")),

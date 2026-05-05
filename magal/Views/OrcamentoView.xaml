@@ -210,9 +210,14 @@
                                    Foreground="{StaticResource AeroTextHint}"
                                    Margin="0,0,0,5"/>
                         <ComboBox ItemsSource="{Binding Clientes}" 
-          SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay}"
-           DisplayMemberPath="nome" 
-          Width="250"/>
+          SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+          DisplayMemberPath="nome" 
+          Width="250"
+          FontSize="12" 
+          Height="28"
+          VerticalContentAlignment="Center"
+          BorderThickness="0"
+          Background="#F8FAFC"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -285,12 +290,16 @@
                FontWeight="Bold"  
                Foreground="{StaticResource AeroTextHint}" 
                Margin="0,0,0,2"/>
-    
-    <ComboBox ItemsSource="{Binding DataContext.Funcionarios, RelativeSource={RelativeSource AncestorType=UserControl}}"
-              SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-              DisplayMemberPath="nome" 
-              />
-</StackPanel>
+
+                                                <ComboBox ItemsSource="{Binding DataContext.Funcionarios, RelativeSource={RelativeSource AncestorType=UserControl}}"
+          SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+          DisplayMemberPath="nome"
+          FontSize="12" 
+          Height="28"
+          VerticalContentAlignment="Center"
+          BorderThickness="0"
+          Background="#F8FAFC"/>
+                                            </StackPanel>
 
                                             <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
                                                 <TextBlock Text="SUBTOTAL" FontSize="9" FontWeight="Bold" 
@@ -377,7 +386,6 @@
 
                                                 <ComboBox ItemsSource="{Binding DataContext.CategoriasCustos, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
               SelectedItem="{Binding categoria, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-              Style="{StaticResource CleanCombo}"
               FontSize="12" 
               Height="28"
               VerticalContentAlignment="Center"

@@ -69,7 +69,7 @@ namespace magal.ViewModels
                 Orcamento = new Orcamento { margem_percentual = 20, percentual_impostos = 15 },
                 Tarefas = new ObservableCollection<Tarefa>(),
                 id_usuario = 1,
-                nome = "Novo Orçamento Aero"
+                nome = ""
             };
 
             CustosExtras.Clear();
@@ -97,7 +97,7 @@ namespace magal.ViewModels
 
         private void AdicionarTarefa()
         {
-            var novaTarefa = new Tarefa { descricao = "Nova Atividade Técnica", horas_estimadas = 0 };
+            var novaTarefa = new Tarefa { descricao = "", horas_estimadas = 0 };
 
             novaTarefa.PropertyChanged += (s, e) => {
                 if (e.PropertyName == nameof(Tarefa.Funcionario) ||
@@ -122,7 +122,7 @@ namespace magal.ViewModels
 
         private void AdicionarCustoExtra()
         {
-            var novoCusto = new Custo { nome = "Novo Item", valor = 0, categoria = "Equipamentos", tipo = "Direto" };
+            var novoCusto = new Custo { nome = "", valor = 0, categoria = "Equipamentos", tipo = "Direto" };
 
             novoCusto.PropertyChanged += (s, e) => {
                 if (e.PropertyName == nameof(Custo.valor)) AtualizarFinanceiro();

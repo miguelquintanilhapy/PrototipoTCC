@@ -32,7 +32,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bd" Background="{TemplateBinding Background}"
-                            CornerRadius="8" Padding="14,7">
+                                CornerRadius="8" Padding="14,7">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -56,7 +56,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bd" Background="{TemplateBinding Background}"
-                        CornerRadius="8" Padding="14,7">
+                                CornerRadius="8" Padding="14,7">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -118,22 +118,22 @@
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
                             <Border x:Name="bg" Background="{TemplateBinding Background}" 
-                                CornerRadius="8" BorderThickness="{TemplateBinding BorderThickness}" 
-                                BorderBrush="{TemplateBinding BorderBrush}"/>
+                                    CornerRadius="8" BorderThickness="{TemplateBinding BorderThickness}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}"/>
                             <ContentPresenter x:Name="ContentSite" 
-                  IsHitTestVisible="False" 
-                  Content="{TemplateBinding SelectionBoxItem}" 
-                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
-                  ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" Margin="10,0,30,0" 
-                  VerticalAlignment="Center"/>
+                                              IsHitTestVisible="False" 
+                                              Content="{TemplateBinding SelectionBoxItem}" 
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
+                                              ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" Margin="10,0,30,0" 
+                                              VerticalAlignment="Center"/>
                             <ToggleButton Background="Transparent" BorderThickness="0" 
-                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"/>
                             <Path Data="M0,0 L4,4 L8,0" Stroke="{StaticResource AeroTextMuted}" 
-                              StrokeThickness="2" HorizontalAlignment="Right" 
-                              Margin="0,0,12,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                                  StrokeThickness="2" HorizontalAlignment="Right" 
+                                  Margin="0,0,12,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
                             <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True">
                                 <Border Background="White" CornerRadius="8" BorderThickness="1" 
-                                    BorderBrush="{StaticResource AeroBorder}" MinWidth="{TemplateBinding ActualWidth}">
+                                        BorderBrush="{StaticResource AeroBorder}" MinWidth="{TemplateBinding ActualWidth}">
                                     <ItemsPresenter/>
                                 </Border>
                             </Popup>
@@ -163,7 +163,6 @@
         </Style>
 
         <Style x:Key="CostCard" TargetType="Border" BasedOn="{StaticResource TaskCard}"/>
-
     </UserControl.Resources>
 
     <Grid Margin="32,28">
@@ -179,8 +178,8 @@
             </StackPanel>
 
             <Border Background="White" CornerRadius="14" Padding="18,14"
-     HorizontalAlignment="Right"
-     BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                    HorizontalAlignment="Right"
+                    BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200"/>
@@ -190,10 +189,10 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Margin="0,0,15,0">
-                        <TextBlock Text="NOME DO PROJETO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5" />
+                        <TextBlock Text="NOME DO PROJETO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4" />
                         <TextBox Text="{Binding ProjetoAtual.nome, UpdateSourceTrigger=PropertyChanged}" 
-                 ToolTip="{Binding ProjetoAtual.nome}"
-                 FontWeight="SemiBold" Height="28" Padding="10,0" VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                                 ToolTip="{Binding ProjetoAtual.nome}"
+                                 FontWeight="SemiBold" Height="28" Padding="10,0" VerticalContentAlignment="Center" BorderThickness="1.5" BorderBrush="{StaticResource AeroBorder}">
                             <TextBox.Resources>
                                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
                                 <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
@@ -202,67 +201,65 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Margin="0,0,15,0">
-                        <TextBlock Text="CLIENTE" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
+                        <TextBlock Text="CLIENTE" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
                         <ComboBox ItemsSource="{Binding Clientes}" 
-                  SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                  ToolTip="{Binding ProjetoAtual.Cliente.nome}"
-                   Cursor="Hand"
-                  DisplayMemberPath="nome" 
-                  FontSize="12" Height="28" VerticalContentAlignment="Center"
-                  BorderThickness="0" Background="#F8FAFC"/>
+                                  SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                  ToolTip="{Binding ProjetoAtual.Cliente.nome}"
+                                  Cursor="Hand"
+                                  DisplayMemberPath="nome" 
+                                  FontSize="12" Height="28" VerticalContentAlignment="Center"
+                                  BorderThickness="0" Background="#F8FAFC"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Margin="0,0,15,0">
-                        <TextBlock Text="TIPO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
+                        <TextBlock Text="TIPO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
                         <ComboBox ItemsSource="{Binding OpcoesTipo}" 
-                  SelectedItem="{Binding ProjetoAtual.tipo, Mode=TwoWay}"
-                  ToolTip="{Binding ProjetoAtual.tipo}"
-                   Cursor="Hand"
-                  FontSize="12" Height="28" VerticalContentAlignment="Center"
-                  BorderThickness="0" Background="#F8FAFC"/>
+                                  SelectedItem="{Binding ProjetoAtual.tipo, Mode=TwoWay}"
+                                  ToolTip="{Binding ProjetoAtual.tipo}"
+                                  Cursor="Hand"
+                                  FontSize="12" Height="28" VerticalContentAlignment="Center"
+                                  BorderThickness="0" Background="#F8FAFC"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="3">
-                        <TextBlock Text="STATUS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
+                        <TextBlock Text="STATUS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
                         <ComboBox ItemsSource="{Binding OpcoesStatus}" 
-                  SelectedItem="{Binding ProjetoAtual.status, Mode=TwoWay}"
-                  ToolTip="{Binding ProjetoAtual.status}"
-                  Cursor="Hand"
-                  FontSize="12" Height="28" VerticalContentAlignment="Center"
-                  BorderThickness="0" Background="#F8FAFC"/>
+                                  SelectedItem="{Binding ProjetoAtual.status, Mode=TwoWay}"
+                                  ToolTip="{Binding ProjetoAtual.status}"
+                                  Cursor="Hand"
+                                  FontSize="12" Height="28" VerticalContentAlignment="Center"
+                                  BorderThickness="0" Background="#F8FAFC"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
+
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-
                 <Border Background="White" CornerRadius="16" Margin="0,0,0,16"
-        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                     <StackPanel>
-
                         <Grid Margin="20,16">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <Border Background="{StaticResource AeroPrimary}" CornerRadius="6"
-                        Width="24" Height="24" Margin="0,0,10,0">
+                                        Width="24" Height="24" Margin="0,0,10,0">
                                     <TextBlock Text="1" Foreground="White" FontSize="11"
-                               FontWeight="Bold" HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
+                                               FontWeight="Bold" HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Text="COMPOSIÇÃO DE MÃO DE OBRA" FontSize="11"
-                           FontWeight="Bold" Foreground="{StaticResource AeroTextMuted}"
-                           VerticalAlignment="Center"/>
+                                           FontWeight="Bold" Foreground="{StaticResource AeroTextDark}"
+                                           VerticalAlignment="Center"/>
                             </StackPanel>
                             <Button Content="+ ADICIONAR ETAPA"
-                    Command="{Binding AdicionarTarefaCommand}"
-                    Style="{StaticResource PrimaryBtn}"
-                    HorizontalAlignment="Right"/>
+                                    Command="{Binding AdicionarTarefaCommand}"
+                                    Width="140"
+                                    Style="{StaticResource PrimaryBtn}"
+                                    HorizontalAlignment="Right"/>
                         </Grid>
 
                         <Border Height="1" Background="#F1F5F9"/>
-
-                        <ItemsControl ItemsSource="{Binding ProjetoAtual.Tarefas}"
-                      Margin="20,14,20,4">
+                        <ItemsControl ItemsSource="{Binding ProjetoAtual.Tarefas}" Margin="20,14,20,4">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Style="{StaticResource TaskCard}" Margin="0,0,0,10">
@@ -271,172 +268,132 @@
                                                 <ColumnDefinition Width="80"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="200"/>
-                                                <ColumnDefinition Width="110"/>
-                                                <ColumnDefinition Width="40"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="5,0">
-                                                <TextBlock Text="HORAS" FontSize="9" FontWeight="Bold" 
-               Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,2"/>
-                                                <TextBox Text="{Binding horas_estimadas, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}" 
-             FontSize="16" FontWeight="Black" Foreground="{StaticResource AeroPrimary}"
-                                                         PreviewTextInput="ValidarEntradaSemNegativo"
-             Background="#F8FAFC" BorderThickness="0" HorizontalContentAlignment="Center"/>
-                                            </StackPanel>
-
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
-                                                <TextBlock Text="DESCRIÇÃO DA ETAPA" FontSize="9" FontWeight="Bold" 
-                                           Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,2"/>
-                                                <TextBox Text="{Binding descricao, UpdateSourceTrigger=PropertyChanged}"
-                                         FontSize="14" FontWeight="SemiBold"
-                                         Foreground="{StaticResource AeroTextDark}"
-                                         Background="Transparent" BorderThickness="0"
-                                         Padding="0,2"/>
-                                                <Border Height="1" Background="{StaticResource BorderLight}" Opacity="0.5"/>
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
-                                                <TextBlock Text="RESPONSÁVEL" 
-               FontSize="9" 
-               FontWeight="Bold"  
-               Foreground="{StaticResource AeroTextHint}" 
-               Margin="0,0,0,2"/>
-
-                                                <ComboBox ItemsSource="{Binding DataContext.Funcionarios, RelativeSource={RelativeSource AncestorType=UserControl}}"
-              SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-              DisplayMemberPath="nome"
-              SelectedValuePath="id_funcionario"
-              FontSize="12" 
-              Height="28"
-              VerticalContentAlignment="Center"
-              BorderThickness="0"
-              Background="#F8FAFC"/>
-                                            </StackPanel>
-
-                                            <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
-                                                <TextBlock Text="SUBTOTAL" FontSize="9" FontWeight="Bold" 
-                                           Foreground="{StaticResource AeroTextHint}" HorizontalAlignment="Right"/>
-                                                <TextBlock Text="{Binding custo_real, StringFormat=C}"
-                                            FontSize="14" FontWeight="Bold"
-                                            Foreground="{StaticResource AeroTextDark}"/>
-                                            </StackPanel>
-
-                                            <Button Grid.Column="4" Content="✕"
-                                    Command="{Binding DataContext.DeletarTarefaCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}"
-                                    Style="{StaticResource IconDeleteBtn}"
-                                    VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <Border Background="#F8FAFC" BorderThickness="0,1,0,0"
-                BorderBrush="#F1F5F9" CornerRadius="0,0,16,16"
-                Padding="20,12">
-                            <Grid>
-                                <TextBlock Text="{Binding ProjetoAtual.Tarefas.Count, StringFormat='{}{0} etapas ativas'}"
-                           FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
-
-                    </StackPanel>
-                </Border>
-
-                <Border Background="White" CornerRadius="16" Margin="0,0,0,8"
-        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
-                    <StackPanel>
-
-                        <Grid Margin="20,16">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Border Background="#64748B" CornerRadius="6"
-                        Width="24" Height="24" Margin="0,0,10,0">
-                                    <TextBlock Text="2" Foreground="White" FontSize="11"
-                               FontWeight="Bold" HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
-                                </Border>
-                                <TextBlock Text="EQUIPAMENTOS E INSUMOS" FontSize="11"
-                           FontWeight="Bold" Foreground="{StaticResource AeroTextMuted}"
-                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                            <Button Content="+ CUSTO EXTRA"
-                    Command="{Binding AdicionarCustoCommand}"
-                    Style="{StaticResource SecondaryBtn}"
-                    HorizontalAlignment="Right"/>
-                        </Grid>
-
-                        <Border Height="1" Background="#F1F5F9"/>
-
-                        <ItemsControl ItemsSource="{Binding CustosExtras}"
-                      Margin="20,14,20,4">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource CostCard}" Margin="0,0,0,10">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="180"/>
                                                 <ColumnDefinition Width="140"/>
                                                 <ColumnDefinition Width="40"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="5,0,15,0">
-                                                <TextBlock Text="DESCRIÇÃO DO CUSTO" FontSize="9" FontWeight="Bold" 
-                                           Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,2"/>
-                                                <TextBox Text="{Binding nome, UpdateSourceTrigger=PropertyChanged}"
-                                         FontSize="14" FontWeight="SemiBold"
-                                         Foreground="{StaticResource AeroTextDark}"
-                                         Background="Transparent" BorderThickness="0"
-                                         Padding="0,2"/>
-                                                <Border Height="1" Background="{StaticResource BorderLight}" Opacity="0.5"/>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="5,0">
+                                                <TextBlock Text="HORAS" FontSize="10" FontWeight="Bold" 
+                   Foreground="{StaticResource AeroTextDark}" Margin="0,0,33,4" 
+                   HorizontalAlignment="Center"/>
+                                                <TextBox Text="{Binding horas_estimadas, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}" 
+                 FontSize="18" FontWeight="Black" Foreground="{StaticResource AeroPrimary}"
+                 PreviewTextInput="ValidarEntradaSemNegativo" Background="#F8FAFC" 
+                 BorderThickness="1.8" BorderBrush="{StaticResource AeroBorder}" 
+                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                 Height="40"/>
                                             </StackPanel>
 
-                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
-                                                <TextBlock Text="CATEGORIA" FontSize="9" FontWeight="Bold" 
-               Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,2"/>
-
-                                                <ComboBox ItemsSource="{Binding DataContext.CategoriasCustos, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-              SelectedItem="{Binding categoria, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-              FontSize="12" 
-              Height="28"
-              VerticalContentAlignment="Center"
-              BorderThickness="0"
-              Background="#F8FAFC">
-                                                </ComboBox>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="10,0">
+                                                <TextBlock Text="DESCRIÇÃO DA ETAPA" FontSize="10" FontWeight="Bold" 
+                   Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
+                                                <TextBox Text="{Binding descricao, UpdateSourceTrigger=PropertyChanged}"
+                 FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource AeroTextDark}"
+                 Background="Transparent" BorderThickness="1.8" BorderBrush="{StaticResource AeroBorder}" 
+                 Padding="8,0" Height="40" VerticalContentAlignment="Center"/>
                                             </StackPanel>
 
-                                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
-                                                <TextBlock Text="VALOR (R$)" FontSize="9" FontWeight="Bold" 
-                                           Foreground="{StaticResource AeroTextHint}" HorizontalAlignment="Right" Margin="0,0,0,2"/>
-                                                <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
-                                         FontSize="15" FontWeight="Bold" 
-                                         Foreground="{StaticResource AeroTextDark}"
-                                         Background="Transparent" BorderThickness="0"
-                                         HorizontalContentAlignment="Right" Padding="0,2"/>
-                                                <Border Height="1" Background="{StaticResource BorderLight}" HorizontalAlignment="Right" Width="100" Opacity="0.5"/>
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Bottom" Margin="10,0">
+                                                <TextBlock Text="RESPONSÁVEL" FontSize="10" FontWeight="Bold" 
+                   Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
+                                                <ComboBox ItemsSource="{Binding DataContext.Funcionarios, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                  SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                  DisplayMemberPath="nome" FontSize="12" Height="40" Cursor="Hand" 
+                  VerticalContentAlignment="Center" BorderThickness="0" 
+                  BorderBrush="{StaticResource AeroBorder}" Background="#F8FAFC"/>
                                             </StackPanel>
 
-                                            <Button Grid.Column="3" Content="✕"
-                                    Command="{Binding DataContext.DeletarCustoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}"
-                                    Style="{StaticResource IconDeleteBtn}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Right"/>
+                                            <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0,10,0">
+                                                <TextBlock Text="SUBTOTAL" FontSize="10" FontWeight="Bold" 
+                   Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4" HorizontalAlignment="Right"/>
+                                                <Border Height="40" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding custo_real, StringFormat=C}" 
+                       FontSize="16" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" 
+                       VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <Button Grid.Column="4" Content="✕" 
+            Command="{Binding DataContext.DeletarTarefaCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            CommandParameter="{Binding}"
+            Style="{StaticResource IconDeleteBtn}" 
+            VerticalAlignment="Bottom" Height="40" Margin="0,0,0,0"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <Border Background="#F8FAFC" BorderThickness="0,1,0,0"
-                BorderBrush="#F1F5F9" CornerRadius="0,0,16,16"
-                Padding="20,12">
-                            <Grid>
-                                <TextBlock Text="{Binding CustosExtras.Count, StringFormat='{}{0} itens de custo'}"
-                           FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
-                            </Grid>
+                        <Border Background="#F8FAFC" BorderThickness="0,1,0,0" BorderBrush="#F1F5F9" CornerRadius="0,0,16,16" Padding="20,12">
+                            <TextBlock Text="{Binding ProjetoAtual.Tarefas.Count, StringFormat='{}{0} etapas ativas'}" FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
                         </Border>
 
+                        <Border Background="White" CornerRadius="16" Margin="0,8,0,8" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                            <StackPanel>
+                                <Grid Margin="20,16">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Background="#64748B" CornerRadius="6" Width="24" Height="24" Margin="0,0,10,0">
+                                            <TextBlock Text="2" Foreground="White" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="EQUIPAMENTOS E INSUMOS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Button Content="+ ADICIONAR CUSTO" Command="{Binding AdicionarCustoCommand}" Style="{StaticResource PrimaryBtn}" Width="140" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <Border Height="1" Background="#F1F5F9"/>
+
+                                <ItemsControl ItemsSource="{Binding CustosExtras}" Margin="20,14,20,14">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource CostCard}" Margin="0,0,0,10">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="80"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="200"/>
+                                                        <ColumnDefinition Width="140"/>
+                                                        <ColumnDefinition Width="40"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,15,0">
+                                                        <TextBlock Text="DESCRIÇÃO DO CUSTO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,2"/>
+                                                        <TextBox Text="{Binding nome, UpdateSourceTrigger=PropertyChanged}"
+                                         FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource AeroTextDark}"
+                                         Background="Transparent" BorderThickness="0" Padding="0,2"/>
+                                                        <Border Height="1" Background="{StaticResource BorderLight}" Opacity="0.5"/>
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
+                                                        <TextBlock Text="CATEGORIA" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,2"/>
+                                                        <ComboBox ItemsSource="{Binding DataContext.CategoriasCustos, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          SelectedItem="{Binding categoria, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          FontSize="12" Height="28" VerticalContentAlignment="Center"
+                                          Cursor="Hand" BorderThickness="0" Background="#F8FAFC"/>
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="10,0">
+                                                        <TextBlock Text="VALOR (R$)" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" HorizontalAlignment="Right" Margin="0,0,0,2"/>
+                                                        <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
+                                         FontSize="15" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}"
+                                         Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Right" Padding="0,2"/>
+                                                        <Border Height="1" Background="{StaticResource BorderLight}" HorizontalAlignment="Right" Width="100" Opacity="0.5"/>
+                                                    </StackPanel>
+
+                                                    <Button Grid.Column="4" Content="✕"
+                                    Command="{Binding DataContext.DeletarCustoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    Style="{StaticResource IconDeleteBtn}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#F8FAFC" BorderThickness="0,1,0,0" BorderBrush="#F1F5F9" CornerRadius="0,0,16,16" Padding="20,12">
+                            <TextBlock Text="{Binding CustosExtras.Count, StringFormat='{}{0} itens de custo'}"
+                                       FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
+                        </Border>
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -448,60 +405,82 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom">
 
-                <Border Background="White" CornerRadius="10" Padding="14,10"
-            Margin="0,0,10,0" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="LUCRO" FontSize="9" FontWeight="Bold"
-                       Foreground="{StaticResource AeroTextHint}"
-                       VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <TextBox Text="{Binding ProjetoAtual.Orcamento.margem_percentual, 
-                     
-                            UpdateSourceTrigger=PropertyChanged, 
-                               StringFormat='{}{0:0.##}'}"
-                            PreviewTextInput="ValidarEntradaSemNegativo"  
-                     Width="40" BorderThickness="0" FontWeight="Bold"
-                     FontSize="14" HorizontalContentAlignment="Center"
-                     Background="Transparent" Padding="0"/>
-                        <TextBlock Text="%" Foreground="{StaticResource AeroTextMuted}"
-                       VerticalAlignment="Center" FontWeight="Bold"/>
-                    </StackPanel>
-                </Border>
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="LUCRO" 
+                   FontSize="10" 
+                   FontWeight="Bold" 
+                   Foreground="{StaticResource AeroTextDark}" 
+                   Margin="0,0,0,3" />
+                    <Grid>
+                        <TextBox Text="{Binding ProjetoAtual.Orcamento.margem_percentual, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}"
+                     PreviewTextInput="ValidarEntradaSemNegativo"
+                     FontWeight="Bold" 
+                     Height="48" 
+                     FontSize="15"                 
+                     Padding="25,0,30,0" 
+                     MinWidth="100"
+                     VerticalContentAlignment="Center" 
+                     BorderThickness="1.5" 
+                     BorderBrush="{StaticResource AeroBorder}">
+                            <TextBox.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                            </TextBox.Resources>
+                        </TextBox>
 
-                <Border Background="White" CornerRadius="10" Padding="14,10"
-            BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBox Text="{Binding ProjetoAtual.Orcamento.percentual_impostos, 
-                        UpdateSourceTrigger=PropertyChanged, 
-                        StringFormat='{}{0:0.##}'}"
-         PreviewTextInput="ValidarEntradaSemNegativo"
-         Width="40" 
-         BorderThickness="0" 
-         FontWeight="Bold"
-         FontSize="14" 
-         HorizontalContentAlignment="Center"
-         Background="Transparent" 
-         Padding="0"/>
-                        <TextBlock Text="%" Foreground="{StaticResource AeroTextMuted}"
-                       VerticalAlignment="Center" FontWeight="Bold"/>
-                    </StackPanel>
-                </Border>
+                        <TextBlock Text="%" 
+                       Foreground="{StaticResource AeroTextDark}" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Right" 
+                       FontWeight="Bold"
+                       FontSize="15"                 
+                       Margin="0,0,20,0"
+                       IsHitTestVisible="False"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Text="IMPOSTOS" 
+                   FontSize="10" 
+                   FontWeight="Bold" 
+                   Foreground="{StaticResource AeroTextDark}" 
+                   Margin="0,0,0,3" />
+                    <Grid>
+                        <TextBox Text="{Binding ProjetoAtual.Orcamento.percentual_impostos, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}"
+                     PreviewTextInput="ValidarEntradaSemNegativo"
+                     FontWeight="Bold" 
+                     Height="48" 
+                     FontSize="15"                 
+                     Padding="25,0,10,0" 
+                     MinWidth="100"
+                     VerticalContentAlignment="Center" 
+                     BorderThickness="1.5" 
+                     BorderBrush="{StaticResource AeroBorder}">
+                            <TextBox.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                            </TextBox.Resources>
+                        </TextBox>
+
+                        <TextBlock Text="%" 
+                       Foreground="{StaticResource AeroTextDark}" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Right" 
+                       FontWeight="Bold"
+                       FontSize="15"                 
+                       Margin="0,0,20,0"
+                       IsHitTestVisible="False"/>
+                    </Grid>
+                </StackPanel>
 
             </StackPanel>
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-
-
-
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                 <StackPanel VerticalAlignment="Center" Margin="0,0,28,0">
-                    <TextBlock Text="TOTAL DA PROPOSTA" FontSize="10" FontWeight="Bold"
-                               Foreground="{StaticResource AeroTextHint}"
-                               HorizontalAlignment="Right" Margin="0,0,0,2"/>
-                    <TextBlock Text="{Binding ProjetoAtual.Orcamento.valor_final, StringFormat=C}"
-                               FontSize="36" FontWeight="Black"
-                               Foreground="{StaticResource AeroPrimary}"
-                               HorizontalAlignment="Right"/>
+                    <TextBlock Text="TOTAL DA PROPOSTA" FontSize="10" FontWeight="Bold"  Foreground="{StaticResource AeroTextDark}" HorizontalAlignment="Right" Margin="0,0,0,2"/>
+                    <TextBlock Text="{Binding ProjetoAtual.Orcamento.valor_final, StringFormat=C}" FontSize="36" FontWeight="Black" Foreground="{StaticResource AeroPrimary}" HorizontalAlignment="Right"/>
                 </StackPanel>
 
                 <Button Content="FINALIZAR PROPOSTA"
@@ -509,9 +488,7 @@
                         IsEnabled="{Binding BotaoAtivo}"
                         Style="{StaticResource PrimaryBtn}"
                         Width="240" Height="54" FontSize="14"/>
-
             </StackPanel>
         </Grid>
-
     </Grid>
 </UserControl>

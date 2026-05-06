@@ -49,15 +49,13 @@ namespace magal.Models
 
                 _funcionario = value;
 
-                // FIX: Sincroniza o ID usando o campo privado (_id_funcionario)
-                // Isso evita disparar o set da propriedade id_funcionario, quebrando o loop.
                 if (_funcionario != null)
                 {
                     _id_funcionario = _funcionario.id_funcionario;
                 }
 
                 OnPropertyChanged();
-                // Notificamos a UI que o ID e o Custo Real mudaram
+                // Notifica a UI que o ID e o Custo Real mudaram
                 OnPropertyChanged(nameof(id_funcionario));
                 OnPropertyChanged(nameof(custo_real));
             }

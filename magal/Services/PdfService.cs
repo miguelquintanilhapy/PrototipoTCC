@@ -55,13 +55,11 @@ namespace magal.Services
                             row.RelativeItem().Column(c =>
                             {
                                 c.Item().Text("PROJETO").FontSize(7).FontColor("#999999").Bold();
-                                // Alterado para .nome (minúsculo)
                                 c.Item().Text(projeto.nome).FontSize(12).Bold().FontColor("#1E3A5F");
                             });
                             row.ConstantItem(130).Column(c =>
                             {
                                 c.Item().Text("DATA DE EMISSÃO").FontSize(7).FontColor("#999999").Bold();
-                                // Alterado para data_criacao (minúsculo)
                                 c.Item().Text(projeto.Orcamento.data_criacao.ToString("dd/MM/yyyy"))
                                     .FontSize(12).Bold().FontColor("#1E3A5F");
                             });
@@ -90,7 +88,6 @@ namespace magal.Services
 
                             foreach (var item in projeto.Tarefas)
                             {
-                                // Alterado para .descricao, .nome, .horas_estimadas, .custo_real
                                 table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(item.descricao).FontSize(9);
                                 table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(item.Funcionario?.nome ?? "N/D").FontSize(9);
                                 table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignCenter().Text($"{item.horas_estimadas:0.#}h").FontSize(9);
@@ -162,8 +159,6 @@ namespace magal.Services
                                         CriarCelula(pct, centralizar: true);
                                         CriarCelula(valor, alinharDireita: true);
                                     }
-
-                                    // Adaptado para os nomes minúsculos do Orcamento
                                     Linha("Custo Total Base", "", projeto.Orcamento.custo_base.ToString("C2", _ptBR));
                                     Linha("Impostos", $"{projeto.Orcamento.percentual_impostos:0.#}%", projeto.Orcamento.valor_impostos.ToString("C2", _ptBR));
                                     Linha("Margem de Lucro", $"{projeto.Orcamento.margem_percentual:0.#}%", projeto.Orcamento.valor_margem.ToString("C2", _ptBR));

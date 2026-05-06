@@ -15,7 +15,7 @@ namespace magal.ViewModels
     {
         private Projeto _projetoAtual;
         private bool _processando = false;
-        private bool _isUpdating = false; // TRAVA CRÍTICA: Impede o StackOverflow (loop infinito)
+        private bool _isUpdating = false;
 
         public Projeto ProjetoAtual
         {
@@ -31,6 +31,16 @@ namespace magal.ViewModels
         {
             "Equipamentos", "Licenças de Software", "Energia Elétrica",
             "Transporte/Deslocamento", "Manutenção", "Aluguel/Estrutura", "EPIs/Ferramentas"
+        };
+
+        public List<string> OpcoesStatus { get; } = new List<string>
+        {
+            "Rascunho", "Orçado", "Aprovado", "Executando", "Concluído", "Cancelado"
+        };
+
+        public List<string> OpcoesTipo { get; } = new List<string>
+        {
+            "Serviço", "Produto", "Consultoria", "P&D"
         };
 
         public bool BotaoAtivo => !_processando;
@@ -63,10 +73,6 @@ namespace magal.ViewModels
             };
 
             CustosExtras.Clear();
-
-            // CORREÇÃO: Removido o PropertyChanged do Orcamento aqui, 
-            // pois ele gerava loop infinito ao chamar o CalcularTotal.
-
             OnPropertyChanged(nameof(ProjetoAtual));
         }
 
@@ -78,7 +84,6 @@ namespace magal.ViewModels
                 var listaFuncionarios = new FuncionarioRepository().ListarTodos();
 
                 Clientes.Clear();
-
                 foreach (var c in listaClientes) Clientes.Add(c);
 
                 Funcionarios.Clear();
@@ -95,8 +100,6 @@ namespace magal.ViewModels
             var novaTarefa = new Tarefa { descricao = "Nova Atividade Técnica", horas_estimadas = 0 };
 
             novaTarefa.PropertyChanged += (s, e) => {
-                // Escutamos apenas as entradas manuais. 
-                // O custo_real é uma consequência, não precisa ser escutado aqui.
                 if (e.PropertyName == nameof(Tarefa.Funcionario) ||
                     e.PropertyName == nameof(Tarefa.horas_estimadas))
                 {
@@ -140,21 +143,35 @@ namespace magal.ViewModels
 
         private void AtualizarFinanceiro()
         {
-            // PROTEÇÃO: Se já estiver calculando ou se o projeto sumiu, aborta.
             if (_isUpdating || ProjetoAtual?.Orcamento == null) return;
 
             try
             {
                 _isUpdating = true;
 
-                // 1. Executa a lógica matemática no Model
+                // --- TRAVA DE VALORES NEGATIVOS ---
+                // Limpa as tarefas
+                foreach (var t in ProjetoAtual.Tarefas)
+                {
+                    if (t.horas_estimadas < 0) t.horas_estimadas = 0;
+                }
+
+                // Limpa os custos extras
+                foreach (var c in CustosExtras)
+                {
+                    if (c.valor < 0) c.valor = 0;
+                }
+
+                // Limpa os impostos e margem no orçamento
+                if (ProjetoAtual.Orcamento.margem_percentual < 0) ProjetoAtual.Orcamento.margem_percentual = 0;
+                if (ProjetoAtual.Orcamento.percentual_impostos < 0) ProjetoAtual.Orcamento.percentual_impostos = 0;
+                // ----------------------------------
+
                 ProjetoAtual.Orcamento.CalcularTotal(
                     ProjetoAtual.Tarefas.ToList(),
                     CustosExtras.ToList()
                 );
 
-                // 2. Notifica a UI especificamente sobre o que mudou no objeto Orçamento.
-                // Isso evita o OnPropertyChanged(nameof(ProjetoAtual)) que travava a tela.
                 ProjetoAtual.Orcamento.OnPropertyChanged("valor_total");
                 ProjetoAtual.Orcamento.OnPropertyChanged("valor_impostos");
                 ProjetoAtual.Orcamento.OnPropertyChanged("lucro_estimado");
@@ -165,7 +182,7 @@ namespace magal.ViewModels
             }
             finally
             {
-                _isUpdating = false; // Libera para a próxima atualização
+                _isUpdating = false;
             }
         }
 
@@ -234,6 +251,60 @@ namespace magal.ViewModels
                 return true;
             }
             return false;
+        }
+
+        public void CarregarProjetoParaEdicao(Projeto projetoDoBanco)
+        {
+            if (projetoDoBanco == null) return;
+            _isUpdating = true;
+
+            try
+            {
+                this.ProjetoAtual.id_projeto = projetoDoBanco.id_projeto;
+                this.ProjetoAtual.nome = projetoDoBanco.nome;
+                this.ProjetoAtual.id_cliente = projetoDoBanco.id_cliente;
+                this.ProjetoAtual.tipo = projetoDoBanco.tipo;
+                this.ProjetoAtual.status = projetoDoBanco.status;
+
+                if (projetoDoBanco.Orcamento != null)
+                {
+                    this.ProjetoAtual.Orcamento = projetoDoBanco.Orcamento;
+                }
+
+                this.ProjetoAtual.Cliente = Clientes.FirstOrDefault(c => c.id_cliente == projetoDoBanco.id_cliente);
+
+                this.ProjetoAtual.Tarefas.Clear();
+                foreach (var t in projetoDoBanco.Tarefas)
+                {
+                    t.Funcionario = Funcionarios.FirstOrDefault(f => f.id_funcionario == t.id_funcionario);
+                    // Garante que o evento de mudança de propriedade seja assinado ao carregar do banco
+                    t.PropertyChanged += (s, e) => {
+                        if (e.PropertyName == nameof(Tarefa.Funcionario) || e.PropertyName == nameof(Tarefa.horas_estimadas))
+                            AtualizarFinanceiro();
+                    };
+                    this.ProjetoAtual.Tarefas.Add(t);
+                }
+
+                this.CustosExtras.Clear();
+                if (projetoDoBanco.Custos != null)
+                {
+                    foreach (var c in projetoDoBanco.Custos)
+                    {
+                        c.PropertyChanged += (s, e) => {
+                            if (e.PropertyName == nameof(Custo.valor)) AtualizarFinanceiro();
+                        };
+                        this.CustosExtras.Add(c);
+                    }
+                }
+
+                _isUpdating = false;
+                AtualizarFinanceiro();
+            }
+            finally
+            {
+                _isUpdating = false;
+            }
+            OnPropertyChanged(nameof(ProjetoAtual));
         }
     }
 }

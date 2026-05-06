@@ -15,7 +15,6 @@ namespace magal.Data.Repositories
             {
                 using (var conn = DbConnectionFactory.CreateConnection())
                 {
-                    // Query conforme o novo init.sql
                     string query = @"
                         SELECT f.id_funcionario, 
                                f.nome, 
@@ -33,14 +32,13 @@ namespace magal.Data.Repositories
                         {
                             while (reader.Read())
                             {
-                                // Sincronizado com os Models em snake_case
                                 var func = new Funcionario
                                 {
                                     id_funcionario = reader.GetInt32(reader.GetOrdinal("id_funcionario")),
                                     nome = reader.GetString(reader.GetOrdinal("nome")),
                                     id_cargo = reader.GetInt32(reader.GetOrdinal("id_cargo")),
 
-                                    // Preenche o objeto Cargo (usando as propriedades minúsculas do Cargo.cs)
+                                    // Preenche o objeto Cargo
                                     Cargo = new Cargo
                                     {
                                         id_cargo = reader.GetInt32(reader.GetOrdinal("id_cargo")),

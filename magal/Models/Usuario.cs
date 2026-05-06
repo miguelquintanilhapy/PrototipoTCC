@@ -7,16 +7,10 @@ namespace magal.Models
 {
     public class Usuario : BaseModel
     {
-        // id_usuario (PK) conforme seu DER
         public int id_usuario { get; set; }
-
         public string nome { get; set; }
-
         public string email { get; set; }
-
         public string senha { get; set; }
-
-        // No seu DER: "Ativo/Inativo"
-        public string status { get; set; }
+        public string status { get; set; } //  "Ativo/Inativo"
     }
 }

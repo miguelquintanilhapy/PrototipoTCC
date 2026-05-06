@@ -12,13 +12,16 @@ namespace magal
         {
             InitializeComponent();
             this.WindowState = WindowState.Maximized;
+
             AbrirOrcamento();
         }
 
+        // Evento do botão "Novo Orçamento"
         private void BtnOrcamentos_Click(object sender, RoutedEventArgs e)
         {
             AbrirOrcamento();
         }
+
 
         private void BtnHistorico_Click(object sender, RoutedEventArgs e)
         {
@@ -27,6 +30,7 @@ namespace magal
 
         private void AbrirOrcamento()
         {
+
             MainContent.Content = new OrcamentoView();
         }
 
@@ -42,6 +46,9 @@ namespace magal
             Projeto projetoCompleto = repo.CarregarProjetoCompleto(projetoSimplificado.id_projeto);
 
             var viewModel = new OrcamentoViewModel();
+
+
+            // Passa o projeto completo para a VM
             viewModel.CarregarProjetoParaEdicao(projetoCompleto);
 
             // Troca de tela

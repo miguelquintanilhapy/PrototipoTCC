@@ -9,7 +9,7 @@ namespace magal.Data
     {
         public static IDbConnection CreateConnection()
         {
-            // Busca o arquivo appsettings.json
+            // Busca o appsettings.json
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")

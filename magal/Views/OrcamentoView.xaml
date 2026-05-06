@@ -174,55 +174,66 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,24">
-
             <StackPanel VerticalAlignment="Center">
-                <Border Background="{StaticResource AeroPrimary}" CornerRadius="4"
-                        HorizontalAlignment="Left" Padding="8,3" Margin="0,0,0,8">
-                    <TextBlock Text="AERO CONCEPTS v2.0" Foreground="White"
-                               FontSize="9" FontWeight="Black"/>
-                </Border>
-                <TextBlock Text="Gestão de Orçamentos" FontSize="28" FontWeight="Bold"
-                           Foreground="{StaticResource AeroTextDark}"/>
+                <TextBlock Text="Gestão de Orçamentos" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}"/>
             </StackPanel>
 
             <Border Background="White" CornerRadius="14" Padding="18,14"
-                    HorizontalAlignment="Right" MinWidth="400"
-                    BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+     HorizontalAlignment="Right"
+     BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="1"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="140"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                        <TextBlock Text="NOME DO PROJETO" FontSize="9" FontWeight="Bold"
-                                   Foreground="{StaticResource AeroTextHint}"
-                                   Margin="0,0,0,5"/>
-                        <TextBox Text="{Binding ProjetoAtual.nome, UpdateSourceTrigger=PropertyChanged}"
-                                 FontWeight="SemiBold"/>
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                        <TextBlock Text="NOME DO PROJETO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5" />
+                        <TextBox Text="{Binding ProjetoAtual.nome, UpdateSourceTrigger=PropertyChanged}" 
+                 ToolTip="{Binding ProjetoAtual.nome}"
+                 FontWeight="SemiBold" Height="28" Padding="10,0" VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                            <TextBox.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                            </TextBox.Resources>
+                        </TextBox>
                     </StackPanel>
 
-                    <Border Grid.Column="1" Background="{StaticResource AeroBorder}" Width="1" Margin="0,2"/>
-
-                    <StackPanel Grid.Column="2" Margin="16,0,0,0">
-                        <TextBlock Text="CLIENTE" FontSize="9" FontWeight="Bold"
-                                   Foreground="{StaticResource AeroTextHint}"
-                                   Margin="0,0,0,5"/>
+                    <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                        <TextBlock Text="CLIENTE" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
                         <ComboBox ItemsSource="{Binding Clientes}" 
-          SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-          DisplayMemberPath="nome" 
-          Width="250"
-          FontSize="12" 
-          Height="28"
-          VerticalContentAlignment="Center"
-          BorderThickness="0"
-          Background="#F8FAFC"/>
+                  SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                  ToolTip="{Binding ProjetoAtual.Cliente.nome}"
+                   Cursor="Hand"
+                  DisplayMemberPath="nome" 
+                  FontSize="12" Height="28" VerticalContentAlignment="Center"
+                  BorderThickness="0" Background="#F8FAFC"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Margin="0,0,15,0">
+                        <TextBlock Text="TIPO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding OpcoesTipo}" 
+                  SelectedItem="{Binding ProjetoAtual.tipo, Mode=TwoWay}"
+                  ToolTip="{Binding ProjetoAtual.tipo}"
+                   Cursor="Hand"
+                  FontSize="12" Height="28" VerticalContentAlignment="Center"
+                  BorderThickness="0" Background="#F8FAFC"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3">
+                        <TextBlock Text="STATUS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding OpcoesStatus}" 
+                  SelectedItem="{Binding ProjetoAtual.status, Mode=TwoWay}"
+                  ToolTip="{Binding ProjetoAtual.status}"
+                  Cursor="Hand"
+                  FontSize="12" Height="28" VerticalContentAlignment="Center"
+                  BorderThickness="0" Background="#F8FAFC"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
-
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
 
@@ -266,12 +277,11 @@
 
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="5,0">
                                                 <TextBlock Text="HORAS" FontSize="9" FontWeight="Bold" 
-                                           Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,2"/>
-                                                <TextBox Text="{Binding horas_estimadas, UpdateSourceTrigger=PropertyChanged}"
-                                         FontSize="16" FontWeight="Black" 
-                                         Foreground="{StaticResource AeroPrimary}"
-                                         Background="#F8FAFC" BorderThickness="0"
-                                         HorizontalContentAlignment="Center"/>
+               Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,2"/>
+                                                <TextBox Text="{Binding horas_estimadas, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}" 
+             FontSize="16" FontWeight="Black" Foreground="{StaticResource AeroPrimary}"
+                                                         PreviewTextInput="ValidarEntradaSemNegativo"
+             Background="#F8FAFC" BorderThickness="0" HorizontalContentAlignment="Center"/>
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
@@ -284,21 +294,22 @@
                                          Padding="0,2"/>
                                                 <Border Height="1" Background="{StaticResource BorderLight}" Opacity="0.5"/>
                                             </StackPanel>
-<StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
-    <TextBlock Text="RESPONSÁVEL" 
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
+                                                <TextBlock Text="RESPONSÁVEL" 
                FontSize="9" 
                FontWeight="Bold"  
                Foreground="{StaticResource AeroTextHint}" 
                Margin="0,0,0,2"/>
 
                                                 <ComboBox ItemsSource="{Binding DataContext.Funcionarios, RelativeSource={RelativeSource AncestorType=UserControl}}"
-          SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-          DisplayMemberPath="nome"
-          FontSize="12" 
-          Height="28"
-          VerticalContentAlignment="Center"
-          BorderThickness="0"
-          Background="#F8FAFC"/>
+              SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+              DisplayMemberPath="nome"
+              SelectedValuePath="id_funcionario"
+              FontSize="12" 
+              Height="28"
+              VerticalContentAlignment="Center"
+              BorderThickness="0"
+              Background="#F8FAFC"/>
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
@@ -437,44 +448,51 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
 
                 <Border Background="White" CornerRadius="10" Padding="14,10"
-                        Margin="0,0,10,0" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+            Margin="0,0,10,0" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="LUCRO" FontSize="9" FontWeight="Bold"
-                                   Foreground="{StaticResource AeroTextHint}"
-                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <TextBox Text="{Binding ProjetoAtual.Orcamento.margem_percentual,
-                                           UpdateSourceTrigger=PropertyChanged}"
-                                 Width="40" BorderThickness="0" FontWeight="Bold"
-                                 FontSize="14" HorizontalContentAlignment="Center"
-                                 Background="Transparent" Padding="0"/>
+                       Foreground="{StaticResource AeroTextHint}"
+                       VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Text="{Binding ProjetoAtual.Orcamento.margem_percentual, 
+                     
+                            UpdateSourceTrigger=PropertyChanged, 
+                               StringFormat='{}{0:0.##}'}"
+                            PreviewTextInput="ValidarEntradaSemNegativo"  
+                     Width="40" BorderThickness="0" FontWeight="Bold"
+                     FontSize="14" HorizontalContentAlignment="Center"
+                     Background="Transparent" Padding="0"/>
                         <TextBlock Text="%" Foreground="{StaticResource AeroTextMuted}"
-                                   VerticalAlignment="Center" FontWeight="Bold"/>
+                       VerticalAlignment="Center" FontWeight="Bold"/>
                     </StackPanel>
                 </Border>
 
                 <Border Background="White" CornerRadius="10" Padding="14,10"
-                        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+            BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="IMPOSTOS" FontSize="9" FontWeight="Bold"
-                                   Foreground="{StaticResource AeroTextHint}"
-                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <TextBox Text="{Binding ProjetoAtual.Orcamento.percentual_impostos,
-                                           UpdateSourceTrigger=PropertyChanged}"
-                                 Width="40" BorderThickness="0" FontWeight="Bold"
-                                 FontSize="14" HorizontalContentAlignment="Center"
-                                 Background="Transparent" Padding="0"/>
+                        <TextBox Text="{Binding ProjetoAtual.Orcamento.percentual_impostos, 
+                        UpdateSourceTrigger=PropertyChanged, 
+                        StringFormat='{}{0:0.##}'}"
+         PreviewTextInput="ValidarEntradaSemNegativo"
+         Width="40" 
+         BorderThickness="0" 
+         FontWeight="Bold"
+         FontSize="14" 
+         HorizontalContentAlignment="Center"
+         Background="Transparent" 
+         Padding="0"/>
                         <TextBlock Text="%" Foreground="{StaticResource AeroTextMuted}"
-                                   VerticalAlignment="Center" FontWeight="Bold"/>
+                       VerticalAlignment="Center" FontWeight="Bold"/>
                     </StackPanel>
                 </Border>
 
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+
+
 
                 <StackPanel VerticalAlignment="Center" Margin="0,0,28,0">
                     <TextBlock Text="TOTAL DA PROPOSTA" FontSize="10" FontWeight="Bold"

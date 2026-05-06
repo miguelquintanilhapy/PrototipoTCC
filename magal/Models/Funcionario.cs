@@ -7,28 +7,29 @@ namespace magal.Models
 {
     public class Funcionario : BaseModel
     {
-        // Alterado para bater com id_funcionario (PK)
         public int id_funcionario { get; set; }
-
-        // Alterado para bater com id_cargo (FK)
         public int id_cargo { get; set; }
-
         public string nome { get; set; }
-
-        // Alterado para bater com custo_hora conforme seu DER
         public decimal custo_hora { get; set; }
-
-        // Alterado para bater com tipo_vinculo conforme seu DER
         public string tipo_vinculo { get; set; }
-
         public string status { get; set; }
-
         public Cargo Cargo { get; set; }
-
         public override string ToString()
         {
             return nome;
         }
+
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Funcionario outro)
+            {
+                return this.id_funcionario == outro.id_funcionario;
+            }
+            return false;
+        }
+
+        public override int GetHashCode() => id_funcionario.GetHashCode();
 
         public string Iniciais
         {

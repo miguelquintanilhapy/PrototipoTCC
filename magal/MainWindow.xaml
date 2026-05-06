@@ -38,9 +38,16 @@
                 <Button Content="Dashboard" Style="{StaticResource MenuButtonStyle}"/>
 
                 <Button x:Name="BtnOrcamentos" 
-                        Content="Novo Orçamento" 
+        Content="Novo Orçamento" 
                         Style="{StaticResource MenuButtonStyle}"
                         Click="BtnOrcamentos_Click"/>
+
+                <Button x:Name="BtnHistorico" 
+        Content="Histórico" 
+        Style="{StaticResource MenuButtonStyle}"
+        Click="BtnHistorico_Click"/>
+
+
 
                 <Button Content="Clientes" Style="{StaticResource MenuButtonStyle}"/>
                 <Button Content="Funcionários" Style="{StaticResource MenuButtonStyle}"/>

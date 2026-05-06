@@ -66,7 +66,7 @@ namespace magal.Models
 
         public DateTime data_criacao { get; set; } = DateTime.Now;
 
-        // Propriedades calculadas que não vão para o banco (somente leitura)
+        // Propriedades calculadas que não vão para o banco, somente leitura
         public decimal valor_margem => custo_base * (margem_percentual / 100);
         public decimal valor_impostos => (custo_base + valor_margem) * (percentual_impostos / 100);
 
@@ -74,7 +74,6 @@ namespace magal.Models
         {
             if (tarefas == null || custosExtras == null) return;
 
-            // Atenção: Aqui usamos custo_real e valor (snake_case) das outras classes
             decimal totalMaoDeObra = tarefas.Sum(t => t.custo_real);
             decimal totalCustosExtras = custosExtras.Sum(c => c.valor);
 

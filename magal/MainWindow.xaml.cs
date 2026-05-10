@@ -56,5 +56,15 @@ namespace magal
             view.DataContext = viewModel;
             MainContent.Content = view;
         }
+
+        private void BtnGerenciamento_Click(object sender, RoutedEventArgs e)
+        {
+            AbrirGerenciamento();
+        }
+
+        private void AbrirGerenciamento()
+        {
+            MainContent.Content = new GerenciamentoView();
+        }
     }
 }

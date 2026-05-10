@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using magal.Models;
 using magal.Data;
+using MySql.Data.MySqlClient;
 
 namespace magal.Data.Repositories
 {
@@ -18,10 +19,15 @@ namespace magal.Data.Repositories
                     string query = @"
                         SELECT f.id_funcionario, 
                                f.nome, 
-                               f.id_cargo, 
+                               f.id_cargo,
+                               f.custo_hora,
+                               f.tipo_vinculo,
+                               f.status,
                                c.nome AS cargo_nome, 
                                c.custo_medio_hora 
+
                         FROM funcionario f 
+
                         INNER JOIN cargo c ON f.id_cargo = c.id_cargo";
 
                     using (var cmd = conn.CreateCommand())
@@ -37,6 +43,10 @@ namespace magal.Data.Repositories
                                     id_funcionario = reader.GetInt32(reader.GetOrdinal("id_funcionario")),
                                     nome = reader.GetString(reader.GetOrdinal("nome")),
                                     id_cargo = reader.GetInt32(reader.GetOrdinal("id_cargo")),
+                                    custo_hora = reader.GetDecimal(reader.GetOrdinal("custo_hora")),
+                                    tipo_vinculo = reader.GetString(reader.GetOrdinal("tipo_vinculo")),
+                                    status = reader.GetString(reader.GetOrdinal("status")),
+
 
                                     // Preenche o objeto Cargo
                                     Cargo = new Cargo
@@ -59,5 +69,19 @@ namespace magal.Data.Repositories
             }
             return lista;
         }
+        public void Excluir(int id_funcionario)
+        {
+            using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
+            {
+                conn.Open();
+                string sql = "DELETE FROM funcionario WHERE id_funcionario = @id";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", id_funcionario);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
+    
 }

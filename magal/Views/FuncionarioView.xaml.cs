@@ -10,26 +10,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using magal.Data.Repositories;
 
 
 namespace magal.Views
 {
-    public partial class GerenciamentoView : UserControl
+    public partial class FuncionarioView : UserControl
     {
-        public GerenciamentoView()
+        public FuncionarioView()
         {
             InitializeComponent();
-        }
-
-        private void BtnFuncionarios_Click(object sender, RoutedEventArgs e)
-        {
-            var janelaPrincipal = Window.GetWindow(this) as MainWindow;
-
-            if (janelaPrincipal != null)
-            {
-                janelaPrincipal.MainContentControl.Content = new FuncionarioView();
-            }
+            this.DataContext = new magal.ViewModels.FuncionarioViewModel();
         }
     }
 }

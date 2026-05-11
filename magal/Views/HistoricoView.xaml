@@ -62,7 +62,7 @@
                     VerticalAlignment="Center"/>
         </Grid>
 
-        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,25">
             <Border Background="White" CornerRadius="12" Margin="0,0,10,0" Padding="20,15"
                     BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                 <StackPanel>
@@ -79,7 +79,7 @@
             </Border>
 
             <Border Background="White" CornerRadius="12" Margin="10,0,0,0" Padding="20,15"
-        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                    BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                 <StackPanel>
                     <TextBlock Text="LUCRO TOTAL ESTIMADO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
                     <TextBlock Text="{Binding TotalLucro}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource VerdeAero}"/>
@@ -91,15 +91,10 @@
             <TextBlock Text="FILTRE POR PROJETO, TIPO OU STATUS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
             <Grid>
                 <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
-                         Height="38" VerticalContentAlignment="Center" Padding="12,0,40,0"
+                         Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"
                          FontSize="14" Background="White" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
-                    <TextBox.Resources>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="CornerRadius" Value="8"/>
-                        </Style>
-                    </TextBox.Resources>
                 </TextBox>
-                <TextBlock Text="🔍" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" Foreground="{StaticResource AeroTextHint}"/>
+                <TextBlock Text="🔍" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="{StaticResource AeroTextHint}" IsHitTestVisible="False"/>
             </Grid>
         </StackPanel>
 
@@ -115,7 +110,8 @@
                           AutoGenerateColumns="False" IsReadOnly="True"
                           Background="Transparent" BorderThickness="0"
                           GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
-                          HeadersVisibility="Column" RowHeight="45">
+                          HeadersVisibility="Column" RowHeight="50"
+                          CanUserAddRows="False" SelectionMode="Single">
 
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader">
@@ -149,29 +145,38 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="DATA" Binding="{Binding data_criacao, StringFormat=dd/MM/yyyy}" Width="110" FontWeight="SemiBold" />
-                        <DataGridTextColumn Header="NOME DO PROJETO" Binding="{Binding nome}" Width="*" FontWeight="SemiBold"/>
+
+                        <DataGridTextColumn Header="NOME DO PROJETO" Binding="{Binding nome}" Width="*" FontWeight="SemiBold">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Margin" Value="10,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
                         <DataGridTextColumn Header="TIPO" Binding="{Binding tipo}" Width="130" />
 
                         <DataGridTextColumn Header="VALOR DE VENDA" 
-                    Binding="{Binding Orcamento.valor_final, StringFormat='{}{0:C}'}" 
-                    Width="160" FontWeight="Bold">
+                                            Binding="{Binding Orcamento.valor_final, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
+                                            Width="160" FontWeight="Bold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Right"/>
                                     <Setter Property="VerticalAlignment" Value="Center"/>
                                     <Setter Property="Foreground" Value="{StaticResource VerdeAero}"/>
-                                    <Setter Property="Padding" Value="0,0,70,0"/>
-                                    <Setter Property="ToolTip" Value="Custo + Margem + Impostos"/>
+                                    <Setter Property="Padding" Value="0,0,20,0"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
                         <DataGridTextColumn Header="STATUS" Binding="{Binding status}" Width="110" FontWeight="SemiBold" />
-                        
+
                         <DataGridTemplateColumn Header="AÇÕES" Width="150">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button Content="Editar" 
                                                 Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
@@ -191,7 +196,7 @@
                 </DataGrid>
 
                 <Border Grid.Row="1" Background="#F8FAFC" BorderThickness="0,1,0,0" BorderBrush="#F1F5F9" CornerRadius="0,0,16,16" Padding="20,12">
-                    <TextBlock Text="{Binding ProjetosView.Count, StringFormat='{}{0} projetos encontrados'}"
+                    <TextBlock Text="{Binding ProjetosView.Count, StringFormat='{}{0} projetos listados'}"
                                FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
                 </Border>
             </Grid>

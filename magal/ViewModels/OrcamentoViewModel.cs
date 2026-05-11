@@ -20,7 +20,13 @@ namespace magal.ViewModels
         public Projeto ProjetoAtual
         {
             get => _projetoAtual;
-            set { _projetoAtual = value; OnPropertyChanged(); }
+            set
+            {
+                _projetoAtual = value;
+                OnPropertyChanged();
+                // Sempre que um projeto novo é atribuído, precisamos ouvir o orçamento dele
+                AssinarEventosOrcamento();
+            }
         }
 
         public ObservableCollection<Cliente> Clientes { get; } = new ObservableCollection<Cliente>();
@@ -64,16 +70,40 @@ namespace magal.ViewModels
 
         private void NovoProjeto()
         {
-            ProjetoAtual = new Projeto
+            _isUpdating = true;
+
+            var p = new Projeto
             {
                 Orcamento = new Orcamento { margem_percentual = 20, percentual_impostos = 15 },
                 Tarefas = new ObservableCollection<Tarefa>(),
-                id_usuario = 1,
-                nome = ""
+                id_usuario = 1, 
+                nome = "",
+                status = "Rascunho",
+                tipo = "Serviço",
+                data_criacao = DateTime.Now
             };
 
             CustosExtras.Clear();
-            OnPropertyChanged(nameof(ProjetoAtual));
+            ProjetoAtual = p;
+
+            _isUpdating = false;
+            AtualizarFinanceiro();
+        }
+
+        private void AssinarEventosOrcamento()
+        {
+            if (ProjetoAtual?.Orcamento != null)
+            {
+                // garante que se o usuário mudar a % na tela, o cálculo rode
+                ProjetoAtual.Orcamento.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(Orcamento.margem_percentual) ||
+                        e.PropertyName == nameof(Orcamento.percentual_impostos))
+                    {
+                        AtualizarFinanceiro();
+                    }
+                };
+            }
         }
 
         private void CarregarDadosIniciais()
@@ -149,36 +179,81 @@ namespace magal.ViewModels
             {
                 _isUpdating = true;
 
-                // --- TRAVA DE VALORES NEGATIVOS ---
-                // Limpa as tarefas
-                foreach (var t in ProjetoAtual.Tarefas)
-                {
-                    if (t.horas_estimadas < 0) t.horas_estimadas = 0;
-                }
-
-                // Limpa os custos extras
-                foreach (var c in CustosExtras)
-                {
-                    if (c.valor < 0) c.valor = 0;
-                }
-
-                // Limpa os impostos e margem no orçamento
                 if (ProjetoAtual.Orcamento.margem_percentual < 0) ProjetoAtual.Orcamento.margem_percentual = 0;
                 if (ProjetoAtual.Orcamento.percentual_impostos < 0) ProjetoAtual.Orcamento.percentual_impostos = 0;
-              
 
+                // executa a lógica de cálculo definida na Model
                 ProjetoAtual.Orcamento.CalcularTotal(
                     ProjetoAtual.Tarefas.ToList(),
                     CustosExtras.ToList()
                 );
 
+                // notifica a View de que os campos de resultado mudaram
                 ProjetoAtual.Orcamento.OnPropertyChanged("valor_total");
                 ProjetoAtual.Orcamento.OnPropertyChanged("valor_impostos");
                 ProjetoAtual.Orcamento.OnPropertyChanged("lucro_estimado");
+                ProjetoAtual.Orcamento.OnPropertyChanged("valor_final");
+                ProjetoAtual.Orcamento.OnPropertyChanged("custo_base");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Erro no cálculo: " + ex.Message);
+            }
+            finally
+            {
+                _isUpdating = false;
+            }
+        }
+
+        public void CarregarProjetoParaEdicao(Projeto projetoDoBanco)
+        {
+            if (projetoDoBanco == null) return;
+            _isUpdating = true;
+
+            try
+            {
+                // atribui o projeto e garante que o Orçamento notifique a VM
+                this.ProjetoAtual = projetoDoBanco;
+                AssinarEventosOrcamento();
+
+                // sincroniza o cliente (para o ComboBox selecionar o item certo)
+                if (this.ProjetoAtual.id_cliente > 0)
+                {
+                    this.ProjetoAtual.Cliente = Clientes.FirstOrDefault(c => c.id_cliente == projetoDoBanco.id_cliente);
+                }
+
+                // limpa e recarrega a lista de Custos Extras da ViewModel
+                this.CustosExtras.Clear();
+                if (projetoDoBanco.Custos != null)
+                {
+                    foreach (var c in projetoDoBanco.Custos)
+                    {
+                        // Assina o evento para que se você mudar o valor do custo na edição, o total atualize
+                        c.PropertyChanged += (s, e) => {
+                            if (e.PropertyName == nameof(Custo.valor)) AtualizarFinanceiro();
+                        };
+                        this.CustosExtras.Add(c);
+                    }
+                }
+
+                foreach (var t in this.ProjetoAtual.Tarefas)
+                {
+                    // vincula o objeto funcionário da lista da ViewModel à tarefa
+                    t.Funcionario = Funcionarios.FirstOrDefault(f => f.id_funcionario == t.id_funcionario);
+
+                    // assiona o evento para que mudanças nas horas ou funcionário recalculem o preço
+                    t.PropertyChanged += (s, e) => {
+                        if (e.PropertyName == nameof(Tarefa.Funcionario) || e.PropertyName == nameof(Tarefa.horas_estimadas))
+                            AtualizarFinanceiro();
+                    };
+                }
+
+                _isUpdating = false;
+                AtualizarFinanceiro();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao carregar edição: " + ex.Message);
             }
             finally
             {
@@ -222,9 +297,7 @@ namespace magal.ViewModels
             try
             {
                 if (ProjetoAtual.Cliente != null)
-                {
                     ProjetoAtual.id_cliente = ProjetoAtual.Cliente.id_cliente;
-                }
 
                 var repo = new ProjetoRepository();
                 repo.SalvarProjetoCompleto(ProjetoAtual, CustosExtras.ToList());
@@ -242,7 +315,7 @@ namespace magal.ViewModels
             var sfd = new SaveFileDialog
             {
                 Filter = "PDF|*.pdf",
-                FileName = $"Proposta_{ProjetoAtual.nome}"
+                FileName = $"Proposta_{ProjetoAtual.nome}_{DateTime.Now:yyyyMMdd}"
             };
 
             if (sfd.ShowDialog() == true)
@@ -251,60 +324,6 @@ namespace magal.ViewModels
                 return true;
             }
             return false;
-        }
-
-        public void CarregarProjetoParaEdicao(Projeto projetoDoBanco)
-        {
-            if (projetoDoBanco == null) return;
-            _isUpdating = true;
-
-            try
-            {
-                this.ProjetoAtual.id_projeto = projetoDoBanco.id_projeto;
-                this.ProjetoAtual.nome = projetoDoBanco.nome;
-                this.ProjetoAtual.id_cliente = projetoDoBanco.id_cliente;
-                this.ProjetoAtual.tipo = projetoDoBanco.tipo;
-                this.ProjetoAtual.status = projetoDoBanco.status;
-
-                if (projetoDoBanco.Orcamento != null)
-                {
-                    this.ProjetoAtual.Orcamento = projetoDoBanco.Orcamento;
-                }
-
-                this.ProjetoAtual.Cliente = Clientes.FirstOrDefault(c => c.id_cliente == projetoDoBanco.id_cliente);
-
-                this.ProjetoAtual.Tarefas.Clear();
-                foreach (var t in projetoDoBanco.Tarefas)
-                {
-                    t.Funcionario = Funcionarios.FirstOrDefault(f => f.id_funcionario == t.id_funcionario);
-                    // Garante que o evento de mudança de propriedade seja assinado ao carregar do banco
-                    t.PropertyChanged += (s, e) => {
-                        if (e.PropertyName == nameof(Tarefa.Funcionario) || e.PropertyName == nameof(Tarefa.horas_estimadas))
-                            AtualizarFinanceiro();
-                    };
-                    this.ProjetoAtual.Tarefas.Add(t);
-                }
-
-                this.CustosExtras.Clear();
-                if (projetoDoBanco.Custos != null)
-                {
-                    foreach (var c in projetoDoBanco.Custos)
-                    {
-                        c.PropertyChanged += (s, e) => {
-                            if (e.PropertyName == nameof(Custo.valor)) AtualizarFinanceiro();
-                        };
-                        this.CustosExtras.Add(c);
-                    }
-                }
-
-                _isUpdating = false;
-                AtualizarFinanceiro();
-            }
-            finally
-            {
-                _isUpdating = false;
-            }
-            OnPropertyChanged(nameof(ProjetoAtual));
         }
     }
 }

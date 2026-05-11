@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Collections.Generic;
 using magal.Models;
 using magal.Data.Repositories;
 
@@ -15,12 +16,19 @@ namespace magal.ViewModels
         private Projeto _projetoSelecionado;
         private string _filtroTexto;
         private string _totalFinanceiro;
+        private string _totalLucro;
         private int _quantidadeProjetos;
 
         public string TotalFinanceiro
         {
             get => _totalFinanceiro;
             set { _totalFinanceiro = value; OnPropertyChanged(); }
+        }
+
+        public string TotalLucro
+        {
+            get => _totalLucro;
+            set { _totalLucro = value; OnPropertyChanged(); }
         }
 
         public int QuantidadeProjetos
@@ -37,14 +45,9 @@ namespace magal.ViewModels
                 _filtroTexto = value;
                 OnPropertyChanged();
                 ProjetosView?.Refresh();
+                // Recalcula indicadores baseados no que está visível (filtrado)
+                AtualizarIndicadores();
             }
-        }
-
-        private string _totalLucro;
-        public string TotalLucro
-        {
-            get => _totalLucro;
-            set { _totalLucro = value; OnPropertyChanged(); }
         }
 
         public Projeto ProjetoSelecionado
@@ -74,6 +77,28 @@ namespace magal.ViewModels
             CarregarHistorico();
         }
 
+        private void CarregarHistorico()
+        {
+            try
+            {
+                // busca os projetos do usuário logado 
+                var lista = _repository.BuscarTodosPorUsuario(1);
+
+                Projetos.Clear();
+
+                foreach (var p in lista)
+                {
+                    Projetos.Add(p);
+                }
+
+                AtualizarIndicadores();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao carregar histórico: " + ex.Message);
+            }
+        }
+
         private bool FiltroDeProjetos(object obj)
         {
             if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
@@ -82,70 +107,42 @@ namespace magal.ViewModels
 
             var busca = FiltroTexto.ToLower().Trim();
 
-            // Adicionamos a verificação do 'tipo' aqui:
             return (projeto.nome?.ToLower().Contains(busca) ?? false) ||
                    (projeto.status?.ToLower().Contains(busca) ?? false) ||
-                   (projeto.tipo?.ToLower().Contains(busca) ?? false);
-        }
-
-        private void CarregarHistorico()
-        {
-            try
-            {
-                // Busca os dados do banco
-                var lista = _repository.BuscarTodosPorUsuario(1);
-
-                Projetos.Clear();
-
-                foreach (var p in lista)
-                {
-                    if (p.Orcamento != null)
-                    {
-                        // IMPORTANTE: Como você mudou o Model, aqui forçamos a interface 
-                        // a ler a propriedade 'valor_final' calculada. 
-                        // Se você criou o método AtualizarNotificacoes() no Model, use-o aqui:
-                        // p.Orcamento.AtualizarNotificacoes();
-                    }
-                    Projetos.Add(p);
-                }
-
-                // Atualiza os indicadores de tela (Soma e Quantidade)
-                AtualizarIndicadores();
-
-                // Força o Refresh da lista visual
-                ProjetosView?.Refresh();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao carregar histórico: {ex.Message}", "Aero Concepts", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                   (projeto.tipo?.ToLower().Contains(busca) ?? false) ||
+                   (projeto.Cliente?.nome?.ToLower().Contains(busca) ?? false);
         }
 
         private void AtualizarIndicadores()
         {
-            var listaFiltrada = ProjetosView.Cast<Projeto>().ToList();
-            QuantidadeProjetos = listaFiltrada.Count;
+            // filtra apenas os projetos que passam pelo filtro de busca da tela
+            var projetosVisiveis = ProjetosView.Cast<Projeto>().ToList();
 
-            // Soma do Valor Final (Faturamento)
-            decimal somaFaturamento = listaFiltrada
+            decimal somaFaturamento = projetosVisiveis
                 .Where(p => p.Orcamento != null)
                 .Sum(p => p.Orcamento.valor_final);
 
-            // Soma do Lucro (valor_margem que criamos na Model)
-            decimal somaLucro = listaFiltrada
+            decimal somaLucro = projetosVisiveis
                 .Where(p => p.Orcamento != null)
                 .Sum(p => p.Orcamento.valor_margem);
 
-            TotalFinanceiro = somaFaturamento.ToString("C2");
-            TotalLucro = somaLucro.ToString("C2");
+            QuantidadeProjetos = projetosVisiveis.Count;
+
+            var cultura = new System.Globalization.CultureInfo("pt-BR");
+            TotalFinanceiro = somaFaturamento.ToString("C2", cultura);
+            TotalLucro = somaLucro.ToString("C2", cultura);
+
+            System.Diagnostics.Debug.WriteLine($"Histórico Atualizado: Faturamento {TotalFinanceiro}, Lucro {TotalLucro}");
         }
 
         private void ExecutarExclusao(Projeto projeto)
         {
             if (projeto == null) return;
 
-            var msg = $"Tem certeza que deseja excluir o projeto '{projeto.nome}'?";
-            if (MessageBox.Show(msg, "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            var result = MessageBox.Show($"Deseja realmente excluir o projeto '{projeto.nome}'?",
+                                       "Confirmar Exclusão", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
             {
                 try
                 {
@@ -153,15 +150,29 @@ namespace magal.ViewModels
                     Projetos.Remove(projeto);
                     AtualizarIndicadores();
                 }
-                catch (Exception ex) { MessageBox.Show(ex.Message); }
+                catch (Exception ex) { MessageBox.Show("Erro ao excluir: " + ex.Message); }
             }
         }
 
         private void ExecutarEdicao(Projeto projeto)
         {
             if (projeto == null) return;
-            var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
-            if (mainWindow != null) mainWindow.IrParaEdicao(projeto);
+
+            try
+            {
+                var projetoCompleto = _repository.CarregarProjetoCompleto(projeto.id_projeto);
+
+                if (projetoCompleto != null)
+                {
+                    var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
+
+                    mainWindow?.IrParaEdicao(projetoCompleto);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao carregar dados para edição: " + ex.Message);
+            }
         }
     }
 }

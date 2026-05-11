@@ -20,7 +20,7 @@ namespace magal.Data.Repositories
                     {
                         if (projeto.id_projeto == 0)
                         {
-                            // --- INSERIR NOVO PROJETO ---
+                            // INSERIR NOVO PROJETO 
                             using (var cmd = new MySqlCommand(@"INSERT INTO projeto (nome, id_cliente, id_usuario, data_criacao, tipo, status) 
                                                               VALUES (@nome, @idCliente, @idUsuario, @data, @tipo, @status);", conn, transaction))
                             {
@@ -38,7 +38,7 @@ namespace magal.Data.Repositories
                         }
                         else
                         {
-                            // --- ATUALIZAR PROJETO EXISTENTE ---
+                            // ATUALIZAR PROJETO EXISTENTE 
                             using (var cmd = new MySqlCommand(@"UPDATE projeto SET nome=@nome, id_cliente=@idCliente, status=@status, tipo=@tipo 
                                                               WHERE id_projeto=@idProj", conn, transaction))
                             {
@@ -50,24 +50,28 @@ namespace magal.Data.Repositories
                                 cmd.ExecuteNonQuery();
                             }
 
+                            // limpeza para reinserção
                             new MySqlCommand($"DELETE FROM orcamento WHERE id_projeto={projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
                             new MySqlCommand($"DELETE FROM tarefa WHERE id_projeto={projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
                             new MySqlCommand($"DELETE FROM custo WHERE id_projeto={projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
                         }
 
-                        // --- INSERIR/REINSERIR ORÇAMENTO ---
-                        using (var cmd = new MySqlCommand(@"INSERT INTO orcamento (id_projeto, custo_base, percentual_impostos, margem_percentual, valor_final) 
-                                                          VALUES (@idProj, @custo, @imp, @marg, @final);", conn, transaction))
+                        // INSERIR ORÇAMENTO 
+                        using (var cmd = new MySqlCommand(@"INSERT INTO orcamento (id_projeto, custo_base, percentual_impostos, margem_percentual, 
+                                                                          valor_margem, valor_impostos, valor_final) 
+                                                          VALUES (@idProj, @custo, @percImp, @margPerc, @vMarg, @vImp, @final);", conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
                             cmd.Parameters.AddWithValue("@custo", projeto.Orcamento.custo_base);
-                            cmd.Parameters.AddWithValue("@imp", projeto.Orcamento.percentual_impostos);
-                            cmd.Parameters.AddWithValue("@marg", projeto.Orcamento.margem_percentual);
+                            cmd.Parameters.AddWithValue("@percImp", projeto.Orcamento.percentual_impostos);
+                            cmd.Parameters.AddWithValue("@margPerc", projeto.Orcamento.margem_percentual);
+                            cmd.Parameters.AddWithValue("@vMarg", projeto.Orcamento.valor_margem);
+                            cmd.Parameters.AddWithValue("@vImp", projeto.Orcamento.valor_impostos);
                             cmd.Parameters.AddWithValue("@final", projeto.Orcamento.valor_final);
                             cmd.ExecuteNonQuery();
                         }
 
-                        // --- INSERIR/REINSERIR TAREFAS ---
+                        // INSERIR TAREFAS 
                         foreach (var tarefa in projeto.Tarefas)
                         {
                             using (var cmd = new MySqlCommand(@"INSERT INTO tarefa (id_projeto, descricao, id_funcionario, horas_estimadas, status) 
@@ -82,7 +86,7 @@ namespace magal.Data.Repositories
                             }
                         }
 
-                        // --- INSERIR/REINSERIR CUSTOS 
+                        // INSERIR CUSTOS EXTRAS 
                         foreach (var custo in custosExtras)
                         {
                             using (var cmd = new MySqlCommand(@"INSERT INTO custo (id_projeto, nome, categoria, tipo, valor, unidade) 
@@ -116,11 +120,13 @@ namespace magal.Data.Repositories
             {
                 conn.Open();
 
-                // Dados Básicos e Orçamento
-                string sqlProj = @"SELECT p.*, o.custo_base, o.percentual_impostos, o.margem_percentual, o.valor_final 
-                                 FROM projeto p 
-                                 LEFT JOIN orcamento o ON p.id_projeto = o.id_projeto 
-                                 WHERE p.id_projeto = @id";
+                // carregar dados do p´rojeto e orçamento
+                // buscamos tudo em um JOIN para garantir consistência
+                string sqlProj = @"SELECT p.*, o.custo_base, o.percentual_impostos, o.margem_percentual, 
+                                  o.valor_margem, o.valor_impostos, o.valor_final 
+                           FROM projeto p 
+                           LEFT JOIN orcamento o ON p.id_projeto = o.id_projeto 
+                           WHERE p.id_projeto = @id";
 
                 using (var cmd = new MySqlCommand(sqlProj, conn))
                 {
@@ -136,20 +142,26 @@ namespace magal.Data.Repositories
                             projeto.data_criacao = Convert.ToDateTime(reader["data_criacao"]);
                             projeto.status = reader["status"].ToString();
                             projeto.tipo = reader["tipo"].ToString();
-                            projeto.Orcamento = new Orcamento
-                            {
-                                custo_base = Convert.ToDecimal(reader["custo_base"]),
-                                percentual_impostos = Convert.ToDecimal(reader["percentual_impostos"]),
-                                margem_percentual = Convert.ToDecimal(reader["margem_percentual"]),
-                                valor_final = Convert.ToDecimal(reader["valor_final"])
-                            };
+
+                            // criando o objeto orçamento respeitando a lógica do model
+                            var orc = new Orcamento();
+
+                            orc.margem_percentual = reader["margem_percentual"] != DBNull.Value ? Convert.ToDecimal(reader["margem_percentual"]) : 0;
+                            orc.percentual_impostos = reader["percentual_impostos"] != DBNull.Value ? Convert.ToDecimal(reader["percentual_impostos"]) : 0;
+                            orc.custo_base = reader["custo_base"] != DBNull.Value ? Convert.ToDecimal(reader["custo_base"]) : 0;
+                            orc.valor_margem = reader["valor_margem"] != DBNull.Value ? Convert.ToDecimal(reader["valor_margem"]) : 0;
+                            orc.valor_impostos = reader["valor_impostos"] != DBNull.Value ? Convert.ToDecimal(reader["valor_impostos"]) : 0;
+                            orc.valor_final = reader["valor_final"] != DBNull.Value ? Convert.ToDecimal(reader["valor_final"]) : 0;
+
+                            projeto.Orcamento = orc;
                         }
                     }
                 }
 
-                // Carregar Tarefas
+                // carregar Tarefas 
                 projeto.Tarefas = new ObservableCollection<Tarefa>();
-                using (var cmd = new MySqlCommand("SELECT * FROM tarefa WHERE id_projeto = @id", conn))
+                string sqlTarefas = "SELECT * FROM tarefa WHERE id_projeto = @id";
+                using (var cmd = new MySqlCommand(sqlTarefas, conn))
                 {
                     cmd.Parameters.AddWithValue("@id", idProjeto);
                     using (var reader = cmd.ExecuteReader())
@@ -160,7 +172,7 @@ namespace magal.Data.Repositories
                             {
                                 id_tarefa = Convert.ToInt32(reader["id_tarefa"]),
                                 descricao = reader["descricao"].ToString(),
-                                horas_estimadas = Convert.ToDecimal(reader["horas_estimadas"]), 
+                                horas_estimadas = Convert.ToDecimal(reader["horas_estimadas"]),
                                 id_funcionario = Convert.ToInt32(reader["id_funcionario"]),
                                 status = reader["status"].ToString()
                             });
@@ -168,8 +180,10 @@ namespace magal.Data.Repositories
                     }
                 }
 
+                // carregar Custos Extras
                 projeto.Custos = new ObservableCollection<Custo>();
-                using (var cmd = new MySqlCommand("SELECT * FROM custo WHERE id_projeto = @id", conn))
+                string sqlCustos = "SELECT * FROM custo WHERE id_projeto = @id";
+                using (var cmd = new MySqlCommand(sqlCustos, conn))
                 {
                     cmd.Parameters.AddWithValue("@id", idProjeto);
                     using (var reader = cmd.ExecuteReader())
@@ -191,19 +205,21 @@ namespace magal.Data.Repositories
             }
             return projeto;
         }
-
         public List<Projeto> BuscarTodosPorUsuario(int idUsuario)
         {
             var lista = new List<Projeto>();
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
                 conn.Open();
-                string sql = @"SELECT p.*, c.nome as nome_cliente, o.valor_final 
-                       FROM projeto p 
-                       INNER JOIN cliente c ON p.id_cliente = c.id_cliente 
-                       LEFT JOIN orcamento o ON p.id_projeto = o.id_projeto 
-                       WHERE p.id_usuario = @idUser 
-                       ORDER BY p.data_criacao DESC";
+
+                string sql = @"SELECT p.*, c.nome as nome_cliente, 
+                                      o.custo_base, o.margem_percentual, o.percentual_impostos, 
+                                      o.valor_margem, o.valor_impostos, o.valor_final 
+                               FROM projeto p 
+                               INNER JOIN cliente c ON p.id_cliente = c.id_cliente 
+                               LEFT JOIN orcamento o ON p.id_projeto = o.id_projeto 
+                               WHERE p.id_usuario = @idUser 
+                               ORDER BY p.data_criacao DESC";
 
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
@@ -220,7 +236,6 @@ namespace magal.Data.Repositories
                                 data_criacao = Convert.ToDateTime(reader["data_criacao"]),
                                 status = reader["status"].ToString(),
                                 tipo = reader["tipo"].ToString(),
-
                                 Cliente = new Cliente { nome = reader["nome_cliente"].ToString() }
                             };
 
@@ -228,12 +243,17 @@ namespace magal.Data.Repositories
                             {
                                 projeto.Orcamento = new Orcamento
                                 {
+                                    custo_base = Convert.ToDecimal(reader["custo_base"]),
+                                    margem_percentual = Convert.ToDecimal(reader["margem_percentual"]),
+                                    percentual_impostos = Convert.ToDecimal(reader["percentual_impostos"]),
+                                    valor_margem = reader["valor_margem"] != DBNull.Value ? Convert.ToDecimal(reader["valor_margem"]) : 0,
+                                    valor_impostos = reader["valor_impostos"] != DBNull.Value ? Convert.ToDecimal(reader["valor_impostos"]) : 0,
                                     valor_final = Convert.ToDecimal(reader["valor_final"])
                                 };
                             }
                             else
                             {
-                                projeto.Orcamento = new Orcamento { valor_final = 0 };
+                                projeto.Orcamento = new Orcamento { valor_final = 0, valor_margem = 0 };
                             }
 
                             lista.Add(projeto);

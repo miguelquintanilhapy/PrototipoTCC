@@ -119,6 +119,7 @@
                             <Setter Property="Foreground" Value="{StaticResource AeroTextMuted}"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                             <Setter Property="Padding" Value="15,10"/>
+                            <Setter Property="Cursor" Value="Hand"/>
                             <Setter Property="BorderThickness" Value="0,0,0,1"/>
                             <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
                         </Style>
@@ -134,10 +135,14 @@
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
+                            
                             <Style.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
                                     <Setter Property="Background" Value="#EFF6FF"/>
                                     <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#F1F5F9"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -156,7 +161,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="TIPO" Binding="{Binding tipo}" Width="130" />
+                        <DataGridTextColumn Header="TIPO" Binding="{Binding tipo}" Width="130"  FontWeight="SemiBold" />
 
                         <DataGridTextColumn Header="VALOR DE VENDA" 
                                             Binding="{Binding Orcamento.valor_final, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
@@ -166,7 +171,7 @@
                                     <Setter Property="HorizontalAlignment" Value="Right"/>
                                     <Setter Property="VerticalAlignment" Value="Center"/>
                                     <Setter Property="Foreground" Value="{StaticResource VerdeAero}"/>
-                                    <Setter Property="Padding" Value="0,0,20,0"/>
+                                    <Setter Property="Padding" Value="0,0,30,0"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>

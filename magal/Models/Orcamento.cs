@@ -75,6 +75,7 @@ namespace magal.Models
                 decimal calculado = custo_base + valor_margem + valor_impostos;
                 return (calculado > 0) ? calculado : (_valor_final_manual ?? 0);
             }
+
             set
             {
                 _valor_final_manual = value;

@@ -177,6 +177,10 @@
 
                             <Setter Property="BorderBrush"
                                     Value="{StaticResource AeroBorder}"/>
+
+                            <Setter Property="Cursor" Value="Hand"/>
+
+                           
                         </Style>
 
                         <Style TargetType="DataGridCell">
@@ -220,87 +224,100 @@
 
                         </Style>
 
+                        
+
                     </DataGrid.Resources>
 
                     <DataGrid.Columns>
 
                         <DataGridTextColumn Header="ID"
-                                            Binding="{Binding id_funcionario}"
-                                            Width="80"
-                                            FontWeight="SemiBold"/>
+                        Binding="{Binding id_funcionario}"
+                        Width="80"
+                        FontWeight="SemiBold">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <DataGridTextColumn Header="NOME"
-                                            Binding="{Binding nome}"
-                                            Width="*"
-                                            FontWeight="SemiBold"/>
+                        Binding="{Binding nome}"
+                        Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <DataGridTextColumn Header="CUSTO/HORA"
-                                            Binding="{Binding custo_hora, StringFormat='{}{0:C}'}"
-                                            Width="160">
-
+                        Binding="{Binding custo_hora, StringFormat='{}{0:C}'}"
+                        Width="160">
                             <DataGridTextColumn.ElementStyle>
-
                                 <Style TargetType="TextBlock">
-
-                                    <Setter Property="HorizontalAlignment"
-                                            Value="Right"/>
-
-                                    <Setter Property="VerticalAlignment"
-                                            Value="Center"/>
-
-                                    <Setter Property="Foreground"
-                                            Value="{StaticResource VerdeAero}"/>
-
-                                    <Setter Property="Padding"
-                                            Value="0,0,40,0"/>
-
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Foreground" Value="{StaticResource VerdeAero}"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
                                 </Style>
-
                             </DataGridTextColumn.ElementStyle>
-
                         </DataGridTextColumn>
 
                         <DataGridTextColumn Header="TIPO VÍNCULO"
-                                            Binding="{Binding tipo_vinculo}"
-                                            Width="170"/>
+                        Binding="{Binding tipo_vinculo}"
+                        Width="170">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <DataGridTextColumn Header="STATUS"
-                                            Binding="{Binding status}"
-                                            Width="120"
-                                            FontWeight="SemiBold"/>
+                        Binding="{Binding status}"
+                        Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <DataGridTemplateColumn Header="AÇÕES"
-                                                Width="150">
-
+                            Width="150">
                             <DataGridTemplateColumn.CellTemplate>
-
                                 <DataTemplate>
-
                                     <StackPanel Orientation="Horizontal">
-
                                         <Button Content="Editar"
-                                                Foreground="{StaticResource AeroAccent}"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                FontWeight="Bold"
-                                                Margin="0,0,12,0"/>
-
+                            Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Foreground="{StaticResource AeroAccent}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            FontWeight="Bold"
+                            Margin="0,0,12,0"/>
                                         <Button Content="Excluir"
-                                                Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Foreground="{StaticResource AeroDanger}"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                FontWeight="Bold"/>
-
+                            Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Foreground="{StaticResource AeroDanger}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            FontWeight="Bold"/>
                                     </StackPanel>
-
                                 </DataTemplate>
-
                             </DataGridTemplateColumn.CellTemplate>
-
                         </DataGridTemplateColumn>
 
                     </DataGrid.Columns>

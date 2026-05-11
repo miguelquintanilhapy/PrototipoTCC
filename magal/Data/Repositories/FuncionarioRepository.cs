@@ -100,6 +100,27 @@ namespace magal.Data.Repositories
                 }
             }
         }
+        public void Atualizar(Funcionario funcionario)
+        {
+            using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
+            {
+                conn.Open();
+                string sql = @"UPDATE funcionario 
+                       SET nome = @nome, id_cargo = @id_cargo, custo_hora = @custo_hora, 
+                           tipo_vinculo = @tipo_vinculo, status = @status 
+                       WHERE id_funcionario = @id_funcionario";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@nome", funcionario.nome);
+                    cmd.Parameters.AddWithValue("@id_cargo", funcionario.id_cargo);
+                    cmd.Parameters.AddWithValue("@custo_hora", funcionario.custo_hora);
+                    cmd.Parameters.AddWithValue("@tipo_vinculo", funcionario.tipo_vinculo);
+                    cmd.Parameters.AddWithValue("@status", funcionario.status);
+                    cmd.Parameters.AddWithValue("@id_funcionario", funcionario.id_funcionario);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
     
 }

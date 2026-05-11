@@ -37,8 +37,9 @@ namespace magal.ViewModels
 
         public RelayCommand ExcluirCommand { get; }
         public RelayCommand AtualizarCommand { get; }
-
         public RelayCommand CriarCommand { get; }
+
+        public RelayCommand EditarCommand { get; }
 
 
 
@@ -52,6 +53,7 @@ namespace magal.ViewModels
             ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as Funcionario));
             AtualizarCommand = new RelayCommand(_ => CarregarFuncionarios());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
+            EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Funcionario));
 
             CarregarFuncionarios();
         }
@@ -108,6 +110,15 @@ namespace magal.ViewModels
         private void ExecutarCriar()
         {
             var dialog = new magal.Views.CadastrarFuncionarioDialog();
+            dialog.Owner = Application.Current.MainWindow;
+            if (dialog.ShowDialog() == true)
+                CarregarFuncionarios();
+        }
+
+        private void ExecutarEdicao(Funcionario funcionario)
+        {
+            if (funcionario == null) return;
+            var dialog = new magal.Views.EditarFuncionarioDialog(funcionario);
             dialog.Owner = Application.Current.MainWindow;
             if (dialog.ShowDialog() == true)
                 CarregarFuncionarios();

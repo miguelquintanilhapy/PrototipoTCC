@@ -37,7 +37,11 @@
             <Border Background="{StaticResource AzulOriginalSide}"/>
 
             <StackPanel Margin="0,202,0,0">
-                <Button Content="Dashboard" FontWeight="SemiBold" Style="{StaticResource MenuButtonStyle}"/>
+                <Button x:Name="BtnHome" 
+        Content="Home" 
+        FontWeight="SemiBold" 
+        Style="{StaticResource MenuButtonStyle}"
+        Click="BtnHome_Click"/>
 
                 <Button x:Name="BtnOrcamentos" 
                         Content="Novo Orçamento" 

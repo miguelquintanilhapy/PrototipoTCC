@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="magal.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
+        <SolidColorBrush x:Key="CinzaAero" Color="#94A3B8"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Image Source="/Imagens/AERO_CONCEPTS_1.png" 
+               Width="400" 
+               VerticalAlignment="Top" 
+               HorizontalAlignment="Center" 
+               Margin="0,-10,0,0" 
+               Stretch="Uniform"/>
+
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,400,0,0">
+
+            <TextBlock Text="AERO CONCEPTS" 
+                       FontSize="75" 
+                       FontWeight="ExtraBold" 
+                       Foreground="{StaticResource AzulAero}" 
+                       HorizontalAlignment="Center"/>
+
+            <TextBlock Text="SISTEMA DE APOIO À DECISÃO" 
+                       FontSize="18" 
+                       FontWeight="SemiBold" 
+                       Foreground="{StaticResource CinzaAero}" 
+                       HorizontalAlignment="Center"
+                       Margin="0,5,0,0"/>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

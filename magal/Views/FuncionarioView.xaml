@@ -67,20 +67,29 @@
 
         <!-- CABEÇALHO -->
         <Grid Grid.Row="0"
-              Height="80"
-              Margin="0,0,0,15">
+      Height="80"
+      Margin="0,0,0,15">
 
             <TextBlock Text="Funcionários"
-                       FontSize="28"
-                       FontWeight="Bold"
-                       Foreground="{StaticResource AzulAero}"
-                       VerticalAlignment="Center"/>
+               FontSize="28"
+               FontWeight="Bold"
+               Foreground="{StaticResource AzulAero}"
+               VerticalAlignment="Center"/>
 
-            <Button Content="ATUALIZAR LISTA"
-                    Style="{StaticResource PrimaryBtn}"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Command="{Binding AtualizarCommand}"/>
+            <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center">
+
+                <Button Content="+ NOVO FUNCIONÁRIO"
+                Style="{StaticResource PrimaryBtn}"
+                Margin="0,0,10,0"
+                Command="{Binding CriarCommand}"/>
+
+                <Button Content="ATUALIZAR LISTA"
+                Style="{StaticResource PrimaryBtn}"
+                Command="{Binding AtualizarCommand}"/>
+
+            </StackPanel>
         </Grid>
 
         <!-- PESQUISA -->

@@ -82,6 +82,24 @@ namespace magal.Data.Repositories
                 }
             }
         }
+        public void Inserir(Funcionario funcionario)
+        {
+            using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
+            {
+                conn.Open();
+                string sql = @"INSERT INTO funcionario (id_cargo, nome, custo_hora, tipo_vinculo, status) 
+                       VALUES (@id_cargo, @nome, @custo_hora, @tipo_vinculo, @status)";
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id_cargo", funcionario.id_cargo);
+                    cmd.Parameters.AddWithValue("@nome", funcionario.nome);
+                    cmd.Parameters.AddWithValue("@custo_hora", funcionario.custo_hora);
+                    cmd.Parameters.AddWithValue("@tipo_vinculo", funcionario.tipo_vinculo);
+                    cmd.Parameters.AddWithValue("@status", funcionario.status);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
     
 }

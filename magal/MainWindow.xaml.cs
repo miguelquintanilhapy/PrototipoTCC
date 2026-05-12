@@ -1,8 +1,9 @@
-﻿using magal.Data.Repositories;
+﻿using System.Windows;
+using System.Windows.Controls;
+using magal.Data.Repositories;
 using magal.Models;
 using magal.ViewModels;
 using magal.Views;
-using System.Windows;
 
 namespace magal
 {
@@ -65,6 +66,11 @@ namespace magal
             MainContent.Content = _historicoView;
         }
 
+        public ContentControl MainContentControl
+        {
+            get { return MainContent; }
+        }
+
         public void IrParaEdicao(Projeto projetoSimplificado)
         {
             var repo = new ProjetoRepository();
@@ -78,6 +84,18 @@ namespace magal
             MainContent.Content = view;
         }
 
+<<<<<<< HEAD
         
+=======
+        private void BtnGerenciamento_Click(object sender, RoutedEventArgs e)
+        {
+            AbrirGerenciamento();
+        }
+
+        private void AbrirGerenciamento()
+        {
+            MainContent.Content = new GerenciamentoView();
+        }
+>>>>>>> cadastrar---funcionarios
     }
 }

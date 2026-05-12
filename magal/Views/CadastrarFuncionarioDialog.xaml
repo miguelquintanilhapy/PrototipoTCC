@@ -1,0 +1,109 @@
+﻿<Window x:Class="magal.Views.CadastrarFuncionarioDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Criar Funcionário"
+        Height="567" Width="460"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F0F4FA">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
+        <SolidColorBrush x:Key="AeroBorder" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="AeroTextMuted" Color="#64748B"/>
+
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="InputStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <Style x:Key="ComboStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8" Padding="14,7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1E3A8A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="32,28">
+
+        <TextBlock Text="Novo Funcionário"
+                   FontSize="22"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource AzulAero}"
+                   Margin="0,0,0,24"/>
+
+        <TextBlock Text="NOME" Style="{StaticResource LabelStyle}"/>
+        <TextBox x:Name="TxtNome" Style="{StaticResource InputStyle}" Margin="0,0,0,14"/>
+
+        <TextBlock Text="CARGO" Style="{StaticResource LabelStyle}"/>
+        <ComboBox x:Name="ComboCargo"
+                  Style="{StaticResource ComboStyle}"
+                  DisplayMemberPath="nome"
+                  SelectedValuePath="id_cargo"
+                  Margin="0,0,0,14"/>
+
+        <TextBlock Text="CUSTO/HORA (R$)" Style="{StaticResource LabelStyle}"/>
+        <TextBox x:Name="TxtCustoHora" Style="{StaticResource InputStyle}" Margin="0,0,0,14"/>
+
+        <TextBlock Text="TIPO VÍNCULO" Style="{StaticResource LabelStyle}"/>
+        <ComboBox x:Name="ComboTipoVinculo"
+                  Style="{StaticResource ComboStyle}"
+                  Margin="0,0,0,14">
+            <ComboBoxItem Content="CLT"/>
+            <ComboBoxItem Content="PJ"/>
+            <ComboBoxItem Content="Autônomo"/>
+        </ComboBox>
+
+        <TextBlock Text="STATUS" Style="{StaticResource LabelStyle}"/>
+        <ComboBox x:Name="ComboStatus"
+                  Style="{StaticResource ComboStyle}"
+                  Margin="0,0,0,24">
+            <ComboBoxItem Content="Ativo"/>
+            <ComboBoxItem Content="Inativo"/>
+        </ComboBox>
+
+        <Button Content="SALVAR FUNCIONÁRIO"
+                Style="{StaticResource PrimaryBtn}"
+                Click="BtnSalvar_Click"/>
+
+    </StackPanel>
+</Window>

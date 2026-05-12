@@ -88,7 +88,7 @@
         </UniformGrid>
 
         <StackPanel Grid.Row="2" Margin="0,0,0,15">
-            <TextBlock Text="FILTRE POR PROJETO, TIPO OU STATUS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
+            <TextBlock Text="FILTRE POR PROJETO, TIPO OU STATUS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
             <Grid>
                 <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
                          Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"
@@ -106,19 +106,20 @@
                 </Grid.RowDefinitions>
 
                 <DataGrid ItemsSource="{Binding ProjetosView}" 
-                          SelectedItem="{Binding ProjetoSelecionado}"
-                          AutoGenerateColumns="False" IsReadOnly="True"
-                          Background="Transparent" BorderThickness="0"
-                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
-                          HeadersVisibility="Column" RowHeight="50"
-                          CanUserAddRows="False" SelectionMode="Single">
-
+          SelectedItem="{Binding ProjetoSelecionado}"
+          AutoGenerateColumns="False" IsReadOnly="True"
+          Background="Transparent" BorderThickness="0"
+          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
+          HeadersVisibility="Column" 
+          RowHeight="60"  CanUserAddRows="False" SelectionMode="Single"
+          FontSize="14">
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#F8FAFC"/>
                             <Setter Property="Foreground" Value="{StaticResource AeroTextMuted}"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="Padding" Value="15,10"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="FontSize" Value="13"/>
+                            <Setter Property="Padding" Value="15,12"/>
                             <Setter Property="Cursor" Value="Hand"/>
                             <Setter Property="BorderThickness" Value="0,0,0,1"/>
                             <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
@@ -135,7 +136,7 @@
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
-                            
+
                             <Style.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
                                     <Setter Property="Background" Value="#EFF6FF"/>
@@ -149,9 +150,17 @@
                     </DataGrid.Resources>
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="DATA" Binding="{Binding data_criacao, StringFormat=dd/MM/yyyy}" Width="110" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="DATA" 
+                            Binding="{Binding data_criacao, StringFormat=dd/MM/yyyy}" 
+                            Width="120" 
+                            FontSize="14" 
+                            FontWeight="SemiBold" />
 
-                        <DataGridTextColumn Header="NOME DO PROJETO" Binding="{Binding nome}" Width="*" FontWeight="SemiBold">
+                        <DataGridTextColumn Header="NOME DO PROJETO" 
+                            Binding="{Binding nome}" 
+                            Width="*" 
+                            FontSize="15" 
+                           FontWeight="SemiBold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -161,38 +170,49 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="TIPO" Binding="{Binding tipo}" Width="130"  FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="TIPO" 
+                            Binding="{Binding tipo}" 
+                            Width="140" 
+                                            FontWeight="SemiBold"
+                            FontSize="14" />
 
                         <DataGridTextColumn Header="VALOR DE VENDA" 
-                                            Binding="{Binding Orcamento.valor_final, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
-                                            Width="160" FontWeight="Bold">
+                            Binding="{Binding Orcamento.valor_final, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
+                            Width="180" 
+                            FontSize="16"  FontWeight="Bold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Right"/>
                                     <Setter Property="VerticalAlignment" Value="Center"/>
                                     <Setter Property="Foreground" Value="{StaticResource VerdeAero}"/>
-                                    <Setter Property="Padding" Value="0,0,40,0"/>
+                                    <Setter Property="Padding" Value="0,0,30,0"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="STATUS" Binding="{Binding status}" Width="110" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="STATUS" 
+                            Binding="{Binding status}" 
+                            Width="130" 
+                            FontSize="14" 
+                            FontWeight="SemiBold" />
 
-                        <DataGridTemplateColumn Header="AÇÕES" Width="150">
+                        <DataGridTemplateColumn Header="AÇÕES" Width="170">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button Content="Editar" 
-                                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Foreground="{StaticResource AeroAccent}"
-                                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,12,0"/>
+                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}"
+                                FontSize="13"
+                                Foreground="{StaticResource AeroAccent}"
+                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
 
                                         <Button Content="Excluir" 
-                                                Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Foreground="{StaticResource AeroDanger}"
-                                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
+                                Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}"
+                                FontSize="13"
+                                Foreground="{StaticResource AeroDanger}"
+                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

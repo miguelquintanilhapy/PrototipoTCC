@@ -179,66 +179,69 @@
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="Gestão de Orçamentos" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AzulAero}"/>
             </StackPanel>
-
-            <Border Background="White" CornerRadius="14" Padding="18,14"
-                    HorizontalAlignment="Right"
-                    BorderThickness="2" BorderBrush="{StaticResource AeroBorder}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="180"/>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="140"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
-                        <TextBlock Text="NOME DO PROJETO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4" />
-                        <TextBox Text="{Binding ProjetoAtual.nome, UpdateSourceTrigger=PropertyChanged}" 
-                                 ToolTip="{Binding ProjetoAtual.nome}"
-                                 FontWeight="SemiBold" Height="28" Padding="10,0" VerticalContentAlignment="Center" BorderThickness="1.5" BorderBrush="{StaticResource AeroBorder}">
-                            <TextBox.Resources>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
-                            </TextBox.Resources>
-                        </TextBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Margin="0,0,15,0">
-                        <TextBlock Text="CLIENTE" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding Clientes}" 
-                                  SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                  ToolTip="{Binding ProjetoAtual.Cliente.nome}"
-                                  Cursor="Hand"
-                                  DisplayMemberPath="nome" 
-                                  FontSize="12" Height="28" VerticalContentAlignment="Center"
-                                  BorderThickness="0" Background="#F8FAFC"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2" Margin="0,0,15,0">
-                        <TextBlock Text="TIPO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding OpcoesTipo}" 
-                                  SelectedItem="{Binding ProjetoAtual.tipo, Mode=TwoWay}"
-                                  ToolTip="{Binding ProjetoAtual.tipo}"
-                                  Cursor="Hand"
-                                  FontSize="12" Height="28" VerticalContentAlignment="Center"
-                                  BorderThickness="0" Background="#F8FAFC"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="3">
-                        <TextBlock Text="STATUS" FontSize="9" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding OpcoesStatus}" 
-                                  SelectedItem="{Binding ProjetoAtual.status, Mode=TwoWay}"
-                                  ToolTip="{Binding ProjetoAtual.status}"
-                                  Cursor="Hand"
-                                  FontSize="12" Height="28" VerticalContentAlignment="Center"
-                                  BorderThickness="0" Background="#F8FAFC"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
+
+                <Border Background="White" CornerRadius="16" Margin="0,0,0,16"
+        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                    <StackPanel>
+                        <Grid Margin="20,16">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Background="{StaticResource AeroPrimary}" CornerRadius="6"
+                        Width="24" Height="24" Margin="0,0,10,0">
+                                    <TextBlock Text="i" Foreground="White" FontSize="14"
+                               FontWeight="Bold" HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="INFORMAÇÕES GERAIS DO PROJETO" FontSize="11"
+                           FontWeight="Bold" Foreground="{StaticResource AzulAero}"
+                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Height="1" Background="#F1F5F9"/>
+
+                        <Grid Margin="20,20,20,25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                                <TextBlock Text="NOME DO PROJETO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6" />
+                                <TextBox Text="{Binding ProjetoAtual.nome, UpdateSourceTrigger=PropertyChanged}" 
+                         FontWeight="SemiBold" Height="40" VerticalContentAlignment="Center" Padding="10,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                                <TextBlock Text="CLIENTE" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6"/>
+                                <ComboBox ItemsSource="{Binding Clientes}" 
+                          SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay}"
+                          DisplayMemberPath="nome" Height="40"  BorderThickness="0.5 " VerticalContentAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Margin="0,0,15,0">
+                                <TextBlock Text="TIPO" FontSize="10"  FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6"/>
+                                <ComboBox ItemsSource="{Binding OpcoesTipo}" 
+                          SelectedItem="{Binding ProjetoAtual.tipo, Mode=TwoWay}"
+                          Height="40" BorderThickness="0.5 " VerticalContentAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6"/>
+                                <ComboBox ItemsSource="{Binding OpcoesStatus}" 
+                          SelectedItem="{Binding ProjetoAtual.status, Mode=TwoWay}"
+                          Height="40" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+
                 <Border Background="White" CornerRadius="16" Margin="0,0,0,16"
                         BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                     <StackPanel>
@@ -250,6 +253,7 @@
                                                FontWeight="Bold" HorizontalAlignment="Center"
                                                VerticalAlignment="Center"/>
                                 </Border>
+                               
                                 <TextBlock Text="COMPOSIÇÃO DE MÃO DE OBRA" FontSize="11"
                                            FontWeight="Bold" Foreground="{StaticResource AzulAero}"
                                            VerticalAlignment="Center"/>

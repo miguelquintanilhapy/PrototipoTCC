@@ -110,7 +110,7 @@ namespace magal.ViewModels
         private void ExecutarCriar()
         {
             var dialog = new magal.Views.CadastrarFuncionarioDialog();
-            dialog.Owner = Application.Current.MainWindow;
+            dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
                 CarregarFuncionarios();
         }
@@ -119,7 +119,7 @@ namespace magal.ViewModels
         {
             if (funcionario == null) return;
             var dialog = new magal.Views.EditarFuncionarioDialog(funcionario);
-            dialog.Owner = Application.Current.MainWindow;
+            dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
                 CarregarFuncionarios();
         }

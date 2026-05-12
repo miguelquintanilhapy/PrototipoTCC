@@ -45,7 +45,6 @@ namespace magal.ViewModels
                 _filtroTexto = value;
                 OnPropertyChanged();
                 ProjetosView?.Refresh();
-                // Recalcula indicadores baseados no que está visível (filtrado)
                 AtualizarIndicadores();
             }
         }
@@ -81,9 +80,7 @@ namespace magal.ViewModels
         {
             try
             {
-                // busca os projetos do usuário logado 
                 var lista = _repository.BuscarTodosPorUsuario(1);
-
                 Projetos.Clear();
 
                 foreach (var p in lista)
@@ -95,7 +92,7 @@ namespace magal.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao carregar histórico: " + ex.Message);
+                MessageBox.Show($"Erro ao carregar histórico: {ex.Message}", "Aviso de Sistema", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -115,7 +112,6 @@ namespace magal.ViewModels
 
         private void AtualizarIndicadores()
         {
-            // filtra apenas os projetos que passam pelo filtro de busca da tela
             var projetosVisiveis = ProjetosView.Cast<Projeto>().ToList();
 
             decimal somaFaturamento = projetosVisiveis
@@ -131,16 +127,17 @@ namespace magal.ViewModels
             var cultura = new System.Globalization.CultureInfo("pt-BR");
             TotalFinanceiro = somaFaturamento.ToString("C2", cultura);
             TotalLucro = somaLucro.ToString("C2", cultura);
-
-            System.Diagnostics.Debug.WriteLine($"Histórico Atualizado: Faturamento {TotalFinanceiro}, Lucro {TotalLucro}");
         }
 
         private void ExecutarExclusao(Projeto projeto)
         {
             if (projeto == null) return;
 
-            var result = MessageBox.Show($"Deseja realmente excluir o projeto '{projeto.nome}'?",
-                                       "Confirmar Exclusão", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show(
+                $"Deseja realmente excluir o projeto '{projeto.nome}'?\nEsta ação não poderá ser desfeita.",
+                "Atenção - Confirmação",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -150,7 +147,10 @@ namespace magal.ViewModels
                     Projetos.Remove(projeto);
                     AtualizarIndicadores();
                 }
-                catch (Exception ex) { MessageBox.Show("Erro ao excluir: " + ex.Message); }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao excluir: {ex.Message}", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
         }
 
@@ -165,13 +165,16 @@ namespace magal.ViewModels
                 if (projetoCompleto != null)
                 {
                     var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
-
                     mainWindow?.IrParaEdicao(projetoCompleto);
+                }
+                else
+                {
+                    MessageBox.Show("Não foi possível carregar os detalhes deste projeto.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao carregar dados para edição: " + ex.Message);
+                MessageBox.Show($"Erro ao carregar edição: {ex.Message}", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
     }

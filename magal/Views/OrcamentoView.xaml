@@ -175,17 +175,20 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0,0,0,24">
-            <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="Gestão de Orçamentos" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AzulAero}"/>
-            </StackPanel>
+        <Grid Grid.Row="0" Height="80" Margin="0,0,0,10">
+            <TextBlock Text="Gestão de Orçamentos" 
+                   FontSize="28" 
+                   FontWeight="Bold" 
+                   Foreground="{StaticResource AzulAero}"
+                   VerticalAlignment="Center"/>
+
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-
                 <Border Background="White" CornerRadius="16" Margin="0,0,0,16"
-        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                    BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+
                     <StackPanel>
                         <Grid Margin="20,16">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -195,7 +198,7 @@
                                FontWeight="Bold" HorizontalAlignment="Center"
                                VerticalAlignment="Center"/>
                                 </Border>
-                                <TextBlock Text="INFORMAÇÕES GERAIS DO PROJETO" FontSize="11"
+                                <TextBlock Text="INFORMAÇÕES GERAIS DO PROJETO" FontSize="12"
                            FontWeight="Bold" Foreground="{StaticResource AzulAero}"
                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -212,30 +215,39 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0" Margin="0,0,15,0">
-                                <TextBlock Text="NOME DO PROJETO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6" />
+                                <TextBlock Text="NOME DO PROJETO" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,-4,0,6" />
                                 <TextBox Text="{Binding ProjetoAtual.nome, UpdateSourceTrigger=PropertyChanged}" 
-                         FontWeight="SemiBold" Height="40" VerticalContentAlignment="Center" Padding="10,0"/>
+                         FontWeight="SemiBold" Height="40" VerticalContentAlignment="Center" BorderThickness="1.5 " Padding="10,0"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Margin="0,0,15,0">
-                                <TextBlock Text="CLIENTE" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6"/>
+                                <TextBlock Text="CLIENTE" 
+               FontSize="12" 
+               FontWeight="Bold" 
+               Foreground="{StaticResource AeroTextDark}" 
+               Margin="0,-4,0,6"/>
+
                                 <ComboBox ItemsSource="{Binding Clientes}" 
-                          SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay}"
-                          DisplayMemberPath="nome" Height="40"  BorderThickness="0.5 " VerticalContentAlignment="Center"/>
+              SelectedItem="{Binding ProjetoAtual.Cliente, Mode=TwoWay}" 
+              DisplayMemberPath="nome" 
+              Height="40"  
+              BorderThickness="0" 
+              FontWeight="SemiBold" 
+              VerticalContentAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="2" Margin="0,0,15,0">
-                                <TextBlock Text="TIPO" FontSize="10"  FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6"/>
+                                <TextBlock Text="TIPO" FontSize="12"  FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,-4,0,6"/>
                                 <ComboBox ItemsSource="{Binding OpcoesTipo}" 
                           SelectedItem="{Binding ProjetoAtual.tipo, Mode=TwoWay}"
-                          Height="40" BorderThickness="0.5 " VerticalContentAlignment="Center"/>
+                          Height="40" BorderThickness="0" VerticalContentAlignment="Center" FontWeight="semiBold" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="3">
-                                <TextBlock Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,6"/>
+                                <TextBlock Text="STATUS" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,-4,0,6"/>
                                 <ComboBox ItemsSource="{Binding OpcoesStatus}" 
                           SelectedItem="{Binding ProjetoAtual.status, Mode=TwoWay}"
-                          Height="40" VerticalContentAlignment="Center"/>
+                          Height="40" VerticalContentAlignment="Center" BorderThickness="0" FontWeight="semiBold"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -254,7 +266,7 @@
                                                VerticalAlignment="Center"/>
                                 </Border>
                                
-                                <TextBlock Text="COMPOSIÇÃO DE MÃO DE OBRA" FontSize="11"
+                                <TextBlock Text="COMPOSIÇÃO DE MÃO DE OBRA" FontSize="12"
                                            FontWeight="Bold" Foreground="{StaticResource AzulAero}"
                                            VerticalAlignment="Center"/>
                             </StackPanel>
@@ -279,8 +291,8 @@
                                                 <ColumnDefinition Width="40"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="5,0">
-                                                <TextBlock Text="HORAS" FontSize="10" FontWeight="Bold" 
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="-1,0">
+                                                <TextBlock Text="HORAS" FontSize="12" FontWeight="Bold" 
                    Foreground="{StaticResource AeroTextDark}" Margin="0,0,33,4" 
                    HorizontalAlignment="Center"/>
                                                 <TextBox Text="{Binding horas_estimadas, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}" 
@@ -292,7 +304,7 @@
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="10,0">
-                                                <TextBlock Text="DESCRIÇÃO DA ETAPA" FontSize="10" FontWeight="Bold" 
+                                                <TextBlock Text="DESCRIÇÃO DA ETAPA" FontSize="12" FontWeight="Bold" 
                    Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
                                                 <TextBox Text="{Binding descricao, UpdateSourceTrigger=PropertyChanged}"
                  FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource AeroTextDark}"
@@ -301,17 +313,17 @@
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="2" VerticalAlignment="Bottom" Margin="10,0">
-                                                <TextBlock Text="RESPONSÁVEL" FontSize="10" FontWeight="Bold" 
+                                                <TextBlock Text="RESPONSÁVEL" FontSize="12" FontWeight="Bold" 
                    Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
                                                 <ComboBox ItemsSource="{Binding DataContext.Funcionarios, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                   SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                  DisplayMemberPath="nome" FontSize="12" Height="40" Cursor="Hand" 
+                  DisplayMemberPath="nome" FontSize="12" Height="40" FontWeight="semiBold" Cursor="Hand" 
                   VerticalContentAlignment="Center" BorderThickness="0" 
                   BorderBrush="{StaticResource AeroBorder}" Background="#F8FAFC"/>
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0,10,0">
-                                                <TextBlock Text="SUBTOTAL" FontSize="10" FontWeight="Bold" 
+                                                <TextBlock Text="SUBTOTAL" FontSize="12" FontWeight="Bold" 
                    Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4" HorizontalAlignment="Right"/>
                                                 <Border Height="40" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding custo_real, StringFormat=C}" 
@@ -342,7 +354,7 @@
                                         <Border Background="{StaticResource AeroPrimary}" CornerRadius="6" Width="24" Height="24" Margin="0,0,10,0">
                                             <TextBlock Text="2" Foreground="White" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
-                                        <TextBlock Text="EQUIPAMENTOS E INSUMOS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="EQUIPAMENTOS E INSUMOS" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AzulAero}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <Button Content="+ ADICIONAR CUSTO" Command="{Binding AdicionarCustoCommand}" Style="{StaticResource PrimaryBtn}" Width="140" HorizontalAlignment="Right"/>
                                 </Grid>
@@ -359,7 +371,7 @@
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="10,0,15,0">
                         <TextBlock Text="DESCRIÇÃO DO CUSTO" 
-                                   FontSize="10" 
+                                   FontSize="12" 
                                    FontWeight="Bold" 
                                    Foreground="{StaticResource AeroTextDark}" 
                                    Margin="0,0,0,4"/>
@@ -376,11 +388,12 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" VerticalAlignment="Bottom" Margin="10,0">
-                        <TextBlock Text="CATEGORIA" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
+                        <TextBlock Text="CATEGORIA" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
                         <ComboBox ItemsSource="{Binding DataContext.CategoriasCustos, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                   SelectedItem="{Binding categoria, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   FontSize="12" 
-                                  Height="40" 
+                                  Height="40"
+                                  FontWeight="semiBold"
                                   VerticalContentAlignment="Center"
                                   Cursor="Hand" 
                                   BorderThickness="0" 
@@ -389,7 +402,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0">
-                        <TextBlock Text="VALOR (R$)" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" HorizontalAlignment="Right" Margin="0,0,0,4"/>
+                        <TextBlock Text="VALOR (R$)" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" HorizontalAlignment="Right" Margin="0,0,0,4"/>
                         <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
                                  FontSize="15" 
                                  FontWeight="Bold" 
@@ -436,7 +449,7 @@
 
                 <StackPanel Margin="0,0,10,0">
                     <TextBlock Text="LUCRO" 
-                   FontSize="10" 
+                   FontSize="12" 
                    FontWeight="Bold" 
                    Foreground="{StaticResource AeroTextDark}" 
                    Margin="0,0,0,3" />
@@ -470,7 +483,7 @@
 
                 <StackPanel>
                     <TextBlock Text="IMPOSTOS" 
-                   FontSize="10" 
+                   FontSize="12" 
                    FontWeight="Bold" 
                    Foreground="{StaticResource AeroTextDark}" 
                    Margin="0,0,0,3" />

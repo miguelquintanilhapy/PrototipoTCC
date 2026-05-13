@@ -11,6 +11,5 @@ namespace magal.Models
         public string nome { get; set; }
         public string nivel { get; set; }
         public decimal custo_medio_hora { get; set; }
-        public string descricao { get; set; }
     }
 }

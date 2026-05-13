@@ -56,7 +56,7 @@ namespace magal.Views
                     nome = TxtNome.Text.Trim(),
                     nivel = ((ComboBoxItem)ComboNivel.SelectedItem).Content.ToString(),
                     custo_medio_hora = custoHora,
-                    descricao = TxtDescricao.Text.Trim()
+                    
                 };
 
                 var repo = new CargoRepository();

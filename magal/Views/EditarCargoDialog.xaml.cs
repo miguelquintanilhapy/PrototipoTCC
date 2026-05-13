@@ -34,7 +34,6 @@ namespace magal.Views
 
             TxtCustoHora.Text = _cargo.custo_medio_hora.ToString("F2");
 
-            TxtDescricao.Text = _cargo.descricao;
 
             foreach (ComboBoxItem item in ComboNivel.Items)
             {
@@ -85,8 +84,6 @@ namespace magal.Views
                     .ToString();
 
                 _cargo.custo_medio_hora = custoHora;
-
-                _cargo.descricao = TxtDescricao.Text.Trim();
 
                 var repo = new CargoRepository();
 

@@ -29,7 +29,7 @@ namespace magal.Data.Repositories
                                     nome = reader.GetString(reader.GetOrdinal("nome")),
                                     nivel = reader.GetString(reader.GetOrdinal("nivel")),
                                     custo_medio_hora = reader.GetDecimal(reader.GetOrdinal("custo_medio_hora")),
-                                    descricao = reader.IsDBNull(reader.GetOrdinal("descricao")) ? "" : reader.GetString(reader.GetOrdinal("descricao"))
+                                   
                                 });
                             }
                         }
@@ -72,7 +72,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
                         cmd.Parameters.AddWithValue("@nivel", cargo.nivel);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
-                        cmd.Parameters.AddWithValue("@descricao", cargo.descricao);
+                       
 
                         cmd.ExecuteNonQuery();
                     }
@@ -107,7 +107,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
                         cmd.Parameters.AddWithValue("@nivel", cargo.nivel);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
-                        cmd.Parameters.AddWithValue("@descricao", cargo.descricao);
+          
 
                         cmd.ExecuteNonQuery();
                     }

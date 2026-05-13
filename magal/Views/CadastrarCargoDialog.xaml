@@ -127,22 +127,7 @@
                  Style="{StaticResource InputStyle}"
                  Margin="0,0,0,14"/>
 
-        <!-- DESCRIÇÃO -->
-        <TextBlock Text="DESCRIÇÃO"
-                   Style="{StaticResource LabelStyle}"/>
-
-        <TextBox x:Name="TxtDescricao"
-                 Height="70"
-                 AcceptsReturn="True"
-                 TextWrapping="Wrap"
-                 VerticalScrollBarVisibility="Auto"
-                 Padding="10"
-                 FontSize="13"
-                 BorderBrush="{StaticResource AeroBorder}"
-                 BorderThickness="1"
-                 Background="White"
-                 Margin="0,0,0,24"/>
-
+        
         <!-- BOTÃO -->
         <Button Content="SALVAR CARGO"
                 Style="{StaticResource PrimaryBtn}"

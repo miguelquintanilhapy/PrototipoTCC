@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="resources\**" />
+    <EmbeddedResource Remove="resources\**" />
+    <None Remove="resources\**" />
+    <Page Remove="resources\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Imagens\2026 2.png" />
     <None Remove="Imagens\AERO_CONCEPTS_1.png" />
     <None Remove="Imagens\AERO_CONCEPTS_2.png" />
@@ -18,7 +25,6 @@
 
   <ItemGroup>
     <Folder Include="Fonts\" />
-    <Folder Include="resources\" />
   </ItemGroup>
 
 	<ItemGroup>

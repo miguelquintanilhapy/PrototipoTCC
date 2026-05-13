@@ -403,7 +403,7 @@
 
                     <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0">
                         <TextBlock Text="VALOR (R$)" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" HorizontalAlignment="Right" Margin="0,0,0,4"/>
-                        <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
+                                <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                  FontSize="15" 
                                  FontWeight="Bold" 
                                  Foreground="{StaticResource AeroTextDark}"

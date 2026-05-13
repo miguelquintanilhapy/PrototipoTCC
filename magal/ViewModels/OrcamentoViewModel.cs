@@ -188,7 +188,8 @@ namespace magal.ViewModels
         {
             var novoCusto = new Custo { nome = "", valor = 0, categoria = "Equipamentos", tipo = "Direto" };
             novoCusto.PropertyChanged += (s, e) => {
-                if (e.PropertyName == nameof(Custo.valor)) AtualizarFinanceiro();
+                if (e.PropertyName == nameof(Custo.valor))
+                    AtualizarFinanceiro();
             };
             CustosExtras.Add(novoCusto);
             AtualizarFinanceiro();

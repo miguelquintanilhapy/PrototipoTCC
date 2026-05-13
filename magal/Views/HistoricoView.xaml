@@ -88,7 +88,7 @@
         </UniformGrid>
 
         <StackPanel Grid.Row="2" Margin="0,0,0,15">
-            <TextBlock Text="FILTRE POR PROJETO, TIPO OU STATUS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
+            <TextBlock Text="FILTRE POR ( PROJETO, CLIENTE, TIPO OU STATUS )" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
             <Grid>
                 <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
                          Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"
@@ -112,7 +112,7 @@
           GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
           HeadersVisibility="Column" 
           RowHeight="60"  CanUserAddRows="False" SelectionMode="Single"
-          FontSize="14">
+          FontSize="14" SelectionChanged="DataGrid_SelectionChanged">
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#F8FAFC"/>
@@ -169,6 +169,12 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="CLIENTE" 
+                            Binding="{Binding Cliente.nome}" 
+                            Width="140" 
+                                             FontWeight="SemiBold"
+                            FontSize="14" />
 
                         <DataGridTextColumn Header="TIPO" 
                             Binding="{Binding tipo}" 

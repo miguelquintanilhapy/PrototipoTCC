@@ -21,5 +21,10 @@ namespace magal.Views
             InitializeComponent();
             this.DataContext = new magal.ViewModels.HistoricoViewModel();
         }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

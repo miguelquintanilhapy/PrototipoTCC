@@ -31,5 +31,16 @@ namespace magal.Views
                 janelaPrincipal.MainContentControl.Content = new FuncionarioView();
             }
         }
+
+        private void BtnCargos_Click(object sender, RoutedEventArgs e)
+        {
+            var janelaPrincipal = Window.GetWindow(this) as MainWindow;
+
+            if (janelaPrincipal != null)
+            {
+                janelaPrincipal.MainContentControl.Content = new CargoView();
+            }
+        }
+
     }
 }

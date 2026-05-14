@@ -1,185 +1,207 @@
 ﻿<UserControl x:Class="magal.Views.GerenciamentoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="#F8FAFC">
+             Background="#F4F7FB">
 
-    <Grid Margin="20">
+    <UserControl.Resources>
+
+        <!-- CORES -->
+        <SolidColorBrush x:Key="AzulEscuro" Color="#131C49"/>
+        <SolidColorBrush x:Key="TextoCinza" Color="#64748B"/>
+        <SolidColorBrush x:Key="BordaCard" Color="#E2E8F0"/>
+
+        <!-- ESTILO DOS CARDS -->
+        <Style x:Key="CardButtonStyle" TargetType="Button">
+
+            <Setter Property="Width" Value="500"/>
+            <Setter Property="Height" Value="210"/>
+            <Setter Property="Margin" Value="15"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BordaCard}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+
+                    <ControlTemplate TargetType="Button">
+
+                        <Border x:Name="CardBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="22">
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="70"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="25"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- ÍCONE -->
+                                <Border Width="56"
+                                        Height="56"
+                                        CornerRadius="28"
+                                        VerticalAlignment="Top">
+
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+
+                                            <Setter Property="Background" Value="#DBEAFE"/>
+
+                                            <Style.Triggers>
+
+                                                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="Funcionarios">
+                                                    <Setter Property="Background" Value="#DBEAFE"/>
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="Cargos">
+                                                    <Setter Property="Background" Value="#DCFCE7"/>
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="Clientes">
+                                                    <Setter Property="Background" Value="#E9D5FF"/>
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="Custos">
+                                                    <Setter Property="Background" Value="#FEF3C7"/>
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+
+                                    <TextBlock Text="{TemplateBinding Content}"
+                                               FontSize="28"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Border>
+
+                                <!-- TEXOS -->
+                                <StackPanel Grid.Column="1"
+                                            Margin="15,0,0,0"
+                                            VerticalAlignment="Center">
+
+                                    <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource AzulEscuro}"/>
+
+                                    <TextBlock Text="{Binding ToolTip, RelativeSource={RelativeSource AncestorType=Button}}"
+                                               FontSize="13"
+                                               Foreground="{StaticResource TextoCinza}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,8,0,0"/>
+                                </StackPanel>
+
+                                <!-- SETA -->
+                                <TextBlock Grid.Column="2"
+                                           Text="›"
+                                           FontSize="24"
+                                           Foreground="#3B82F6"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+
+                            </Grid>
+                        </Border>
+
+                        <!-- HOVER -->
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+
+                                <Setter TargetName="CardBorder"
+                                        Property="Background"
+                                        Value="#F8FBFF"/>
+
+                                <Setter TargetName="CardBorder"
+                                        Property="BorderBrush"
+                                        Value="#60A5FA"/>
+
+                                <Setter TargetName="CardBorder"
+                                        Property="Effect">
+
+                                    <Setter.Value>
+
+                                        <DropShadowEffect
+                                            BlurRadius="18"
+                                            ShadowDepth="0"
+                                            Opacity="0.18"/>
+
+                                    </Setter.Value>
+
+                                </Setter>
+
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid Margin="35">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- TÍTULO -->
         <StackPanel Grid.Row="0">
 
-            <Border Background="#1E3A8A"
-                    CornerRadius="8"
-                    Padding="10,4"
-                    HorizontalAlignment="Left">
-
-                <TextBlock Text="AERO CONCEPTS v2.0"
-                           Foreground="White"
-                           FontWeight="Bold"
-                           FontSize="12"/>
-            </Border>
-
             <TextBlock Text="Central de Gerenciamento"
-                       FontSize="38"
-                       FontWeight="Bold"
-                       Foreground="#0F172A"
-                       Margin="0,15,0,5"/>
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource AzulEscuro}"/>
 
             <TextBlock Text="Gerencie funcionários, cargos, clientes e custos do sistema"
-                       FontSize="16"
-                       Foreground="#64748B"/>
+                   FontSize="16"
+                   Margin="0,8,0,0"
+                   Foreground="{StaticResource TextoCinza}"/>
+
         </StackPanel>
 
         <!-- CARDS -->
         <UniformGrid Grid.Row="2"
-                     Columns="2"
-                     Rows="2"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     Margin="40">
+                 Columns="2"
+                 Rows="2"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Top">
 
             <!-- FUNCIONÁRIOS -->
-            <Button Width="220"
-                    Height="140"
-                    Margin="15"
-                    BorderThickness="0"
-                    Background="White"
-                    Cursor="Hand"
-                    Click="BtnFuncionarios_Click">
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="20"
-                                Padding="20">
-
-                            <StackPanel VerticalAlignment="Center">
-
-                                <TextBlock Text="👤"
-                                           FontSize="42"
-                                           HorizontalAlignment="Center"/>
-
-                                <TextBlock Text="Funcionários"
-                                           FontSize="20"
-                                           FontWeight="SemiBold"
-                                           Foreground="#0F172A"
-                                           HorizontalAlignment="Center"
-                                           Margin="0,10,0,0"/>
-
-                            </StackPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <Button Style="{StaticResource CardButtonStyle}"
+                Content="👥"
+                Tag="Funcionarios"
+                ToolTip="Gerencie os funcionários, dados pessoais, contratos e informações profissionais."
+                Click="BtnFuncionarios_Click"/>
 
             <!-- CARGOS -->
-            <Button Width="220"
-                    Height="140"
-                    Margin="15"
-                    BorderThickness="0"
-                    Background="White"
-                    Cursor="Hand">
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="20"
-                                Padding="20">
-
-                            <StackPanel>
-
-                                <TextBlock Text="💼"
-                                           FontSize="42"
-                                           HorizontalAlignment="Center"/>
-
-                                <TextBlock Text="Cargos"
-                                           FontSize="20"
-                                           FontWeight="SemiBold"
-                                           Foreground="#0F172A"
-                                           HorizontalAlignment="Center"
-                                           Margin="0,10,0,0"/>
-
-                            </StackPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <Button Style="{StaticResource CardButtonStyle}"
+                Content="💼"
+                Tag="Cargos"
+                ToolTip="Cadastre e gerencie os cargos da empresa, salários e níveis."
+                Click="BtnCargos_Click"/>
 
             <!-- CLIENTES -->
-            <Button Width="220"
-                    Height="140"
-                    Margin="15"
-                    BorderThickness="0"
-                    Background="White"
-                    Cursor="Hand">
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="20"
-                                Padding="20">
-
-                            <StackPanel>
-
-                                <TextBlock Text="🏢"
-                                           FontSize="42"
-                                           HorizontalAlignment="Center"/>
-
-                                <TextBlock Text="Clientes"
-                                           FontSize="20"
-                                           FontWeight="SemiBold"
-                                           Foreground="#0F172A"
-                                           HorizontalAlignment="Center"
-                                           Margin="0,10,0,0"/>
-
-                            </StackPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <Button Style="{StaticResource CardButtonStyle}"
+                Content="🏢"
+                Tag="Clientes"
+                ToolTip="Gerencie os clientes, contatos, empresas e informações comerciais."/>
 
             <!-- CUSTOS -->
-            <Button Width="220"
-                    Height="140"
-                    Margin="15"
-                    BorderThickness="0"
-                    Background="White"
-                    Cursor="Hand">
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="20"
-                                Padding="20">
-
-                            <StackPanel>
-
-                                <TextBlock Text="💰"
-                                           FontSize="42"
-                                           HorizontalAlignment="Center"/>
-
-                                <TextBlock Text="Custos"
-                                           FontSize="20"
-                                           FontWeight="SemiBold"
-                                           Foreground="#0F172A"
-                                           HorizontalAlignment="Center"
-                                           Margin="0,10,0,0"/>
-
-                            </StackPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <Button Style="{StaticResource CardButtonStyle}"
+                Content="💰"
+                Tag="Custos"
+                ToolTip="Gerencie os custos diretos e indiretos utilizados nos orçamentos."/>
 
         </UniformGrid>
 

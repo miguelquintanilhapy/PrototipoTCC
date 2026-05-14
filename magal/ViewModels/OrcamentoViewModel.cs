@@ -56,9 +56,10 @@ namespace magal.ViewModels
             DeletarCustoCommand = new RelayCommand(param => DeletarCustoExtra(param as Custo));
             GerarPdfCommand = new RelayCommand(_ => ExecutarFluxoFinal());
             DescartarCommand = new RelayCommand(_ => ExecutarDescarte());
-
-            NovoProjeto();
+           
             CarregarDadosIniciais();
+            NovoProjeto();
+           
         }
 
         private bool TemAlteracoes()

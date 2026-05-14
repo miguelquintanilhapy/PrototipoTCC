@@ -35,7 +35,7 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Background" Value="White"/>
             <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="0.4"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
@@ -100,10 +100,10 @@
                   Style="{StaticResource ComboStyle}"
                   Margin="0,0,0,16">
 
-            <ComboBoxItem Content="Jr"/>
-            <ComboBoxItem Content="Pl"/>
-            <ComboBoxItem Content="Sr"/>
-            <ComboBoxItem Content="Especialista"/>
+            <ComboBoxItem Content="Júnior"  FontWeight="SemiBold"/>
+            <ComboBoxItem Content="Pleno" FontWeight="SemiBold"/>
+            <ComboBoxItem Content="Sênior" FontWeight="SemiBold"/>
+            <ComboBoxItem Content="Especialista" FontWeight="SemiBold"/>
 
         </ComboBox>
 

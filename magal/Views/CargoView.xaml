@@ -58,9 +58,10 @@
                 <Button Content="+ NOVO CARGO" 
                         Style="{StaticResource PrimaryBtn}"
                         Margin="0,0,10,0"
-                        Click="BtnNovoCargo_Click"/>
+                        Command="{Binding CriarCommand}"/>
 
                 <Button Content="ATUALIZAR LISTA" 
+                        Command="{Binding AtualizarCommand}"
                         Style="{StaticResource PrimaryBtn}"/>
             </StackPanel>
         </Grid>
@@ -68,7 +69,8 @@
         <StackPanel Grid.Row="1" Margin="0,0,0,15">
             <TextBlock Text="FILTRE POR NOME OU NÍVEL" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
             <Grid>
-                <TextBox Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"
+                <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
+                         Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"
                          FontSize="14" Background="White" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
                     <TextBox.Resources>
                         <Style TargetType="{x:Type Border}">
@@ -87,7 +89,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <DataGrid ItemsSource="{Binding Cargos}" 
+                <DataGrid ItemsSource="{Binding CargosView}" 
                           AutoGenerateColumns="False" IsReadOnly="True"
                           Background="Transparent" BorderThickness="0"
                           GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
@@ -176,13 +178,15 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button Content="Editar" 
-                                                Click="BtnEditar_Click"
+                                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
                                                 FontSize="13"
                                                 Foreground="{StaticResource AeroAccent}"
                                                 Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
 
                                         <Button Content="Excluir" 
-                                                Click="BtnExcluir_Click"
+                                                Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
                                                 FontSize="13"
                                                 Foreground="{StaticResource AeroDanger}"
                                                 Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
@@ -194,7 +198,7 @@
                 </DataGrid>
 
                 <Border Grid.Row="1" Background="#F8FAFC" BorderThickness="0,1,0,0" BorderBrush="#F1F5F9" CornerRadius="0,0,16,16" Padding="20,12">
-                    <TextBlock Text="{Binding Cargos.Count, StringFormat='{}{0} cargos encontrados'}"
+                    <TextBlock Text="{Binding CargosView.Count, StringFormat='{}{0} cargos encontrados'}"
                                FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
                 </Border>
             </Grid>

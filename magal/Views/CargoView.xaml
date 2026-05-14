@@ -1,0 +1,319 @@
+﻿<UserControl x:Class="magal.Views.CargoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             Background="#F0F4FA">
+
+    <UserControl.Resources>
+
+        <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
+        <SolidColorBrush x:Key="AeroAccent" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="AeroDanger" Color="#EF4444"/>
+        <SolidColorBrush x:Key="AeroTextMuted" Color="#64748B"/>
+        <SolidColorBrush x:Key="AeroTextHint" Color="#94A3B8"/>
+        <SolidColorBrush x:Key="AeroBorder" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="VerdeAero" Color="#009140"/>
+
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+
+            <Setter Property="Background" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+
+                    <ControlTemplate TargetType="Button">
+
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="14,7">
+
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#1E3A8A"/>
+
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Grid Margin="32,28">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- TOPO -->
+        <Grid Grid.Row="0"
+              Height="80"
+              Margin="0,0,0,10">
+
+            <TextBlock Text="Gestão de Cargos"
+                       FontSize="28"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource AzulAero}"
+                       VerticalAlignment="Center"/>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+
+                <Button Content="+ NOVO CARGO"
+                        Click="BtnNovoCargo_Click"
+                        Style="{StaticResource PrimaryBtn}"
+                        Margin="0,0,10,0"/>
+
+                <Button Content="ATUALIZAR LISTA"
+                        Style="{StaticResource PrimaryBtn}"/>
+
+            </StackPanel>
+
+        </Grid>
+
+        <!-- FILTRO -->
+        <StackPanel Grid.Row="1"
+                    Margin="0,0,0,15">
+
+            <TextBlock Text="FILTRE POR NOME OU NÍVEL"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource AzulAero}"
+                       Margin="0,0,0,4"/>
+
+            <Grid>
+
+                <TextBox Height="42"
+                         VerticalContentAlignment="Center"
+                         Padding="12,0,40,0"
+                         FontSize="14"
+                         Background="White"
+                         BorderThickness="1"
+                         BorderBrush="{StaticResource AeroBorder}">
+
+                    <TextBox.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </TextBox.Resources>
+
+                </TextBox>
+
+                <TextBlock Text="🔍"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0,0,15,0"
+                           Foreground="{StaticResource AeroTextHint}"/>
+
+            </Grid>
+
+        </StackPanel>
+
+        <!-- TABELA -->
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="16"
+                BorderThickness="1"
+                BorderBrush="{StaticResource AeroBorder}"
+                Padding="1">
+
+            <Grid>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DataGrid ItemsSource="{Binding Cargos}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="#F1F5F9"
+                          HeadersVisibility="Column"
+                          RowHeight="60">
+
+                    <DataGrid.Resources>
+
+                        <Style TargetType="DataGridColumnHeader">
+
+                            <Setter Property="Background" Value="#F8FAFC"/>
+                            <Setter Property="Foreground" Value="{StaticResource AeroTextMuted}"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="15,12"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+
+                        </Style>
+
+                        <Style TargetType="DataGridCell">
+
+                            <Setter Property="Padding" Value="15,0"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+
+                            <Setter Property="Template">
+                                <Setter.Value>
+
+                                    <ControlTemplate TargetType="DataGridCell">
+
+                                        <Border Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}">
+
+                                            <ContentPresenter VerticalAlignment="Center"/>
+
+                                        </Border>
+
+                                    </ControlTemplate>
+
+                                </Setter.Value>
+                            </Setter>
+
+                            <Style.Triggers>
+
+                                <!-- HOVER -->
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#F1F5F9"/>
+                                </Trigger>
+
+                                <!-- SELECIONADO -->
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#EFF6FF"/>
+                                    <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
+                                </Trigger>
+
+                            </Style.Triggers>
+
+                        </Style>
+                        
+                    </DataGrid.Resources>
+
+                    <DataGrid.Columns>
+
+                        <!-- ID -->
+                        <DataGridTextColumn Header="ID"
+                        Binding="{Binding id_cargo}"
+                        Width="80"
+                        FontSize="14"
+                        FontWeight="SemiBold"/>
+
+                        <!-- NOME -->
+                        <DataGridTextColumn Header="NOME"
+                        Binding="{Binding nome}"
+                        Width="260"
+                        FontSize="14"
+                        FontWeight="SemiBold">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- NÍVEL -->
+                        <DataGridTextColumn Header="NÍVEL"
+                        Binding="{Binding nivel}"
+                        Width="120"
+                        FontSize="14"
+                        FontWeight="SemiBold"/>
+
+                        <!-- CUSTO/HORA -->
+                        <DataGridTextColumn Header="CUSTO/HORA"
+                        Binding="{Binding custo_medio_hora, StringFormat='R$ {0:N2}'}"
+                        Width="170"
+                        FontSize="15"
+                        FontWeight="SemiBold">
+
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#009140"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+
+                        </DataGridTextColumn>
+
+                        
+                        <!-- AÇÕES -->
+                        <DataGridTemplateColumn Header="AÇÕES" Width="160">
+
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">         
+
+                                        <Button Content="Editar"
+                                                Click="BtnEditar_Click"
+                                                Foreground="#3B82F6"
+                                                FontWeight="Bold"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Margin="0,0,15,0"/>
+
+                                        <Button Content="Excluir"
+                                                Click="BtnExcluir_Click"
+                                                Foreground="#EF4444"
+                                                FontWeight="Bold"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"/>             
+
+                                    </StackPanel>
+
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+                <Border Grid.Row="1"
+                        Background="#F8FAFC"
+                        BorderThickness="0,1,0,0"
+                        BorderBrush="#F1F5F9"
+                        CornerRadius="0,0,16,16"
+                        Padding="20,12">
+
+                    <TextBlock Text="{Binding Cargos.Count, StringFormat='{}{0} cargos encontrados'}"
+                               FontSize="12"
+                               Foreground="{StaticResource AeroTextHint}"/>
+
+                </Border>
+
+            </Grid>
+
+        </Border>
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,123 @@
+﻿<Window x:Class="magal.Views.EditarCargoDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Editar Cargo"
+        Height="550"
+        Width="550"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F0F4FA">
+
+    <Window.Resources>
+
+        <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
+        <SolidColorBrush x:Key="AeroBorder" Color="#E2E8F0"/>
+
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="InputStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <Style x:Key="ComboStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="14,7">
+
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#1E3A8A"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <StackPanel Margin="32,28">
+
+        <TextBlock Text="Editar Cargo"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource AzulAero}"
+                   Margin="0,0,0,24"/>
+
+        <TextBlock Text="NOME DO CARGO"
+                   Style="{StaticResource LabelStyle}"/>
+
+        <TextBox x:Name="TxtNome"
+                 Style="{StaticResource InputStyle}"
+                 Margin="0,0,0,16"/>
+
+        <TextBlock Text="NÍVEL"
+                   Style="{StaticResource LabelStyle}"/>
+
+        <ComboBox x:Name="ComboNivel"
+                  Style="{StaticResource ComboStyle}"
+                  Margin="0,0,0,16">
+
+            <ComboBoxItem Content="Jr"/>
+            <ComboBoxItem Content="Pl"/>
+            <ComboBoxItem Content="Sr"/>
+            <ComboBoxItem Content="Especialista"/>
+
+        </ComboBox>
+
+        <TextBlock Text="CUSTO MÉDIO/HORA (R$)"
+                   Style="{StaticResource LabelStyle}"/>
+
+        <TextBox x:Name="TxtCustoHora"
+                 Style="{StaticResource InputStyle}"
+                 Margin="0,0,0,16"/>
+
+        <Button Content="SALVAR ALTERAÇÕES"
+                Style="{StaticResource PrimaryBtn}"
+                Click="BtnSalvar_Click"/>
+
+    </StackPanel>
+
+</Window>

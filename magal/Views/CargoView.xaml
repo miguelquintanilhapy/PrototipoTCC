@@ -261,46 +261,33 @@
 
                         
                         <!-- AÇÕES -->
-                        <DataGridTemplateColumn Header="AÇÕES" Width="220">
-
-                            <!-- HEADER -->
-                            <DataGridTemplateColumn.HeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                    <Setter Property="Padding" Value="0,12,25,12"/>
-                                </Style>
-                            </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn Header="AÇÕES" Width="160">
 
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
 
-                                    <Grid>
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">         
 
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    Margin="0,0,20,0">
+                                        <Button Content="Editar"
+                                                Click="BtnEditar_Click"
+                                                Foreground="#3B82F6"
+                                                FontWeight="Bold"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Margin="0,0,15,0"/>
 
-                                            <Button Content="Editar"
-                                                    Click="BtnEditar_Click"
-                                                    Foreground="#3B82F6"
-                                                    FontWeight="Bold"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Cursor="Hand"
-                                                    Margin="0,0,15,0"/>
+                                        <Button Content="Excluir"
+                                                Click="BtnExcluir_Click"
+                                                Foreground="#EF4444"
+                                                FontWeight="Bold"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"/>             
 
-                                            <Button Content="Excluir"
-                                                    Click="BtnExcluir_Click"
-                                                    Foreground="#EF4444"
-                                                    FontWeight="Bold"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Cursor="Hand"/>
-
-                                        </StackPanel>
-
-                                    </Grid>
+                                    </StackPanel>
 
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

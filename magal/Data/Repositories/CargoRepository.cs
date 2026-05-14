@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using magal.Models;
 using magal.Data;
-
 namespace magal.Data.Repositories
 {
     public class CargoRepository
@@ -11,12 +10,15 @@ namespace magal.Data.Repositories
         public List<Cargo> ListarTodos()
         {
             var lista = new List<Cargo>();
+
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
                     conn.Open();
-                    string sql = "SELECT id_cargo, nome, nivel, custo_medio_hora, descricao FROM cargo";
+
+                    string sql = "SELECT id_cargo, nome, nivel, custo_medio_hora FROM cargo";
+
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         using (var reader = cmd.ExecuteReader())
@@ -28,8 +30,7 @@ namespace magal.Data.Repositories
                                     id_cargo = reader.GetInt32(reader.GetOrdinal("id_cargo")),
                                     nome = reader.GetString(reader.GetOrdinal("nome")),
                                     nivel = reader.GetString(reader.GetOrdinal("nivel")),
-                                    custo_medio_hora = reader.GetDecimal(reader.GetOrdinal("custo_medio_hora")),
-                                   
+                                    custo_medio_hora = reader.GetDecimal(reader.GetOrdinal("custo_medio_hora"))
                                 });
                             }
                         }
@@ -40,6 +41,7 @@ namespace magal.Data.Repositories
             {
                 throw new Exception("Erro no CargoRepository: " + ex.Message);
             }
+
             return lista;
         }
 
@@ -47,32 +49,29 @@ namespace magal.Data.Repositories
         {
             try
             {
-                using (var conn = (MySql.Data.MySqlClient.MySqlConnection)DbConnectionFactory.CreateConnection())
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
                     conn.Open();
 
                     string sql = @"
-                INSERT INTO cargo
-                (
-                    nome,
-                    nivel,
-                    custo_medio_hora,
-                    descricao
-                )
-                VALUES
-                (
-                    @nome,
-                    @nivel,
-                    @custo,
-                    @descricao
-                )";
+                        INSERT INTO cargo
+                        (
+                            nome,
+                            nivel,
+                            custo_medio_hora
+                        )
+                        VALUES
+                        (
+                            @nome,
+                            @nivel,
+                            @custo
+                        )";
 
-                    using (var cmd = new MySql.Data.MySqlClient.MySqlCommand(sql, conn))
+                    using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
                         cmd.Parameters.AddWithValue("@nivel", cargo.nivel);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
-                       
 
                         cmd.ExecuteNonQuery();
                     }
@@ -88,26 +87,24 @@ namespace magal.Data.Repositories
         {
             try
             {
-                using (var conn = (MySql.Data.MySqlClient.MySqlConnection)DbConnectionFactory.CreateConnection())
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
                     conn.Open();
 
                     string sql = @"
-                UPDATE cargo
-                SET
-                    nome = @nome,
-                    nivel = @nivel,
-                    custo_medio_hora = @custo,
-                    descricao = @descricao
-                WHERE id_cargo = @id";
+                        UPDATE cargo
+                        SET
+                            nome = @nome,
+                            nivel = @nivel,
+                            custo_medio_hora = @custo
+                        WHERE id_cargo = @id";
 
-                    using (var cmd = new MySql.Data.MySqlClient.MySqlCommand(sql, conn))
+                    using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", cargo.id_cargo);
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
                         cmd.Parameters.AddWithValue("@nivel", cargo.nivel);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
-          
 
                         cmd.ExecuteNonQuery();
                     }
@@ -123,13 +120,13 @@ namespace magal.Data.Repositories
         {
             try
             {
-                using (var conn = (MySql.Data.MySqlClient.MySqlConnection)DbConnectionFactory.CreateConnection())
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
                     conn.Open();
 
                     string sql = "DELETE FROM cargo WHERE id_cargo = @id";
 
-                    using (var cmd = new MySql.Data.MySqlClient.MySqlCommand(sql, conn))
+                    using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", idCargo);
 

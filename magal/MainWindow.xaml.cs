@@ -20,10 +20,7 @@ namespace magal
             InitializeComponent();
             this.WindowState = WindowState.Maximized;
 
-            // 1. Carrega os dados do usuário assim que a janela é instanciada
             CarregarDadosUsuario();
-
-            // 2. Inicia na Home
             AbrirHome();
         }
 
@@ -32,7 +29,6 @@ namespace magal
             // Verificamos se a sessão global existe
             if (Sessao.UsuarioLogado != null)
             {
-                // ATENÇÃO: Verifique se as propriedades no seu Model são 'nome' ou 'Nome' (C# costuma usar Maiúsculo)
                 string nome = Sessao.UsuarioLogado.nome;
                 string email = Sessao.UsuarioLogado.email;
 
@@ -103,7 +99,6 @@ namespace magal
         // --- PERFIL E USUÁRIO ---
         private void BtnPerfil_Click(object sender, RoutedEventArgs e)
         {
-            // Abre o ContextMenu (Adicionar Usuário) ao clicar no perfil
             if (sender is Button btn && btn.ContextMenu != null)
             {
                 btn.ContextMenu.PlacementTarget = btn;
@@ -125,10 +120,10 @@ namespace magal
 
             if (resultado == MessageBoxResult.Yes)
             {
-                Sessao.UsuarioLogado = null; // Limpa a sessão
+                Sessao.UsuarioLogado = null; 
                 LoginView login = new LoginView();
                 login.Show();
-                this.Close(); // Fecha a MainWindow
+                Close(); 
             }
         }
 

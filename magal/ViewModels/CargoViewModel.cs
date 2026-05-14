@@ -64,8 +64,8 @@ namespace magal.ViewModels
 
             var busca = FiltroTexto.ToLower().Trim();
 
-            return (cargo.nome?.ToLower().Contains(busca) ?? false) ||
-                   (cargo.nivel?.ToLower().Contains(busca) ?? false);
+            return (cargo.nome?.ToLower().Contains(busca) ?? false);
+                  
         }
 
         private void CarregarCargos()

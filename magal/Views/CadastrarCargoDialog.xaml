@@ -105,21 +105,7 @@
                  Style="{StaticResource InputStyle}"
                  Margin="0,0,0,14"/>
 
-        <!-- NÍVEL -->
-        <TextBlock Text="NÍVEL"
-                   Style="{StaticResource LabelStyle}"/>
-
-        <ComboBox x:Name="ComboNivel"
-                  Style="{StaticResource ComboStyle}"
-                  Margin="0,0,0,14">
-
-            <ComboBoxItem Content="Júnior"  FontWeight="SemiBold"/>
-            <ComboBoxItem Content="Pleno" FontWeight="SemiBold"/>
-            <ComboBoxItem Content="Sênior" FontWeight="SemiBold"/>
-            <ComboBoxItem Content="Especialista" FontWeight="SemiBold"/>
-
-        </ComboBox>
-
+      
         <!-- CUSTO -->
         <TextBlock Text="CUSTO MÉDIO/HORA (R$)"
                    Style="{StaticResource LabelStyle}"/>

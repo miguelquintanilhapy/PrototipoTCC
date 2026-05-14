@@ -1,15 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using magal.Models;
 using magal.Data.Repositories;
 
@@ -33,22 +23,11 @@ namespace magal.Views
             TxtNome.Text = _cargo.nome;
 
             TxtCustoHora.Text = _cargo.custo_medio_hora.ToString("F2");
-
-
-            foreach (ComboBoxItem item in ComboNivel.Items)
-            {
-                if (item.Content.ToString() == _cargo.nivel)
-                {
-                    ComboNivel.SelectedItem = item;
-                    break;
-                }
-            }
         }
 
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
-                ComboNivel.SelectedItem == null ||
                 string.IsNullOrWhiteSpace(TxtCustoHora.Text))
             {
                 MessageBox.Show(
@@ -78,10 +57,6 @@ namespace magal.Views
             try
             {
                 _cargo.nome = TxtNome.Text.Trim();
-
-                _cargo.nivel = ((ComboBoxItem)ComboNivel.SelectedItem)
-                    .Content
-                    .ToString();
 
                 _cargo.custo_medio_hora = custoHora;
 

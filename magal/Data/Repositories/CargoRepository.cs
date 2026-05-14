@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using magal.Models;
 using magal.Data;
+
 namespace magal.Data.Repositories
 {
     public class CargoRepository
@@ -17,7 +18,7 @@ namespace magal.Data.Repositories
                 {
                     conn.Open();
 
-                    string sql = "SELECT id_cargo, nome, nivel, custo_medio_hora FROM cargo";
+                    string sql = "SELECT id_cargo, nome, custo_medio_hora FROM cargo";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
@@ -29,7 +30,6 @@ namespace magal.Data.Repositories
                                 {
                                     id_cargo = reader.GetInt32(reader.GetOrdinal("id_cargo")),
                                     nome = reader.GetString(reader.GetOrdinal("nome")),
-                                    nivel = reader.GetString(reader.GetOrdinal("nivel")),
                                     custo_medio_hora = reader.GetDecimal(reader.GetOrdinal("custo_medio_hora"))
                                 });
                             }
@@ -54,23 +54,19 @@ namespace magal.Data.Repositories
                     conn.Open();
 
                     string sql = @"
-                        INSERT INTO cargo
-                        (
+                        INSERT INTO cargo (
                             nome,
-                            nivel,
                             custo_medio_hora
                         )
                         VALUES
                         (
                             @nome,
-                            @nivel,
                             @custo
                         )";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
-                        cmd.Parameters.AddWithValue("@nivel", cargo.nivel);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
 
                         cmd.ExecuteNonQuery();
@@ -95,7 +91,6 @@ namespace magal.Data.Repositories
                         UPDATE cargo
                         SET
                             nome = @nome,
-                            nivel = @nivel,
                             custo_medio_hora = @custo
                         WHERE id_cargo = @id";
 
@@ -103,7 +98,6 @@ namespace magal.Data.Repositories
                     {
                         cmd.Parameters.AddWithValue("@id", cargo.id_cargo);
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
-                        cmd.Parameters.AddWithValue("@nivel", cargo.nivel);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
 
                         cmd.ExecuteNonQuery();

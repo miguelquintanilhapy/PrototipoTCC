@@ -26,7 +26,6 @@ namespace magal.Views
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
-                ComboNivel.SelectedItem == null ||
                 string.IsNullOrWhiteSpace(TxtCustoHora.Text))
             {
                 MessageBox.Show(
@@ -54,7 +53,7 @@ namespace magal.Views
                 var cargo = new Cargo
                 {
                     nome = TxtNome.Text.Trim(),
-                    nivel = ((ComboBoxItem)ComboNivel.SelectedItem).Content.ToString(),
+                    
                     custo_medio_hora = custoHora,
                     
                 };

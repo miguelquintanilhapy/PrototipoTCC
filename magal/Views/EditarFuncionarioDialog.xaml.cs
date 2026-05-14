@@ -22,68 +22,134 @@ namespace magal.Views
         public EditarFuncionarioDialog(Funcionario funcionario)
         {
             InitializeComponent();
+
             _funcionario = funcionario;
+
             CarregarCargos();
+
             PreencherCampos();
         }
 
         private void CarregarCargos()
         {
             var repo = new CargoRepository();
+
             ComboCargo.ItemsSource = repo.ListarTodos();
         }
 
         private void PreencherCampos()
         {
             TxtNome.Text = _funcionario.nome;
+
             TxtCustoHora.Text = _funcionario.custo_hora.ToString("F2");
+
             ComboCargo.SelectedValue = _funcionario.id_cargo;
 
-            foreach (ComboBoxItem item in ComboTipoVinculo.Items)
-                if (item.Content.ToString() == _funcionario.tipo_vinculo)
-                    ComboTipoVinculo.SelectedItem = item;
+            // NÍVEL
+            foreach (ComboBoxItem item in ComboNivel.Items)
+            {
+                if (item.Content.ToString() == _funcionario.nivel)
+                {
+                    ComboNivel.SelectedItem = item;
+                    break;
+                }
+            }
 
+            // TIPO VÍNCULO
+            foreach (ComboBoxItem item in ComboTipoVinculo.Items)
+            {
+                if (item.Content.ToString() == _funcionario.tipo_vinculo)
+                {
+                    ComboTipoVinculo.SelectedItem = item;
+                    break;
+                }
+            }
+
+            // STATUS
             foreach (ComboBoxItem item in ComboStatus.Items)
+            {
                 if (item.Content.ToString() == _funcionario.status)
+                {
                     ComboStatus.SelectedItem = item;
+                    break;
+                }
+            }
         }
 
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
                 ComboCargo.SelectedValue == null ||
+                ComboNivel.SelectedItem == null ||
                 string.IsNullOrWhiteSpace(TxtCustoHora.Text) ||
                 ComboTipoVinculo.SelectedItem == null ||
                 ComboStatus.SelectedItem == null)
             {
-                MessageBox.Show("Preencha todos os campos.", "Aero Concepts", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "Preencha todos os campos.",
+                    "Aero Concepts",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
                 return;
             }
 
-            if (!decimal.TryParse(TxtCustoHora.Text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.CurrentCulture, out decimal custoHora))
+            if (!decimal.TryParse(
+                    TxtCustoHora.Text,
+                    System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    out decimal custoHora))
             {
-                MessageBox.Show("Custo/Hora inválido.", "Aero Concepts", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "Custo/Hora inválido.",
+                    "Aero Concepts",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
                 return;
             }
 
             try
             {
                 _funcionario.nome = TxtNome.Text.Trim();
+
                 _funcionario.id_cargo = (int)ComboCargo.SelectedValue;
+
+                _funcionario.nivel = ((ComboBoxItem)ComboNivel.SelectedItem)
+                    .Content
+                    .ToString();
+
                 _funcionario.custo_hora = custoHora;
-                _funcionario.tipo_vinculo = ((ComboBoxItem)ComboTipoVinculo.SelectedItem).Content.ToString();
-                _funcionario.status = ((ComboBoxItem)ComboStatus.SelectedItem).Content.ToString();
+
+                _funcionario.tipo_vinculo = ((ComboBoxItem)ComboTipoVinculo.SelectedItem)
+                    .Content
+                    .ToString();
+
+                _funcionario.status = ((ComboBoxItem)ComboStatus.SelectedItem)
+                    .Content
+                    .ToString();
 
                 var repo = new FuncionarioRepository();
+
                 repo.Atualizar(_funcionario);
 
-                MessageBox.Show("Funcionário atualizado com sucesso!", "Aero Concepts", MessageBoxButton.OK, MessageBoxImage.Information);
-                this.DialogResult = true;
-                this.Close();
+                MessageBox.Show(
+                    "Funcionário atualizado com sucesso!",
+                    "Aero Concepts",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                DialogResult = true;
+
+                Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao salvar: " + ex.Message, "Aero Concepts", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Erro ao salvar: " + ex.Message,
+                    "Aero Concepts",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
     }

@@ -218,12 +218,11 @@ namespace magal.Data.Repositories
                                FROM projeto p 
                                INNER JOIN cliente c ON p.id_cliente = c.id_cliente 
                                LEFT JOIN orcamento o ON p.id_projeto = o.id_projeto 
-                               WHERE p.id_usuario = @idUser 
                                ORDER BY p.data_criacao DESC";
 
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@idUser", idUsuario);
+                    
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())

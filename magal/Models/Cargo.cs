@@ -9,7 +9,6 @@ namespace magal.Models
     {
         public int id_cargo { get; set; }
         public string nome { get; set; }
-        public string nivel { get; set; }
         public decimal custo_medio_hora { get; set; }
     }
 }

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Editar Cargo"
         Height="550"
-        Width="550"
+        Width="420"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="#F0F4FA">
@@ -92,21 +92,7 @@
         <TextBox x:Name="TxtNome"
                  Style="{StaticResource InputStyle}"
                  Margin="0,0,0,16"/>
-
-        <TextBlock Text="NÍVEL"
-                   Style="{StaticResource LabelStyle}"/>
-
-        <ComboBox x:Name="ComboNivel"
-                  Style="{StaticResource ComboStyle}"
-                  Margin="0,0,0,16">
-
-            <ComboBoxItem Content="Júnior"  FontWeight="SemiBold"/>
-            <ComboBoxItem Content="Pleno" FontWeight="SemiBold"/>
-            <ComboBoxItem Content="Sênior" FontWeight="SemiBold"/>
-            <ComboBoxItem Content="Especialista" FontWeight="SemiBold"/>
-
-        </ComboBox>
-
+     
         <TextBlock Text="CUSTO MÉDIO/HORA (R$)"
                    Style="{StaticResource LabelStyle}"/>
 

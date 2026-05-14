@@ -1,31 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-
+using magal.ViewModels; 
 
 namespace magal.Views
 {
     public partial class GerenciamentoView : UserControl
     {
+        private readonly GerenciamentoViewModel _viewModel;
+
         public GerenciamentoView()
         {
             InitializeComponent();
+
+            _viewModel = new GerenciamentoViewModel();
+            this.DataContext = _viewModel;
+        }
+
+      
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            _viewModel.CarregarIndicadores();
         }
 
         private void BtnFuncionarios_Click(object sender, RoutedEventArgs e)
         {
             var janelaPrincipal = Window.GetWindow(this) as MainWindow;
-
             if (janelaPrincipal != null)
             {
                 janelaPrincipal.MainContentControl.Content = new FuncionarioView();
@@ -35,12 +35,14 @@ namespace magal.Views
         private void BtnCargos_Click(object sender, RoutedEventArgs e)
         {
             var janelaPrincipal = Window.GetWindow(this) as MainWindow;
-
             if (janelaPrincipal != null)
             {
                 janelaPrincipal.MainContentControl.Content = new CargoView();
             }
         }
 
+        private void BtnClientes_Click(object sender, RoutedEventArgs e)
+        {
+        }
     }
 }

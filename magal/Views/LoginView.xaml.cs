@@ -62,7 +62,6 @@ namespace magal.Views
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            // Padronização: Trim() evita erros com espaços acidentais no e-mail
             string usuarioDigitado = txtUsuario.Text.Trim();
             string senhaDigitada = senhaVisivel ? txtSenhaVisivel.Text : txtSenha.Password;
 
@@ -78,7 +77,6 @@ namespace magal.Views
                 {
                     conn.Open();
 
-                    // SQL parametrizado conforme as colunas do seu banco
                     string sql = "SELECT id_usuario, nome, email FROM usuario WHERE email = @email AND senha = @pass AND status = 'Ativo'";
 
                     using (var cmd = new MySqlCommand(sql, conn))
@@ -90,7 +88,6 @@ namespace magal.Views
                         {
                             if (reader.Read())
                             {
-                                // Criamos o objeto usuario com os dados que vieram do banco
                                 var usuarioLogado = new Usuario
                                 {
                                     id_usuario = Convert.ToInt32(reader["id_usuario"]),
@@ -117,7 +114,6 @@ namespace magal.Views
 
         private void ExecutarAnimacaoSaida()
         {
-            // Animação suave de Opacidade
             var fadeOut = new DoubleAnimation
             {
                 From = 1.0,

@@ -76,6 +76,35 @@
             </Setter>
         </Style>
 
+
+        <Style x:Key="DiscardBtn" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AeroDanger}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" 
+                        Background="{TemplateBinding Background}" 
+                        CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#DC2626"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#991B1B"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="IconDeleteBtn" TargetType="Button">
             <Setter Property="Background"      Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -525,15 +554,12 @@
                 </StackPanel>
 
                 <Button Content="DESCARTAR ALTERAÇÕES"
-            Command="{Binding DescartarCommand}"
-            Visibility="{Binding VisibilidadeBotaoDescartar}"
-            Background="{StaticResource AeroPrimary}"
-            Foreground="White"
-            Width="240" 
-            Height="54" 
-            FontSize="14"
-            Margin="0,0,12,0"
-            Style="{StaticResource PrimaryBtn}"/>
+        Command="{Binding DescartarCommand}"
+        Visibility="{Binding VisibilidadeBotaoDescartar}"
+        Style="{StaticResource DiscardBtn}" 
+        Width="240" 
+        Height="54" 
+        Margin="0,0,12,0"/>
 
                 <Button Content="FINALIZAR PROPOSTA"
             Command="{Binding GerarPdfCommand}"

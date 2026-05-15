@@ -430,16 +430,15 @@
                                   BorderBrush="{StaticResource AeroBorder}" 
                                   Background="#F8FAFC"/>
                     </StackPanel>
-
-                   <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0">
-    <TextBlock Text="VALOR (R$)" 
+                                                    <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0">
+                                                        <TextBlock Text="VALOR (R$)" 
                FontSize="12" 
                FontWeight="Bold" 
                Foreground="{StaticResource AeroTextDark}" 
                HorizontalAlignment="Right" 
                Margin="0,0,0,4"/>
-    
-    <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged}"
+
+                                                        <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, Delay=500}"
              FontSize="15" 
              FontWeight="Bold" 
              Foreground="{StaticResource AeroTextDark}"
@@ -450,9 +449,9 @@
              Height="40" 
              VerticalContentAlignment="Center" 
              Padding="8,0"
-             PreviewTextInput="ValidarEntradaSemNegativo"/>        
-</StackPanel>
-                    <Button Grid.Column="4" Content="✕"
+             PreviewTextInput="ValidarEntradaSemNegativo"/>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="4" Content="✕"
                             Command="{Binding DataContext.DeletarCustoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             CommandParameter="{Binding}"
                             Style="{StaticResource IconDeleteBtn}"

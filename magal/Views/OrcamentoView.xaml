@@ -431,21 +431,27 @@
                                   Background="#F8FAFC"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0">
-                        <TextBlock Text="VALOR (R$)" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" HorizontalAlignment="Right" Margin="0,0,0,4"/>
-                                <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                 FontSize="15" 
-                                 FontWeight="Bold" 
-                                 Foreground="{StaticResource AeroTextDark}"
-                                 Background="Transparent" 
-                                 BorderThickness="1" 
-                                 BorderBrush="{StaticResource AeroBorder}"
-                                 HorizontalContentAlignment="Right" 
-                                 Height="40" 
-                                 VerticalContentAlignment="Center" 
-                                 Padding="8,0"/>
-                    </StackPanel>
-
+                   <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0">
+    <TextBlock Text="VALOR (R$)" 
+               FontSize="12" 
+               FontWeight="Bold" 
+               Foreground="{StaticResource AeroTextDark}" 
+               HorizontalAlignment="Right" 
+               Margin="0,0,0,4"/>
+    
+    <TextBox Text="{Binding valor, UpdateSourceTrigger=PropertyChanged, Delay=500}"
+             FontSize="15" 
+             FontWeight="Bold" 
+             Foreground="{StaticResource AeroTextDark}"
+             Background="Transparent" 
+             BorderThickness="1" 
+             BorderBrush="{StaticResource AeroBorder}"
+             HorizontalContentAlignment="Right" 
+             Height="40" 
+             VerticalContentAlignment="Center" 
+             Padding="8,0"
+             PreviewTextInput="ValidarEntradaSemNegativo"/>        
+</StackPanel>
                     <Button Grid.Column="4" Content="✕"
                             Command="{Binding DataContext.DeletarCustoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             CommandParameter="{Binding}"
@@ -475,99 +481,105 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom">
 
-                <StackPanel Margin="0,0,10,0">
-                    <TextBlock Text="LUCRO" 
-                   FontSize="12" 
-                   FontWeight="Bold" 
-                   Foreground="{StaticResource AeroTextDark}" 
-                   Margin="0,0,0,3" />
-                    <Grid>
-                        <TextBox Text="{Binding ProjetoAtual.Orcamento.margem_percentual, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}"
-                     PreviewTextInput="ValidarEntradaSemNegativo"
-                     FontWeight="Bold" 
-                     Height="48" 
-                     FontSize="15"                 
-                     Padding="25,0,30,0" 
-                     MinWidth="100"
-                     VerticalContentAlignment="Center" 
-                     BorderThickness="1.5" 
-                     BorderBrush="{StaticResource AeroBorder}">
-                            <TextBox.Resources>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
-                            </TextBox.Resources>
-                        </TextBox>
+            <Border Grid.Column="0" 
+            Background="#F8FAFC" 
+            BorderBrush="{StaticResource AeroBorder}" 
+            BorderThickness="1" 
+            CornerRadius="12" 
+            Padding="12,10"
+            VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal">
 
-                        <TextBlock Text="%" 
-                       Foreground="{StaticResource AeroTextDark}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Right" 
-                       FontWeight="Bold"
-                       FontSize="15"                 
-                       Margin="0,0,20,0"
-                       IsHitTestVisible="False"/>
-                    </Grid>
+                    <StackPanel VerticalAlignment="Center" Margin="5,0,15,0">
+                        <TextBlock Text="AJUSTES DE" FontSize="12" FontWeight="Black" Foreground="{StaticResource AeroPrimary}"/>
+                        <TextBlock Text="MARGENS" FontSize="12" FontWeight="Black" Foreground="{StaticResource AeroPrimary}"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="LUCRO" 
+                           FontSize="12" 
+                           FontWeight="Bold" 
+                           Foreground="{StaticResource AeroTextDark}" 
+                           Margin="0,0,0,3" />
+                        <Grid>
+                            <TextBox Text="{Binding ProjetoAtual.Orcamento.margem_percentual, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}"
+                             PreviewTextInput="ValidarEntradaSemNegativo"
+                             FontWeight="Bold" 
+                             Height="48" 
+                              
+                             FontSize="15"                 
+                             Padding="25,0,30,0" 
+                             MinWidth="100"
+                             VerticalContentAlignment="Center" 
+                             BorderThickness="1.5" 
+                             BorderBrush="{StaticResource AeroBorder}">
+                                <TextBox.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                                </TextBox.Resources>
+                            </TextBox>
+                            <TextBlock Text="%" 
+                               Foreground="{StaticResource AeroTextDark}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Right" 
+                               FontWeight="Bold"
+                               FontSize="15"                 
+                               Margin="0,0,20,0"
+                               IsHitTestVisible="False"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="IMPOSTOS" 
+                           FontSize="12" 
+                           FontWeight="Bold" 
+                           Foreground="{StaticResource AeroTextDark}" 
+                           Margin="0,0,0,3" />
+                        <Grid>
+                            <TextBox Text="{Binding ProjetoAtual.Orcamento.percentual_impostos, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}"
+                             PreviewTextInput="ValidarEntradaSemNegativo"
+                             FontWeight="Bold" 
+                             Height="48" 
+                             FontSize="15"                 
+                             Padding="25,0,10,0" 
+                             MinWidth="100"
+                             VerticalContentAlignment="Center" 
+                             BorderThickness="1.5" 
+                             BorderBrush="{StaticResource AeroBorder}">
+                                <TextBox.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                                </TextBox.Resources>
+                            </TextBox>
+                            <TextBlock Text="%" 
+                               Foreground="{StaticResource AeroTextDark}" 
+                               VerticalAlignment="Center" 
+                               HorizontalAlignment="Right" 
+                               FontWeight="Bold"
+                               FontSize="15"                 
+                               Margin="0,0,20,0"
+                               IsHitTestVisible="False"/>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
+            </Border>
 
-                <StackPanel>
-                    <TextBlock Text="IMPOSTOS" 
-                   FontSize="12" 
-                   FontWeight="Bold" 
-                   Foreground="{StaticResource AeroTextDark}" 
-                   Margin="0,0,0,3" />
-                    <Grid>
-                        <TextBox Text="{Binding ProjetoAtual.Orcamento.percentual_impostos, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:0.##}'}"
-                     PreviewTextInput="ValidarEntradaSemNegativo"
-                     FontWeight="Bold" 
-                     Height="48" 
-                     FontSize="15"                 
-                     Padding="25,0,10,0" 
-                     MinWidth="100"
-                     VerticalContentAlignment="Center" 
-                     BorderThickness="1.5" 
-                     BorderBrush="{StaticResource AeroBorder}">
-                            <TextBox.Resources>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
-                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
-                            </TextBox.Resources>
-                        </TextBox>
-
-                        <TextBlock Text="%" 
-                       Foreground="{StaticResource AeroTextDark}" 
-                       VerticalAlignment="Center" 
-                       HorizontalAlignment="Right" 
-                       FontWeight="Bold"
-                       FontSize="15"                 
-                       Margin="0,0,20,0"
-                       IsHitTestVisible="False"/>
-                    </Grid>
-                </StackPanel>
-
-            </StackPanel>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <StackPanel VerticalAlignment="Center" Margin="0,0,28,0">
                     <TextBlock Text="TOTAL DA PROPOSTA" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" HorizontalAlignment="Right" Margin="0,0,0,2"/>
                     <TextBlock Text="{Binding ProjetoAtual.Orcamento.valor_final, StringFormat=C}" FontSize="36" FontWeight="Black" Foreground="{StaticResource AeroPrimary}" HorizontalAlignment="Right"/>
                 </StackPanel>
 
-                <Button Content="DESCARTAR ALTERAÇÕES"
-        Command="{Binding DescartarCommand}"
-        Visibility="{Binding VisibilidadeBotaoDescartar}"
-        Style="{StaticResource DiscardBtn}" 
-        Width="240" 
-        Height="54" 
-        Margin="0,0,12,0"/>
+                <Button Content="DESCARTAR ALTERAÇÕES" Command="{Binding DescartarCommand}" Visibility="{Binding VisibilidadeBotaoDescartar}" Style="{StaticResource DiscardBtn}" Width="240" Height="54" Margin="0,0,12,0"/>
 
                 <Button Content="FINALIZAR PROPOSTA"
-            Command="{Binding GerarPdfCommand}"
-            IsEnabled="{Binding BotaoAtivo}"
-            Style="{StaticResource PrimaryBtn}"
-            Width="240" 
-            Height="54" 
-            FontSize="14"/>
+                Command="{Binding GerarPdfCommand}"
+                IsEnabled="{Binding BotaoAtivo}"
+                Style="{StaticResource PrimaryBtn}"
+                Width="240" 
+                Height="54" 
+                FontSize="14"/>
             </StackPanel>
         </Grid>
     </Grid>

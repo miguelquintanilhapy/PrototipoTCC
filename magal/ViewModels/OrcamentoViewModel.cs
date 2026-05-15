@@ -336,19 +336,21 @@ namespace magal.ViewModels
 
         private void AtualizarFinanceiro()
         {
-            if (_isUpdating || ProjetoAtual?.Orcamento == null) return;
+            if (ProjetoAtual?.Orcamento == null) return;
+
             try
             {
-                _isUpdating = true;
-                ProjetoAtual.Orcamento.CalcularTotal(ProjetoAtual.Tarefas.ToList(), CustosExtras.ToList());
-                ProjetoAtual.Orcamento.OnPropertyChanged("valor_total");
-                ProjetoAtual.Orcamento.OnPropertyChanged("valor_final");
+                ProjetoAtual.Orcamento.CalcularTotal(
+                    ProjetoAtual.Tarefas.ToList(),
+                    CustosExtras.ToList()
+                );
+
+                OnPropertyChanged(nameof(ProjetoAtual));
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Erro no cálculo: " + ex.Message);
             }
-            finally { _isUpdating = false; }
         }
 
         private bool SalvarNoBancoSilencioso()

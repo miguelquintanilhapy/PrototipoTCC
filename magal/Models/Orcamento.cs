@@ -27,6 +27,13 @@ namespace magal.Models
             }
         }
 
+        private int _validade_dias = 15;
+        public int validade_dias
+        {
+            get => _validade_dias;
+            set { _validade_dias = value; OnPropertyChanged(); }
+        }
+
         private decimal _percentual_impostos;
         public decimal percentual_impostos
         {
@@ -104,5 +111,9 @@ namespace magal.Models
             // dispara o setter de custo_base, que limpa os manuais e recalcula tudo
             custo_base = totalMaoDeObra + totalCustosExtras;
         }
+
+
+
+
     }
 }

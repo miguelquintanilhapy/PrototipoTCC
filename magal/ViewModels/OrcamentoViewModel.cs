@@ -19,7 +19,7 @@ namespace magal.ViewModels
 
         // Variáveis para controle de descarte e verificação
         private Projeto _projetoOriginal;
-        private List<decimal> _custosValoresOriginais; 
+        private List<decimal> _custosValoresOriginais;
 
         public Projeto ProjetoAtual
         {
@@ -28,6 +28,7 @@ namespace magal.ViewModels
             {
                 _projetoAtual = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(DataExpiracaoFormatada));
                 AssinarEventosOrcamento();
             }
         }
@@ -56,26 +57,44 @@ namespace magal.ViewModels
             DeletarCustoCommand = new RelayCommand(param => DeletarCustoExtra(param as Custo));
             GerarPdfCommand = new RelayCommand(_ => ExecutarFluxoFinal());
             DescartarCommand = new RelayCommand(_ => ExecutarDescarte());
-           
+
             CarregarDadosIniciais();
             NovoProjeto();
-           
+        }
+
+        // CORREÇÃO: Removido o "=" que sobrescrevia a data do projeto
+        public string DataExpiracaoFormatada
+        {
+            get
+            {
+                if (ProjetoAtual?.Orcamento == null) return "-";
+
+                // Apenas lê a data, não altera o objeto
+                DateTime dataBase = ProjetoAtual.data_criacao;
+
+                if (dataBase == DateTime.MinValue)
+                    dataBase = DateTime.Now;
+
+                return dataBase.AddDays(ProjetoAtual.Orcamento.validade_dias).ToString("dd/MM/yyyy");
+            }
         }
 
         private bool TemAlteracoes()
         {
             if (_projetoOriginal == null) return !string.IsNullOrWhiteSpace(ProjetoAtual.nome) || ProjetoAtual.Tarefas.Count > 0;
 
+            // Comparação rigorosa para detectar mudanças, incluindo a validade
             bool basicoAlterado = ProjetoAtual.nome != _projetoOriginal.nome ||
                                   ProjetoAtual.id_cliente != _projetoOriginal.id_cliente ||
                                   ProjetoAtual.status != _projetoOriginal.status ||
                                   ProjetoAtual.tipo != _projetoOriginal.tipo ||
                                   ProjetoAtual.Orcamento.margem_percentual != _projetoOriginal.Orcamento.margem_percentual ||
-                                  ProjetoAtual.Orcamento.percentual_impostos != _projetoOriginal.Orcamento.percentual_impostos;
+                                  ProjetoAtual.Orcamento.percentual_impostos != _projetoOriginal.Orcamento.percentual_impostos ||
+                                  ProjetoAtual.Orcamento.validade_dias != _projetoOriginal.Orcamento.validade_dias;
 
             if (basicoAlterado) return true;
             if (ProjetoAtual.Tarefas.Count != _projetoOriginal.Tarefas.Count) return true;
-            if (CustosExtras.Count != _custosValoresOriginais.Count) return true;
+            if (CustosExtras.Count != (_custosValoresOriginais?.Count ?? 0)) return true;
 
             return false;
         }
@@ -98,22 +117,25 @@ namespace magal.ViewModels
         public void CarregarProjetoParaEdicao(Projeto projetoDoBanco)
         {
             if (projetoDoBanco == null) return;
+
             _isUpdating = true;
             try
             {
                 this.ProjetoAtual = projetoDoBanco;
 
-                // BACKUP PARA COMPARAÇÃO
+                // BACKUP PARA COMPARAÇÃO (Deep Copy simples)
                 _projetoOriginal = new Projeto
                 {
                     nome = projetoDoBanco.nome,
                     id_cliente = projetoDoBanco.id_cliente,
                     status = projetoDoBanco.status,
                     tipo = projetoDoBanco.tipo,
+                    data_criacao = projetoDoBanco.data_criacao,
                     Orcamento = new Orcamento
                     {
                         margem_percentual = projetoDoBanco.Orcamento.margem_percentual,
-                        percentual_impostos = projetoDoBanco.Orcamento.percentual_impostos
+                        percentual_impostos = projetoDoBanco.Orcamento.percentual_impostos,
+                        validade_dias = projetoDoBanco.Orcamento.validade_dias
                     },
                     Tarefas = new ObservableCollection<Tarefa>(projetoDoBanco.Tarefas.ToList())
                 };
@@ -146,9 +168,6 @@ namespace magal.ViewModels
                             AtualizarFinanceiro();
                     };
                 }
-
-                _isUpdating = false;
-                AtualizarFinanceiro();
             }
             catch (Exception ex)
             {
@@ -157,6 +176,7 @@ namespace magal.ViewModels
             finally
             {
                 _isUpdating = false;
+                AtualizarFinanceiro();
             }
         }
 
@@ -164,7 +184,6 @@ namespace magal.ViewModels
         {
             if (_processando) return;
 
-            // VERIFICAÇÃO DE ALTERAÇÕES
             if (!TemAlteracoes())
             {
                 MessageBox.Show("Nenhuma alteração foi detectada no projeto.", "Informação", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -196,7 +215,6 @@ namespace magal.ViewModels
                     if (GerarRelatorioPdf())
                     {
                         MessageBox.Show("Alterações salvas com sucesso!", "Sucesso", MessageBoxButton.OK);
-
                         var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
                         mainWindow?.AbrirHistorico();
                     }
@@ -214,7 +232,7 @@ namespace magal.ViewModels
             _isUpdating = true;
             var p = new Projeto
             {
-                Orcamento = new Orcamento { margem_percentual = 20, percentual_impostos = 15 },
+                Orcamento = new Orcamento { margem_percentual = 20, percentual_impostos = 15, validade_dias = 15 },
                 Tarefas = new ObservableCollection<Tarefa>(),
                 id_usuario = 1,
                 nome = "",
@@ -227,8 +245,8 @@ namespace magal.ViewModels
             _projetoOriginal = null;
             CustosExtras.Clear();
 
-            AdicionarTarefa();     
-            AdicionarCustoExtra(); 
+            AdicionarTarefa();
+            AdicionarCustoExtra();
 
             _isUpdating = false;
             AtualizarFinanceiro();
@@ -244,6 +262,12 @@ namespace magal.ViewModels
                         e.PropertyName == nameof(Orcamento.percentual_impostos))
                     {
                         AtualizarFinanceiro();
+                    }
+
+                    // Notifica a interface para atualizar a data escrita por extenso
+                    if (e.PropertyName == nameof(Orcamento.validade_dias))
+                    {
+                        OnPropertyChanged(nameof(DataExpiracaoFormatada));
                     }
                 };
             }
@@ -331,7 +355,6 @@ namespace magal.ViewModels
         {
             if (custo != null && CustosExtras.Contains(custo))
             {
-                // Verifica se o nome está vazio ou nulo para personalizar a mensagem
                 string identificador = string.IsNullOrWhiteSpace(custo.nome)
                     ? "este item"
                     : $"o custo '{custo.nome}'";
@@ -349,7 +372,7 @@ namespace magal.ViewModels
 
         private void AtualizarFinanceiro()
         {
-            if (ProjetoAtual?.Orcamento == null) return;
+            if (ProjetoAtual?.Orcamento == null || _isUpdating) return;
 
             try
             {
@@ -358,6 +381,7 @@ namespace magal.ViewModels
                     CustosExtras.ToList()
                 );
 
+                // Força a UI a revalidar os campos financeiros
                 OnPropertyChanged(nameof(ProjetoAtual));
             }
             catch (Exception ex)

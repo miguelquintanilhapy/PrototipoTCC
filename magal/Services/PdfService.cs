@@ -70,7 +70,7 @@ namespace magal.Services
                     page.Content().PaddingTop(16).Column(col =>
                     {
                         // TABELA DE MÃO DE OBRA
-                        col.Item().Text("1. COMPOSIÇÃO DE MÃO DE OBRA E ETAPAS")
+                        col.Item().Text("1. COMPOSIÇÃO DE MÃO DE OBRA E TAREFAS")
                             .FontSize(9).Bold().FontColor("#555555");
 
                         col.Item().PaddingTop(6).PaddingBottom(15).Table(table =>
@@ -83,7 +83,7 @@ namespace magal.Services
                             table.Header(header =>
                             {
                                 void H(string t) => header.Cell().Background("#1E3A5F").Padding(8).Text(t).FontColor(Colors.White).Bold().FontSize(9);
-                                H("ETAPA/DESCRIÇÃO"); H("RESPONSÁVEL"); H("HORAS"); H("VALOR/HORA"); H("TOTAL");
+                                H("TAREFAS/DESCRIÇÃO"); H("RESPONSÁVEL"); H("HORAS"); H("VALOR/HORA"); H("TOTAL");
                             });
 
                             foreach (var item in projeto.Tarefas)

@@ -12,7 +12,7 @@ using System.Windows.Input;
 namespace magal.ViewModels
 {
     /// <summary>
-    /// ViewModel responsável por gerenciar a elaboração e edição de orçamentos de projetos,
+    /// ViewModel responsável por gerenciar a elaçaboração e edição de orçamentos de projetos,
     /// controlando custos diretos, alocação de equipe (tarefas), margens, impostos e exportação em PDF.
     /// </summary>
     public class OrcamentoViewModel : BaseModel
@@ -26,6 +26,8 @@ namespace magal.ViewModels
         // Variáveis para controle de descarte e verificação de concorrência/mudanças
         private Projeto _projetoOriginal;
         private List<decimal> _custosValoresOriginais;
+        private decimal _valorFinalOriginal;
+        private decimal _totalHorasOriginal;
 
         #endregion
 
@@ -198,6 +200,8 @@ namespace magal.ViewModels
                 };
 
                 _custosValoresOriginais = projetoDoBanco.Custos?.Select(c => c.valor).ToList() ?? new List<decimal>();
+                _valorFinalOriginal = projetoDoBanco.Orcamento?.valor_final ?? 0;
+                _totalHorasOriginal = projetoDoBanco.Tarefas?.Sum(t => t.horas_estimadas) ?? 0;
 
                 OnPropertyChanged(nameof(VisibilidadeBotaoDescartar));
                 AssinarEventosOrcamento();
@@ -249,6 +253,7 @@ namespace magal.ViewModels
         {
             if (_projetoOriginal == null) return !string.IsNullOrWhiteSpace(ProjetoAtual.nome) || ProjetoAtual.Tarefas.Count > 0;
 
+            // 1. Verifica se dados textuais ou configurações do orçamento mudaram
             bool basicoAlterado = ProjetoAtual.nome != _projetoOriginal.nome ||
                                   ProjetoAtual.id_cliente != _projetoOriginal.id_cliente ||
                                   ProjetoAtual.status != _projetoOriginal.status ||
@@ -258,9 +263,18 @@ namespace magal.ViewModels
                                   ProjetoAtual.Orcamento.validade_dias != _projetoOriginal.Orcamento.validade_dias;
 
             if (basicoAlterado) return true;
+
+            // 2. Verifica se a quantidade de linhas de tarefas ou custos mudou
             if (ProjetoAtual.Tarefas.Count != _projetoOriginal.Tarefas.Count) return true;
             if (CustosExtras.Count != (_custosValoresOriginais?.Count ?? 0)) return true;
 
+            // 3. Verifica se os valores internos (horas ou dinheiro) mudaram
+            decimal totalHorasAtual = ProjetoAtual.Tarefas?.Sum(t => t.horas_estimadas) ?? 0;
+            if (totalHorasAtual != _totalHorasOriginal) return true;
+
+            if (ProjetoAtual.Orcamento.valor_final != _valorFinalOriginal) return true;
+
+            // Se tudo for igual, nenhuma alteração real foi feita
             return false;
         }
 

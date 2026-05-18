@@ -76,11 +76,14 @@ namespace magal.ViewModels
             CarregarHistorico();
         }
 
-        private void CarregarHistorico()
+        public void CarregarHistorico()
         {
             try
             {
-                FiltroTexto = string.Empty;
+                // Limpa o filtro ao recarregar para mostrar tudo
+                _filtroTexto = string.Empty;
+                OnPropertyChanged(nameof(FiltroTexto));
+
                 var lista = _repository.BuscarTodosPorUsuario(1);
                 Projetos.Clear();
 
@@ -105,14 +108,20 @@ namespace magal.ViewModels
 
             var busca = FiltroTexto.ToLower().Trim();
 
+            // Incluído a Data de Expiração na busca (converte para string dd/MM/yyyy)
+            bool dataExpiracaoBate = projeto.Orcamento != null &&
+                                     projeto.DataExpiracao.ToString("dd/MM/yyyy").Contains(busca);
+
             return (projeto.nome?.ToLower().Contains(busca) ?? false) ||
                    (projeto.status?.ToLower().Contains(busca) ?? false) ||
                    (projeto.tipo?.ToLower().Contains(busca) ?? false) ||
-                   (projeto.Cliente?.nome?.ToLower().Contains(busca) ?? false);
+                   (projeto.Cliente?.nome?.ToLower().Contains(busca) ?? false) ||
+                   dataExpiracaoBate;
         }
 
         private void AtualizarIndicadores()
         {
+            // Pega apenas o que está passando pelo filtro atual
             var projetosVisiveis = ProjetosView.Cast<Projeto>().ToList();
 
             decimal somaFaturamento = projetosVisiveis
@@ -166,6 +175,7 @@ namespace magal.ViewModels
                 if (projetoCompleto != null)
                 {
                     var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
+                    // Garante que o MainWindow saiba lidar com a troca de tela
                     mainWindow?.IrParaEdicao(projetoCompleto);
                 }
                 else

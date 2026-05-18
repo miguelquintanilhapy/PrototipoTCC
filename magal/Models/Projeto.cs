@@ -14,8 +14,8 @@ namespace magal.Models
         public string status { get; set; } // "Rascunho/Orçado/Aprovado/Executando/Concluído"
         public DateTime data_criacao { get; set; } = DateTime.Now;
         public DateTime? data_conclusao_prevista { get; set; }
-        // Dentro da classe Projeto.cs
         public DateTime DataExpiracao => data_criacao.AddDays(Orcamento?.validade_dias ?? 0);
+        public bool EstaVencido => status == "Em Aberto" && DataExpiracao < DateTime.Today;
 
         // Objetos de navegação e coleções
         public Orcamento Orcamento { get; set; } = new Orcamento();

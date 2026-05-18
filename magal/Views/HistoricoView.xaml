@@ -106,13 +106,14 @@
                 </Grid.RowDefinitions>
 
                 <DataGrid ItemsSource="{Binding ProjetosView}" 
-          SelectedItem="{Binding ProjetoSelecionado}"
-          AutoGenerateColumns="False" IsReadOnly="True"
-          Background="Transparent" BorderThickness="0"
-          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
-          HeadersVisibility="Column" 
-          RowHeight="60"  CanUserAddRows="False" SelectionMode="Single"
-          FontSize="14" SelectionChanged="DataGrid_SelectionChanged">
+                          SelectedItem="{Binding ProjetoSelecionado}"
+                          AutoGenerateColumns="False" IsReadOnly="True"
+                          Background="Transparent" BorderThickness="0"
+                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
+                          HeadersVisibility="Column" 
+                          RowHeight="60" CanUserAddRows="False" SelectionMode="Single"
+                          FontSize="14" SelectionChanged="DataGrid_SelectionChanged">
+
                     <DataGrid.Resources>
                         <Style TargetType="DataGridColumnHeader">
                             <Setter Property="Background" Value="#F8FAFC"/>
@@ -148,33 +149,39 @@
                             </Style.Triggers>
                         </Style>
                     </DataGrid.Resources>
-                    
-                    
+
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="DATA" 
-            Binding="{Binding data_criacao, StringFormat=dd/MM/yyyy}" 
-            Width="110" 
-            FontSize="14" 
-            FontWeight="SemiBold" />
+                                            Binding="{Binding data_criacao, StringFormat=dd/MM/yyyy}" 
+                                            Width="110" 
+                                            FontSize="14" 
+                                            FontWeight="SemiBold" />
 
                         <DataGridTextColumn Header="EXPIRA EM" 
-            Binding="{Binding DataExpiracao, StringFormat=dd/MM/yyyy}" 
-            Width="110" 
-            FontSize="14" 
-            FontWeight="SemiBold">
+                                            Binding="{Binding DataExpiracao, StringFormat=dd/MM/yyyy}" 
+                                            Width="110" 
+                                            FontSize="14" 
+                                            FontWeight="SemiBold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center"/>
                                     <Setter Property="Foreground" Value="{StaticResource AeroTextMuted}"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding EstaVencido}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource AeroDanger}"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
                         <DataGridTextColumn Header="NOME DO PROJETO" 
-            Binding="{Binding nome}" 
-            Width="*" 
-            FontSize="15" 
-           FontWeight="SemiBold">
+                                            Binding="{Binding nome}" 
+                                            Width="*" 
+                                            FontSize="15" 
+                                            FontWeight="SemiBold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -185,21 +192,21 @@
                         </DataGridTextColumn>
 
                         <DataGridTextColumn Header="CLIENTE" 
-            Binding="{Binding Cliente.nome}" 
-            Width="140" 
-            FontWeight="SemiBold"
-            FontSize="14" />
+                                            Binding="{Binding Cliente.nome}" 
+                                            Width="140" 
+                                            FontWeight="SemiBold"
+                                            FontSize="14" />
 
                         <DataGridTextColumn Header="TIPO" 
-            Binding="{Binding tipo}" 
-            Width="120" 
-            FontWeight="SemiBold"
-            FontSize="14" />
+                                            Binding="{Binding tipo}" 
+                                            Width="120" 
+                                            FontWeight="SemiBold"
+                                            FontSize="14" />
 
                         <DataGridTextColumn Header="VALOR DE VENDA" 
-            Binding="{Binding Orcamento.valor_final, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
-            Width="160" 
-            FontSize="16"  FontWeight="Bold">
+                                            Binding="{Binding Orcamento.valor_final, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
+                                            Width="160" 
+                                            FontSize="16"  FontWeight="Bold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Right"/>
@@ -211,28 +218,28 @@
                         </DataGridTextColumn>
 
                         <DataGridTextColumn Header="STATUS" 
-            Binding="{Binding status}" 
-            Width="120" 
-            FontSize="14" 
-            FontWeight="SemiBold" />
+                                            Binding="{Binding status}" 
+                                            Width="120" 
+                                            FontSize="14" 
+                                            FontWeight="SemiBold" />
 
                         <DataGridTemplateColumn Header="AÇÕES" Width="150">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button Content="Editar" 
-                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                CommandParameter="{Binding}"
-                                FontSize="13"
-                                Foreground="{StaticResource AeroAccent}"
-                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
+                                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                FontSize="13"
+                                                Foreground="{StaticResource AeroAccent}"
+                                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
 
                                         <Button Content="Excluir" 
-                                Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                CommandParameter="{Binding}"
-                                FontSize="13"
-                                Foreground="{StaticResource AeroDanger}"
-                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
+                                                Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                FontSize="13"
+                                                Foreground="{StaticResource AeroDanger}"
+                                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

@@ -5,13 +5,20 @@ using System.Windows;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Collections.Generic;
+using System.Globalization;
 using magal.Models;
 using magal.Data.Repositories;
 
 namespace magal.ViewModels
 {
+    /// <summary>
+    /// ViewModel responsável por gerenciar a tela de histórico de projetos, 
+    /// controlando filtros de busca, indicadores financeiros e ações de edição/exclusão.
+    /// </summary>
     public class HistoricoViewModel : BaseModel
     {
+        #region Atributos e Campos Privados
+
         private readonly ProjetoRepository _repository;
         private Projeto _projetoSelecionado;
         private string _filtroTexto;
@@ -19,24 +26,45 @@ namespace magal.ViewModels
         private string _totalLucro;
         private int _quantidadeProjetos;
 
+        /// <summary>
+        /// Cultura padrão para formatação monetária nacional.
+        /// </summary>
+        private static readonly CultureInfo _ptBR = new("pt-BR");
+
+        #endregion
+
+        #region Propriedades de Indicadores e Filtros
+
+        /// <summary>
+        /// Obtém ou define o valor formatado do faturamento total dos projetos visíveis.
+        /// </summary>
         public string TotalFinanceiro
         {
             get => _totalFinanceiro;
             set { _totalFinanceiro = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// Obtém ou define o valor formatado do lucro total (margem) dos projetos visíveis.
+        /// </summary>
         public string TotalLucro
         {
             get => _totalLucro;
             set { _totalLucro = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// Obtém ou define a quantidade total de projetos que atendem ao filtro atual.
+        /// </summary>
         public int QuantidadeProjetos
         {
             get => _quantidadeProjetos;
             set { _quantidadeProjetos = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// Obtém ou define o texto de busca utilizado para filtrar os projetos na tela em tempo real.
+        /// </summary>
         public string FiltroTexto
         {
             get => _filtroTexto;
@@ -49,26 +77,64 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtém ou define o projeto atualmente selecionado na listagem (DataGrid).
+        /// </summary>
         public Projeto ProjetoSelecionado
         {
             get => _projetoSelecionado;
             set { _projetoSelecionado = value; OnPropertyChanged(); }
         }
 
+        #endregion
+
+        #region Coleções e Visões de Dados
+
+        /// <summary>
+        /// Lista observável de projetos carregados do banco de dados.
+        /// </summary>
         public ObservableCollection<Projeto> Projetos { get; } = new ObservableCollection<Projeto>();
+
+        /// <summary>
+        /// Visão customizada da coleção de projetos que permite a aplicação de filtros em tempo real sem perder a lista original.
+        /// </summary>
         public ICollectionView ProjetosView { get; private set; }
 
+        #endregion
+
+        #region Comandos disparados pela View
+
+        /// <summary>
+        /// Comando para deletar um projeto do banco de dados e da listagem.
+        /// </summary>
         public RelayCommand ExcluirCommand { get; }
+
+        /// <summary>
+        /// Comando para redirecionar o usuário para a tela de edição do projeto selecionado.
+        /// </summary>
         public RelayCommand EditarCommand { get; }
+
+        /// <summary>
+        /// Comando para recarregar a lista do histórico a partir do banco de dados.
+        /// </summary>
         public RelayCommand AtualizarCommand { get; }
 
+        #endregion
+
+        #region Construtores
+
+        /// <summary>
+        /// Inicializa uma nova instância da classe <see cref="HistoricoViewModel"/>, configurando os repositórios, comandos e filtros.
+        /// </summary>
         public HistoricoViewModel()
         {
             _repository = new ProjetoRepository();
 
+            // Configuração do mecanismo de filtragem do WPF
             ProjetosView = CollectionViewSource.GetDefaultView(Projetos);
             ProjetosView.Filter = FiltroDeProjetos;
 
+            // Inicialização dos comandos mapeados para os botões da tela
             ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as Projeto));
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Projeto));
             AtualizarCommand = new RelayCommand(_ => CarregarHistorico());
@@ -76,14 +142,21 @@ namespace magal.ViewModels
             CarregarHistorico();
         }
 
+        #endregion
+
+        #region Métodos Públicos
+
+        /// <summary>
+        /// Busca a lista atualizada de projetos do banco de dados e limpa os filtros da tela.
+        /// </summary>
         public void CarregarHistorico()
         {
             try
             {
-                // Limpa o filtro ao recarregar para mostrar tudo
                 _filtroTexto = string.Empty;
                 OnPropertyChanged(nameof(FiltroTexto));
 
+                // TODO: Substituir o ID fixo '1' pelo ID do usuário logado na sessão futuramente
                 var lista = _repository.BuscarTodosPorUsuario(1);
                 Projetos.Clear();
 
@@ -100,15 +173,23 @@ namespace magal.ViewModels
             }
         }
 
+        #endregion
+
+        #region Métodos Auxiliares / Privados
+
+        /// <summary>
+        /// Avalia se um projeto deve ser exibido no DataGrid com base no texto inserido no campo de busca.
+        /// </summary>
+        /// <param name="obj">O objeto de projeto encapsulado pela view.</param>
+        /// <returns><c>true</c> se o projeto corresponder aos critérios de busca; caso contrário, <c>false</c>.</returns>
         private bool FiltroDeProjetos(object obj)
         {
             if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
-            var projeto = obj as Projeto;
-            if (projeto == null) return false;
+            if (obj is not Projeto projeto) return false;
 
             var busca = FiltroTexto.ToLower().Trim();
 
-            // Incluído a Data de Expiração na busca (converte para string dd/MM/yyyy)
+            // Verifica correspondência na data de expiração gerada pela Model
             bool dataExpiracaoBate = projeto.Orcamento != null &&
                                      projeto.DataExpiracao.ToString("dd/MM/yyyy").Contains(busca);
 
@@ -119,9 +200,11 @@ namespace magal.ViewModels
                    dataExpiracaoBate;
         }
 
+        /// <summary>
+        /// Recalcula e atualiza as propriedades de resumo financeiro e quantidade com base estritamente nos projetos visíveis pós-filtro.
+        /// </summary>
         private void AtualizarIndicadores()
         {
-            // Pega apenas o que está passando pelo filtro atual
             var projetosVisiveis = ProjetosView.Cast<Projeto>().ToList();
 
             decimal somaFaturamento = projetosVisiveis
@@ -134,11 +217,13 @@ namespace magal.ViewModels
 
             QuantidadeProjetos = projetosVisiveis.Count;
 
-            var cultura = new System.Globalization.CultureInfo("pt-BR");
-            TotalFinanceiro = somaFaturamento.ToString("C2", cultura);
-            TotalLucro = somaLucro.ToString("C2", cultura);
+            TotalFinanceiro = somaFaturamento.ToString("C2", _ptBR);
+            TotalLucro = somaLucro.ToString("C2", _ptBR);
         }
 
+        /// <summary>
+        /// Solicita a confirmação do usuário e executa a exclusão física do projeto no banco de dados e na memória.
+        /// </summary>
         private void ExecutarExclusao(Projeto projeto)
         {
             if (projeto == null) return;
@@ -164,6 +249,9 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Carrega a estrutura de dados profunda do projeto selecionado e aciona a navegação da janela principal para a tela de edição.
+        /// </summary>
         private void ExecutarEdicao(Projeto projeto)
         {
             if (projeto == null) return;
@@ -175,7 +263,6 @@ namespace magal.ViewModels
                 if (projetoCompleto != null)
                 {
                     var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
-                    // Garante que o MainWindow saiba lidar com a troca de tela
                     mainWindow?.IrParaEdicao(projetoCompleto);
                 }
                 else
@@ -188,5 +275,7 @@ namespace magal.ViewModels
                 MessageBox.Show($"Erro ao carregar edição: {ex.Message}", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        #endregion
     }
 }

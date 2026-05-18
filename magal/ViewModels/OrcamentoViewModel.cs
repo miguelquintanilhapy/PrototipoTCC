@@ -11,16 +11,29 @@ using System.Windows.Input;
 
 namespace magal.ViewModels
 {
+    /// <summary>
+    /// ViewModel responsável por gerenciar a elaboração e edição de orçamentos de projetos,
+    /// controlando custos diretos, alocação de equipe (tarefas), margens, impostos e exportação em PDF.
+    /// </summary>
     public class OrcamentoViewModel : BaseModel
     {
+        #region Atributos e Campos Privados
+
         private Projeto _projetoAtual;
         private bool _processando = false;
         private bool _isUpdating = false;
 
-        // Variáveis para controle de descarte e verificação
+        // Variáveis para controle de descarte e verificação de concorrência/mudanças
         private Projeto _projetoOriginal;
         private List<decimal> _custosValoresOriginais;
 
+        #endregion
+
+        #region Propriedades e Filtros
+
+        /// <summary>
+        /// Obtém ou define o projeto que está sendo orçado ou editado atualmente na tela.
+        /// </summary>
         public Projeto ProjetoAtual
         {
             get => _projetoAtual;
@@ -33,22 +46,110 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtém a string contendo a data limite de validade da proposta comercial calculada por extenso.
+        /// </summary>
+        public string DataExpiracaoFormatada
+        {
+            get
+            {
+                if (ProjetoAtual?.Orcamento == null) return "-";
+
+                DateTime dataBase = ProjetoAtual.data_criacao;
+
+                if (dataBase == DateTime.MinValue)
+                    dataBase = DateTime.Now;
+
+                return dataBase.AddDays(ProjetoAtual.Orcamento.validade_dias).ToString("dd/MM/yyyy");
+            }
+        }
+
+        /// <summary>
+        /// Obtém o estado de permissão do botão de execução (Bloqueia reentrância caso o fluxo esteja processando).
+        /// </summary>
+        public bool BotaoAtivo => !_processando;
+
+        /// <summary>
+        /// Determina o comportamento visual do botão de descarte (Exibido apenas em modo de edição).
+        /// </summary>
+        public Visibility VisibilidadeBotaoDescartar =>
+            (_projetoOriginal != null) ? Visibility.Visible : Visibility.Collapsed;
+
+        #endregion
+
+        #region Coleções Estáticas e Listas Auxiliares
+
+        /// <summary>
+        /// Fonte de dados com todos os clientes elegíveis para vinculação ao projeto.
+        /// </summary>
         public ObservableCollection<Cliente> Clientes { get; } = new ObservableCollection<Cliente>();
+
+        /// <summary>
+        /// Fonte de dados contendo os funcionários ativos para vinculação nas tarefas operacionais.
+        /// </summary>
         public ObservableCollection<Funcionario> Funcionarios { get; } = new ObservableCollection<Funcionario>();
+
+        /// <summary>
+        /// Lista de custos adicionais e despesas diretas associadas ao projeto atual.
+        /// </summary>
         public ObservableCollection<Custo> CustosExtras { get; } = new ObservableCollection<Custo>();
 
+        /// <summary>
+        /// Categorias fixas de despesas de infraestrutura e projetos.
+        /// </summary>
         public List<string> CategoriasCustos { get; } = new List<string> { "Equipamentos", "Licenças de Software", "Energia Elétrica", "Transporte/Deslocamento", "Manutenção", "Aluguel/Estrutura", "EPIs/Ferramentas" };
+
+        /// <summary>
+        /// Lista de controle de fluxo de estados físicos do projeto.
+        /// </summary>
         public List<string> OpcoesStatus { get; } = new List<string> { "Rascunho", "Orçado", "Aprovado", "Executando", "Concluído", "Cancelado" };
+
+        /// <summary>
+        /// Opções de enquadramento técnico do projeto.
+        /// </summary>
         public List<string> OpcoesTipo { get; } = new List<string> { "Serviço", "Produto", "Consultoria", "P&D" };
 
-        public bool BotaoAtivo => !_processando;
+        #endregion
+
+        #region Comandos disparados pela View
+
+        /// <summary>
+        /// Comando para inserir uma nova linha de tarefa na matriz técnica do projeto.
+        /// </summary>
         public RelayCommand AdicionarTarefaCommand { get; }
+
+        /// <summary>
+        /// Comando para expurgar uma linha de tarefa técnica do escopo físico do projeto.
+        /// </summary>
         public RelayCommand DeletarTarefaCommand { get; }
+
+        /// <summary>
+        /// Comando para adicionar uma nova linha de despesa na tabela de custos extras.
+        /// </summary>
         public RelayCommand AdicionarCustoCommand { get; }
+
+        /// <summary>
+        /// Comando para deletar uma despesa extra da lista de custos do projeto.
+        /// </summary>
         public RelayCommand DeletarCustoCommand { get; }
+
+        /// <summary>
+        /// Comando mestre para salvar o projeto de forma persistente e gerar a proposta comercial consolidada.
+        /// </summary>
         public RelayCommand GerarPdfCommand { get; }
+
+        /// <summary>
+        /// Comando para anular alterações feitas em modo de edição e retroceder a visualização.
+        /// </summary>
         public RelayCommand DescartarCommand { get; }
 
+        #endregion
+
+        #region Construtores
+
+        /// <summary>
+        /// Inicializa uma nova instância da classe <see cref="OrcamentoViewModel"/>, mapeando as ações e gerando um novo template limpo.
+        /// </summary>
         public OrcamentoViewModel()
         {
             AdicionarTarefaCommand = new RelayCommand(_ => AdicionarTarefa());
@@ -62,58 +163,14 @@ namespace magal.ViewModels
             NovoProjeto();
         }
 
-        // CORREÇÃO: Removido o "=" que sobrescrevia a data do projeto
-        public string DataExpiracaoFormatada
-        {
-            get
-            {
-                if (ProjetoAtual?.Orcamento == null) return "-";
+        #endregion
 
-                // Apenas lê a data, não altera o objeto
-                DateTime dataBase = ProjetoAtual.data_criacao;
+        #region Métodos Públicos (Controle de Estado Interno)
 
-                if (dataBase == DateTime.MinValue)
-                    dataBase = DateTime.Now;
-
-                return dataBase.AddDays(ProjetoAtual.Orcamento.validade_dias).ToString("dd/MM/yyyy");
-            }
-        }
-
-        private bool TemAlteracoes()
-        {
-            if (_projetoOriginal == null) return !string.IsNullOrWhiteSpace(ProjetoAtual.nome) || ProjetoAtual.Tarefas.Count > 0;
-
-            // Comparação rigorosa para detectar mudanças, incluindo a validade
-            bool basicoAlterado = ProjetoAtual.nome != _projetoOriginal.nome ||
-                                  ProjetoAtual.id_cliente != _projetoOriginal.id_cliente ||
-                                  ProjetoAtual.status != _projetoOriginal.status ||
-                                  ProjetoAtual.tipo != _projetoOriginal.tipo ||
-                                  ProjetoAtual.Orcamento.margem_percentual != _projetoOriginal.Orcamento.margem_percentual ||
-                                  ProjetoAtual.Orcamento.percentual_impostos != _projetoOriginal.Orcamento.percentual_impostos ||
-                                  ProjetoAtual.Orcamento.validade_dias != _projetoOriginal.Orcamento.validade_dias;
-
-            if (basicoAlterado) return true;
-            if (ProjetoAtual.Tarefas.Count != _projetoOriginal.Tarefas.Count) return true;
-            if (CustosExtras.Count != (_custosValoresOriginais?.Count ?? 0)) return true;
-
-            return false;
-        }
-
-        private void ExecutarDescarte()
-        {
-            var result = MessageBox.Show("Deseja descartar todas as alterações e voltar ao histórico?", "Atenção",
-                MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
-                mainWindow?.AbrirHistorico();
-            }
-        }
-
-        public Visibility VisibilidadeBotaoDescartar =>
-            (_projetoOriginal != null) ? Visibility.Visible : Visibility.Collapsed;
-
+        /// <summary>
+        /// Transpõe e injeta uma instância de projeto vinda do banco de dados para a tela de edição, gerando backups de descarte.
+        /// </summary>
+        /// <param name="projetoDoBanco">O objeto persistido do projeto que será mapeado para a tela.</param>
         public void CarregarProjetoParaEdicao(Projeto projetoDoBanco)
         {
             if (projetoDoBanco == null) return;
@@ -180,6 +237,51 @@ namespace magal.ViewModels
             }
         }
 
+        #endregion
+
+        #region Métodos Auxiliares / Privados
+
+        /// <summary>
+        /// Compara minuciosamente o estado atual do formulário com o backup original para verificar se há dados modificados.
+        /// </summary>
+        /// <returns><c>true</c> se houver alterações detectadas; caso contrário, <c>false</c>.</returns>
+        private bool TemAlteracoes()
+        {
+            if (_projetoOriginal == null) return !string.IsNullOrWhiteSpace(ProjetoAtual.nome) || ProjetoAtual.Tarefas.Count > 0;
+
+            bool basicoAlterado = ProjetoAtual.nome != _projetoOriginal.nome ||
+                                  ProjetoAtual.id_cliente != _projetoOriginal.id_cliente ||
+                                  ProjetoAtual.status != _projetoOriginal.status ||
+                                  ProjetoAtual.tipo != _projetoOriginal.tipo ||
+                                  ProjetoAtual.Orcamento.margem_percentual != _projetoOriginal.Orcamento.margem_percentual ||
+                                  ProjetoAtual.Orcamento.percentual_impostos != _projetoOriginal.Orcamento.percentual_impostos ||
+                                  ProjetoAtual.Orcamento.validade_dias != _projetoOriginal.Orcamento.validade_dias;
+
+            if (basicoAlterado) return true;
+            if (ProjetoAtual.Tarefas.Count != _projetoOriginal.Tarefas.Count) return true;
+            if (CustosExtras.Count != (_custosValoresOriginais?.Count ?? 0)) return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Cancela as edições correntes e força a janela a retroceder para a tela de histórico.
+        /// </summary>
+        private void ExecutarDescarte()
+        {
+            var result = MessageBox.Show("Deseja descartar todas as alterações e voltar ao histórico?", "Atenção",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
+                mainWindow?.AbrirHistorico();
+            }
+        }
+
+        /// <summary>
+        /// Executa a validação estrutural de segurança, salva os dados fisicamente e aciona o motor de relatórios em PDF.
+        /// </summary>
         private void ExecutarFluxoFinal()
         {
             if (_processando) return;
@@ -227,6 +329,9 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Instancia um novo formulário com valores padrão para a criação de um orçamento limpo.
+        /// </summary>
         private void NovoProjeto()
         {
             _isUpdating = true;
@@ -252,6 +357,9 @@ namespace magal.ViewModels
             AtualizarFinanceiro();
         }
 
+        /// <summary>
+        /// Assina o ouvinte de eventos de propriedade do modelo interno de orçamento para recalcular o fluxo financeiro em tempo real.
+        /// </summary>
         private void AssinarEventosOrcamento()
         {
             if (ProjetoAtual?.Orcamento != null)
@@ -264,7 +372,6 @@ namespace magal.ViewModels
                         AtualizarFinanceiro();
                     }
 
-                    // Notifica a interface para atualizar a data escrita por extenso
                     if (e.PropertyName == nameof(Orcamento.validade_dias))
                     {
                         OnPropertyChanged(nameof(DataExpiracaoFormatada));
@@ -273,6 +380,9 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Popula as coleções iniciais de clientes e funcionários carregando os dados do banco de dados.
+        /// </summary>
         private void CarregarDadosIniciais()
         {
             try
@@ -301,6 +411,9 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Insere uma nova linha técnica de tarefas e aciona as escutas de alteração de horas e valores.
+        /// </summary>
         private void AdicionarTarefa()
         {
             var primeiroFunc = Funcionarios.FirstOrDefault();
@@ -321,6 +434,9 @@ namespace magal.ViewModels
             AtualizarFinanceiro();
         }
 
+        /// <summary>
+        /// Remove com validação e confirmação em tela uma tarefa vinculada ao escopo do projeto.
+        /// </summary>
         private void DeletarTarefa(Tarefa tarefa)
         {
             if (tarefa != null && ProjetoAtual.Tarefas.Contains(tarefa))
@@ -340,6 +456,9 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Insere uma nova linha de despesas na grade de custos diretos e externos.
+        /// </summary>
         private void AdicionarCustoExtra()
         {
             var novoCusto = new Custo { nome = "", valor = 0, categoria = "Equipamentos", tipo = "Direto" };
@@ -351,6 +470,9 @@ namespace magal.ViewModels
             AtualizarFinanceiro();
         }
 
+        /// <summary>
+        /// Remove um custo extra associado da lista de insumos com confirmação em tela.
+        /// </summary>
         private void DeletarCustoExtra(Custo custo)
         {
             if (custo != null && CustosExtras.Contains(custo))
@@ -370,6 +492,9 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Dispara o motor matemático de cálculo unificado de precificação das entidades acopladas ao orçamento.
+        /// </summary>
         private void AtualizarFinanceiro()
         {
             if (ProjetoAtual?.Orcamento == null || _isUpdating) return;
@@ -381,7 +506,7 @@ namespace magal.ViewModels
                     CustosExtras.ToList()
                 );
 
-                // Força a UI a revalidar os campos financeiros
+                // Força a UI a revalidar e renderizar as propriedades financeiras atualizadas
                 OnPropertyChanged(nameof(ProjetoAtual));
             }
             catch (Exception ex)
@@ -390,6 +515,10 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Grava o estado atual do projeto de forma atômica no banco de dados sem exibir mensagens de sucesso intermediárias.
+        /// </summary>
+        /// <returns><c>true</c> se a operação no banco for concluída com sucesso; caso contrário, <c>false</c>.</returns>
         private bool SalvarNoBancoSilencioso()
         {
             try
@@ -408,6 +537,10 @@ namespace magal.ViewModels
             }
         }
 
+        /// <summary>
+        /// Invoca a caixa de diálogo do sistema operacional para gravação física do relatório de proposta comercial em PDF.
+        /// </summary>
+        /// <returns><c>true</c> se o arquivo for compilado e gravado; caso contrário, <c>false</c>.</returns>
         private bool GerarRelatorioPdf()
         {
             var sfd = new SaveFileDialog { Filter = "PDF|*.pdf", FileName = $"Proposta_{ProjetoAtual.nome}" };
@@ -426,5 +559,7 @@ namespace magal.ViewModels
             }
             return false;
         }
+
+        #endregion
     }
 }

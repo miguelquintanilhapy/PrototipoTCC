@@ -296,6 +296,10 @@ namespace magal.ViewModels
         /// <summary>
         /// Executa a validação estrutural de segurança, salva os dados fisicamente e aciona o motor de relatórios em PDF.
         /// </summary>
+        /// <summary>
+        /// Executa a validação estrutural de segurança, salva os dados fisicamente no banco de dados 
+        /// e oferece a opção de gerar a proposta comercial consolidada em PDF.
+        /// </summary>
         private void ExecutarFluxoFinal()
         {
             if (_processando) return;
@@ -318,7 +322,7 @@ namespace magal.ViewModels
                 return;
             }
 
-            var confirm = MessageBox.Show("Deseja salvar as alterações e gerar o PDF?", "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var confirm = MessageBox.Show("Deseja salvar as alterações deste projeto?", "Confirmar Salvamento", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (confirm != MessageBoxResult.Yes) return;
 
             try
@@ -326,14 +330,27 @@ namespace magal.ViewModels
                 _processando = true;
                 OnPropertyChanged(nameof(BotaoAtivo));
 
+                //Salva sempre no banco de dados primeiro de forma silenciosa
                 if (SalvarNoBancoSilencioso())
                 {
-                    if (GerarRelatorioPdf())
+                    // Pergunta ao usuário de forma amigável se ele quer o PDF agora
+                    var respostaPdf = MessageBox.Show(
+                        "Alterações gravadas no banco de dados com sucesso!\n\nDeseja gerar o relatório em PDF desta proposta?",
+                        "Gerar PDF Opcional",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (respostaPdf == MessageBoxResult.Yes)
                     {
-                        MessageBox.Show("Alterações salvas com sucesso!", "Sucesso", MessageBoxButton.OK);
-                        var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
-                        mainWindow?.AbrirHistorico();
+                        // Tenta gerar o PDF. Se ele gerar ou cancelar o arquivo, o projeto já está salvo de qualquer forma.
+                        GerarRelatorioPdf();
                     }
+
+                    // Sucesso absoluto e redirecionamento para a tela de histórico
+                    MessageBox.Show("Projeto salvo com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
+                    mainWindow?.AbrirHistorico();
                 }
             }
             finally

@@ -1,7 +1,7 @@
+using magal.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using magal.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,29 +28,67 @@ namespace magal.Services
         /// <summary>
         /// Gera e salva o arquivo de Proposta Técnica Comercial em PDF com base nos dados do projeto e custos extras informados.
         /// </summary>
-        /// <param name="projeto">A instância do <see cref="Projeto"/> contendo os dados do cliente, orçamento e tarefas.</param>
-        /// <param name="custosExtras">Lista de custos adicionais com equipamentos ou licenças para integrar ao relatório.</param>
-        /// <param name="caminhoArquivo">O caminho físico do diretório onde o arquivo .pdf será salvo.</param>
         public void GerarPropostaTecnica(Projeto projeto, List<Custo> custosExtras, string caminhoArquivo)
         {
-            // Define o tipo de licença gratuita do QuestPDF exigido para execução do motor de renderização
             QuestPDF.Settings.License = LicenseType.Community;
 
             Document.Create(container =>
             {
                 container.Page(page =>
                 {
-                    // Configurações Globais da Página
                     page.Size(PageSizes.A4);
                     page.Margin(2, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
 
-                    // Montagem das Seções do Documento utilizando Métodos Auxiliares
                     page.Header().Column(col => ConstruirCabecalho(col, projeto));
-
                     page.Content().PaddingTop(16).Column(col => ConstruirConteudoPrincipal(col, projeto, custosExtras));
+                    page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
+                });
+            }).GeneratePdf(caminhoArquivo);
+        }
 
+        /// <summary>
+        /// Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos projetos.
+        /// </summary>
+        public void GerarRelatorioTabelaProjetos(List<Projeto> projetos, string caminhoArquivo)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape());
+                    page.Margin(1.5f, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
+
+                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "PROJETOS", projetos.Count));
+                    page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioProjetos(col, projetos));
+                    page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
+                });
+            }).GeneratePdf(caminhoArquivo);
+        }
+
+        /// <summary>
+        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos funcionários filtrados.
+        /// </summary>
+        public void GerarRelatorioTabelaFuncionarios(List<Funcionario> funcionarios, string caminhoArquivo)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem para leitura confortável
+                    page.Margin(1.5f, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
+
+                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "FUNCIONÁRIOS", funcionarios.Count));
+                    page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioFuncionarios(col, funcionarios));
                     page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
                 });
             }).GeneratePdf(caminhoArquivo);
@@ -60,12 +98,8 @@ namespace magal.Services
 
         #region Métodos Auxiliares / Privados
 
-        /// <summary>
-        /// Constrói o cabeçalho estilizado do documento contendo o título da empresa, identificador da proposta, dados do cliente e prazos de validade.
-        /// </summary>
         private void ConstruirCabecalho(ColumnDescriptor col, Projeto projeto)
         {
-            // Faixa azul escura principal
             col.Item().Background("#1E3A5F").Padding(16).Row(row =>
             {
                 row.RelativeItem().Column(c =>
@@ -78,7 +112,6 @@ namespace magal.Services
                     .FontSize(9).FontColor("#A8C4E0");
             });
 
-            // Seção de metadados (Cliente, Projeto, Datas)
             col.Item().BorderBottom(1).BorderColor("#E0E0E0").PaddingVertical(10).Row(row =>
             {
                 row.RelativeItem().Column(c =>
@@ -98,7 +131,7 @@ namespace magal.Services
                 row.ConstantItem(150).Column(c =>
                 {
                     c.Item().Text("DATA DE EMISSÃO").FontSize(7).FontColor("#999999").Bold();
-                    c.Item().Text(projeto.Orcamento.data_criacao.ToString("dd/MM/yyyy")).FontSize(11).Bold().FontColor("#1E3A5F");
+                    c.Item().Text(projeto.Orcamento?.data_criacao.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy")).FontSize(11).Bold().FontColor("#1E3A5F");
 
                     c.Item().PaddingTop(4);
 
@@ -108,12 +141,8 @@ namespace magal.Services
             });
         }
 
-        /// <summary>
-        /// Gerencia a inserção das tabelas de composição de mão de obra, custos extras e o bloco de resumo financeiro final.
-        /// </summary>
         private void ConstruirConteudoPrincipal(ColumnDescriptor col, Projeto projeto, List<Custo> custosExtras)
         {
-            // Tabela de Mão de Obra e Tarefas
             col.Item().Text("1. COMPOSIÇÃO DE MÃO DE OBRA E TAREFAS").FontSize(9).Bold().FontColor("#555555");
             col.Item().PaddingTop(6).PaddingBottom(15).Table(table =>
             {
@@ -124,8 +153,11 @@ namespace magal.Services
 
                 table.Header(header =>
                 {
-                    void H(string t) => header.Cell().Background("#1E3A5F").Padding(8).Text(t).FontColor(Colors.White).Bold().FontSize(9);
-                    H("TAREFAS/DESCRIÇÃO"); H("RESPONSÁVEL"); H("HORAS"); H("VALOR/HORA"); H("TOTAL");
+                    header.Cell().Background("#1E3A5F").Padding(8).Text("TAREFAS/DESCRIÇÃO").FontColor(Colors.White).Bold().FontSize(9);
+                    header.Cell().Background("#1E3A5F").Padding(8).Text("RESPONSÁVEL").FontColor(Colors.White).Bold().FontSize(9);
+                    header.Cell().Background("#1E3A5F").Padding(8).AlignCenter().Text("HORAS").FontColor(Colors.White).Bold().FontSize(9);
+                    header.Cell().Background("#1E3A5F").Padding(8).AlignRight().Text("VALOR/HORA").FontColor(Colors.White).Bold().FontSize(9);
+                    header.Cell().Background("#1E3A5F").Padding(8).AlignRight().Text("TOTAL").FontColor(Colors.White).Bold().FontSize(9);
                 });
 
                 foreach (var item in projeto.Tarefas)
@@ -140,7 +172,6 @@ namespace magal.Services
                 }
             });
 
-            // Tabela de Custos Extras
             if (custosExtras != null && custosExtras.Any())
             {
                 col.Item().Text("2. EQUIPAMENTOS, LICENÇAS E CUSTOS ADICIONAIS").FontSize(9).Bold().FontColor("#555555");
@@ -153,8 +184,9 @@ namespace magal.Services
 
                     table.Header(header =>
                     {
-                        void H(string t) => header.Cell().Background("#4A5568").Padding(8).Text(t).FontColor(Colors.White).Bold().FontSize(9);
-                        H("DESCRIÇÃO DO ITEM"); H("CATEGORIA"); H("VALOR");
+                        header.Cell().Background("#4A5568").Padding(8).Text("DESCRIÇÃO DO ITEM").FontColor(Colors.White).Bold().FontSize(9);
+                        header.Cell().Background("#4A5568").Padding(8).Text("CATEGORIA").FontColor(Colors.White).Bold().FontSize(9);
+                        header.Cell().Background("#4A5568").Padding(8).AlignRight().Text("VALOR").FontColor(Colors.White).Bold().FontSize(9);
                     });
 
                     foreach (var custo in custosExtras)
@@ -166,7 +198,6 @@ namespace magal.Services
                 });
             }
 
-            // Resumo Financeiro Final
             col.Item().PaddingTop(30).Row(row =>
             {
                 row.RelativeItem();
@@ -182,46 +213,231 @@ namespace magal.Services
                             var bg = destaque ? "#1E3A5F" : "#FFFFFF";
                             var fg = destaque ? "#FFFFFF" : "#333333";
 
-                            var container = t.Cell().Background(bg).Padding(6);
-                            if (destaque == false) container = container.BorderBottom(1).BorderColor("#F1F5F9");
-
-                            // Célula do Label
                             var cLabel = t.Cell().Background(bg).Padding(6);
+                            if (!destaque) cLabel = cLabel.BorderBottom(1).BorderColor("#F1F5F9");
                             var tLabel = cLabel.Text(label).FontSize(9).FontColor(fg);
                             if (destaque) tLabel.Bold();
 
-                            // Célula da Porcentagem
                             var cPct = t.Cell().Background(bg).Padding(6).AlignCenter();
+                            if (!destaque) cPct = cPct.BorderBottom(1).BorderColor("#F1F5F9");
                             var tPct = cPct.Text(pct).FontSize(9).FontColor(fg);
                             if (destaque) tPct.Bold();
 
-                            // Célula do Valor Final
                             var cValor = t.Cell().Background(bg).Padding(6).AlignRight();
+                            if (!destaque) cValor = cValor.BorderBottom(1).BorderColor("#F1F5F9");
                             var tValor = cValor.Text(valor).FontSize(9).FontColor(fg);
                             if (destaque) tValor.Bold();
                         }
 
-                        Linha("Custo Total Base", "", projeto.Orcamento.custo_base.ToString("C2", _ptBR));
-                        Linha("Impostos", $"{projeto.Orcamento.percentual_impostos:0.#}%", projeto.Orcamento.valor_impostos.ToString("C2", _ptBR));
-                        Linha("Margem de Lucro", $"{projeto.Orcamento.margem_percentual:0.#}%", projeto.Orcamento.valor_margem.ToString("C2", _ptBR));
-                        Linha("VALOR TOTAL DA PROPOSTA", "", projeto.Orcamento.valor_final.ToString("C2", _ptBR), destaque: true);
+                        decimal custoBase = projeto.Orcamento?.custo_base ?? 0;
+                        decimal pctImpostos = projeto.Orcamento?.percentual_impostos ?? 0;
+                        decimal valImpostos = projeto.Orcamento?.valor_impostos ?? 0;
+                        decimal pctMargem = projeto.Orcamento?.margem_percentual ?? 0;
+                        decimal valMargem = projeto.Orcamento?.valor_margem ?? 0;
+                        decimal valFinal = projeto.Orcamento?.valor_final ?? 0;
+
+                        Linha("Custo Total Base", "", custoBase.ToString("C2", _ptBR));
+                        Linha("Impostos", $"{pctImpostos:0.#}%", valImpostos.ToString("C2", _ptBR));
+                        Linha("Margem de Lucro", $"{pctMargem:0.#}%", valMargem.ToString("C2", _ptBR));
+                        Linha("VALOR TOTAL DA PROPOSTA", "", valFinal.ToString("C2", _ptBR), destaque: true);
                     });
                 });
             });
         }
 
+        private void ConstruirCabecalhoRelatorio(ColumnDescriptor col, string tipoRelatorio, int totalRegistros)
+        {
+            col.Item().Background("#1E3A5F").Padding(14).Row(row =>
+            {
+                row.RelativeItem().Column(c =>
+                {
+                    c.Item().Text($"RELATÓRIO GERENCIAL DE {tipoRelatorio}").FontSize(18).Bold().FontColor(Colors.White);
+                    c.Item().Text("AERO CONCEPTS — SISTEMA INTERNO DE HISTÓRICO").FontSize(10).FontColor("#A8C4E0");
+                });
+
+                row.ConstantItem(220).AlignRight().AlignMiddle().Column(c =>
+                {
+                    c.Item().Text($"Emitido em: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(10).FontColor(Colors.White);
+                    c.Item().Text($"Total de registros exibidos: {totalRegistros}").FontSize(10).FontColor("#A8C4E0").Bold();
+                });
+            });
+        }
+
+        private void ConstruirTabelaRelatorioProjetos(ColumnDescriptor col, List<Projeto> projetos)
+        {
+            col.Item().Table(table =>
+            {
+                table.ColumnsDefinition(cols =>
+                {
+                    cols.ConstantColumn(45);   // ID
+                    cols.RelativeColumn(3);    // Nome do Projeto
+                    cols.RelativeColumn(2.5f); // Cliente
+                    cols.RelativeColumn(1.3f); // Tipo
+                    cols.RelativeColumn(1.5f); // Status
+                    cols.ConstantColumn(85);   // Vencimento
+                    cols.RelativeColumn(2.2f); // Valor Final
+                });
+
+                table.Header(header =>
+                {
+                    header.Cell().Background("#2D3748").Padding(8).Text("ID").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("NOME DO PROJETO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("CLIENTE").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("TIPO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("STATUS").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("VENCIMENTO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).AlignRight().Text("VALOR FINAL").FontColor(Colors.White).Bold().FontSize(9.5f);
+                });
+
+                bool listraAlternada = false;
+                foreach (var p in projetos)
+                {
+                    string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
+
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(p.id_projeto.ToString()).FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(p.nome ?? "-").FontSize(10).Bold();
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(p.Cliente?.nome ?? "Consumidor Final").FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(p.tipo ?? "-").FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(p.status?.ToUpper() ?? "N/D").FontSize(10).Bold();
+
+                    string corData = p.EstaVencido ? "#EF4444" : "#333333";
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(p.DataExpiracao.ToString("dd/MM/yyyy")).FontSize(10).FontColor(corData);
+
+                    decimal valorFinal = p.Orcamento?.valor_final ?? 0;
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignRight().Text(valorFinal.ToString("C2", _ptBR)).FontSize(10).Bold();
+
+                    listraAlternada = !listraAlternada;
+                }
+            });
+
+            decimal totalFaturado = projetos.Where(p => p.Orcamento != null).Sum(p => p.Orcamento.valor_final);
+            decimal totalLucro = projetos.Where(p => p.Orcamento != null).Sum(p => p.Orcamento.valor_margem);
+
+            col.Item().PaddingTop(12).AlignRight().Width(280).Table(t =>
+            {
+                t.ColumnsDefinition(c => { c.RelativeColumn(1); c.RelativeColumn(1); });
+
+                t.Cell().Background("#EDF2F7").Padding(6).Text("Lucro Estimado:").FontSize(10).FontColor("#2D3748").Bold();
+                t.Cell().Background("#EDF2F7").Padding(6).AlignRight().Text(totalLucro.ToString("C2", _ptBR)).FontSize(10).FontColor("#2D3748").Bold();
+
+                t.Cell().Background("#1E3A5F").Padding(6).Text("Faturamento Total:").FontSize(10).FontColor(Colors.White).Bold();
+                t.Cell().Background("#1E3A5F").Padding(6).AlignRight().Text(totalFaturado.ToString("C2", _ptBR)).FontSize(10).FontColor(Colors.White).Bold();
+            });
+        }
+
+
+
         /// <summary>
-        /// Desenha a assinatura corporativa e a paginação dinâmica no rodapé de todas as páginas do PDF.
+        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos cargos.
         /// </summary>
+        public void GerarRelatorioTabelaCargos(List<Cargo> cargos, string caminhoArquivo)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem para leitura confortável
+                    page.Margin(1.5f, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
+
+                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CARGOS", cargos.Count));
+                    page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioCargos(col, cargos));
+                    page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
+                });
+            }).GeneratePdf(caminhoArquivo);
+        }
+
+        private void ConstruirTabelaRelatorioCargos(ColumnDescriptor col, List<Cargo> cargos)
+        {
+            col.Item().Table(table =>
+            {
+                table.ColumnsDefinition(cols =>
+                {
+                    cols.ConstantColumn(60);   // ID
+                    cols.RelativeColumn(6);    // Nome do Cargo
+                    cols.RelativeColumn(3);    // Custo Médio/Hora (Com bastante espaço e respiro)
+                });
+
+                table.Header(header =>
+                {
+                    header.Cell().Background("#2D3748").Padding(8).Text("ID").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("NOME DO CARGO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).AlignCenter().Text("CUSTO MÉDIO / HORA").FontColor(Colors.White).Bold().FontSize(9.5f);
+                });
+
+                bool listraAlternada = false;
+                foreach (var c in cargos)
+                {
+                    string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
+
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_cargo.ToString()).FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.nome ?? "-").FontSize(10).Bold();
+
+                    // Exibe o custo hora formatado em PT-BR com a cor VerdeAero da marca
+                    decimal custoHora = c.custo_medio_hora;
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter()
+                        .Text(custoHora.ToString("C2", _ptBR)).FontSize(10).Bold().FontColor("#009140");
+
+                    listraAlternada = !listraAlternada;
+                }
+            });
+        }
+
+        private void ConstruirTabelaRelatorioFuncionarios(ColumnDescriptor col, List<Funcionario> funcionarios)
+        {
+            col.Item().Table(table =>
+            {
+                table.ColumnsDefinition(cols =>
+                {
+                    cols.ConstantColumn(50);   // ID
+                    cols.RelativeColumn(4);    // Nome Completo
+                    cols.RelativeColumn(2.5f); // Tipo de Vínculo
+                    cols.RelativeColumn(2.2f); // Custo/Hora -> Agora com mais espaço interno
+                    cols.RelativeColumn(1.5f); // Status -> Isolado na ponta direita
+                });
+
+                table.Header(header =>
+                {
+                    header.Cell().Background("#2D3748").Padding(8).Text("ID").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("NOME COMPLETO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("TIPO DE VÍNCULO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).AlignLeft().Text("CUSTO/HORA").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("STATUS").FontColor(Colors.White).Bold().FontSize(9.5f);
+                });
+
+                bool listraAlternada = false;
+                foreach (var f in funcionarios)
+                {
+                    string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
+
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(f.id_funcionario.ToString()).FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(f.nome ?? "-").FontSize(10).Bold();
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(f.tipo_vinculo ?? "-").FontSize(10);
+
+                    // Puxando o valor correto direto do funcionário como combinado!
+                    decimal custoHora = f.custo_hora;
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignLeft().Text(custoHora.ToString("C2", _ptBR)).FontSize(10);
+
+                    // Agora usando a cor exata da sua View XAML
+                    string corStatus = (f.status?.ToLower() == "ativo") ? "#009140" : "#EF4444";
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(f.status?.ToUpper() ?? "N/D").FontSize(10).Bold().FontColor(corStatus);
+
+                    listraAlternada = !listraAlternada;
+                }
+            });
+        }
         private void ConstruirRodape(RowDescriptor row)
         {
-            row.RelativeItem().Text("Aero Concepts — Tecnologia em Engenharia Aeronáutica").FontSize(7).FontColor("#AAAAAA");
+            row.RelativeItem().Text("Aero Concepts — Tecnologia em Engenharia Aeronáutica").FontSize(8).FontColor("#AAAAAA");
             row.ConstantItem(80).AlignRight().Text(x =>
             {
-                x.Span("Página ").FontSize(7);
-                x.CurrentPageNumber().FontSize(7);
-                x.Span(" de ").FontSize(7);
-                x.TotalPages().FontSize(7);
+                x.Span("Página ").FontSize(8);
+                x.CurrentPageNumber().FontSize(8);
+                x.Span(" de ").FontSize(8);
+                x.TotalPages().FontSize(8);
             });
         }
 

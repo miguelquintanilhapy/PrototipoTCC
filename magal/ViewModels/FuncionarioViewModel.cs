@@ -6,6 +6,9 @@ using System.ComponentModel;
 using System.Windows.Data;
 using magal.Models;
 using magal.Data.Repositories;
+using magal.Services; // Certifique-se de que o namespace do seu PdfService está aqui
+using Microsoft.Win32;
+using System.Collections.Generic;
 
 namespace magal.ViewModels
 {
@@ -18,6 +21,7 @@ namespace magal.ViewModels
         #region Atributos e Campos Privados
 
         private readonly FuncionarioRepository _repository;
+        private readonly PdfService _pdfService; // Adicionado o campo do serviço de PDF
         private Funcionario _funcionarioSelecionado;
         private string _filtroTexto;
 
@@ -86,6 +90,11 @@ namespace magal.ViewModels
         /// </summary>
         public RelayCommand EditarCommand { get; }
 
+        /// <summary>
+        /// NOVO: Comando para exportar a listagem atual de funcionários em formato PDF.
+        /// </summary>
+        public RelayCommand ExportarPdfCommand { get; }
+
         #endregion
 
         #region Construtores
@@ -96,6 +105,7 @@ namespace magal.ViewModels
         public FuncionarioViewModel()
         {
             _repository = new FuncionarioRepository();
+            _pdfService = new PdfService(); // Instanciando o serviço de geração de PDFs
 
             // Configuração do mecanismo de filtragem do WPF
             FuncionariosView = CollectionViewSource.GetDefaultView(Funcionarios);
@@ -106,6 +116,9 @@ namespace magal.ViewModels
             AtualizarCommand = new RelayCommand(_ => CarregarFuncionarios());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Funcionario));
+
+            // NOVO: Inicializando o comando de exportação de PDF
+            ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
 
             CarregarFuncionarios();
         }
@@ -203,6 +216,50 @@ namespace magal.ViewModels
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
                 CarregarFuncionarios();
+        }
+
+        /// <summary>
+        /// Abre a caixa de diálogo para salvar o arquivo e dispara a geração do PDF com os dados filtrados na tela.
+        /// </summary>
+        private void ExecutarExportacaoPdf()
+        {
+            // Captura apenas os registros que estão atualmente passando pelo filtro do DataGrid
+            var funcionariosFiltrados = FuncionariosView.Cast<Funcionario>().ToList();
+
+            if (!funcionariosFiltrados.Any())
+            {
+                MessageBox.Show("Não há registros na tabela para exportar.", "Aero Concepts",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Pega o caminho real da pasta de Downloads do usuário logado no Windows
+            string pastaDownloads = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Arquivos PDF (*.pdf)|*.pdf",
+                FileName = $"Relatorio_Funcionarios_{DateTime.Now:yyyyMMdd_HHmm}.pdf",
+                InitialDirectory = System.IO.Directory.Exists(pastaDownloads) ? pastaDownloads : string.Empty, // Abre direto em Downloads
+                Title = "Salvar Relatório de Funcionários"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // AQUI ESTÁ A CORREÇÃO: Chamando o serviço para criar o PDF real no disco!
+                    _pdfService.GerarRelatorioTabelaFuncionarios(funcionariosFiltrados, saveFileDialog.FileName);
+
+                    MessageBox.Show("Relatório gerado com sucesso!", "Sucesso",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao exportar PDF: {ex.Message}", "Erro",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         #endregion

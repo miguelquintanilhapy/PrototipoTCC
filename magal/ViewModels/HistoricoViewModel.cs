@@ -6,8 +6,10 @@ using System.ComponentModel;
 using System.Windows.Data;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.Win32; 
 using magal.Models;
 using magal.Data.Repositories;
+using magal.Services; 
 
 namespace magal.ViewModels
 {
@@ -119,6 +121,11 @@ namespace magal.ViewModels
         /// </summary>
         public RelayCommand AtualizarCommand { get; }
 
+        /// <summary>
+        /// Comando para exportar a listagem atual filtrada de projetos para um relatório em PDF.
+        /// </summary>
+        public RelayCommand ExportarPdfCommand { get; }
+
         #endregion
 
         #region Construtores
@@ -138,6 +145,7 @@ namespace magal.ViewModels
             ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as Projeto));
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Projeto));
             AtualizarCommand = new RelayCommand(_ => CarregarHistorico());
+            ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
 
             CarregarHistorico();
         }
@@ -161,7 +169,7 @@ namespace magal.ViewModels
 
                 foreach (var p in lista)
                 {
-                    //Se o banco trouxe o orçamento nulo nesta query simplificada,
+                    // Se o banco trouxe o orçamento nulo nesta query simplificada,
                     // criamos uma instância vazia para evitar que a propriedade jogue a data para o passado.
                     if (p.Orcamento == null)
                     {
@@ -229,6 +237,42 @@ namespace magal.ViewModels
 
             TotalFinanceiro = somaFaturamento.ToString("C2", _ptBR);
             TotalLucro = somaLucro.ToString("C2", _ptBR);
+        }
+
+        /// <summary>
+        /// Pega os projetos atualmente visíveis na tela (aplicados os filtros) e gera um relatório tabular em PDF.
+        /// </summary>
+        private void ExecutarExportacaoPdf()
+        {
+            // Obtém estritamente a lista filtrada que o usuário está vendo na interface
+            var projetosVisiveis = ProjetosView.Cast<Projeto>().ToList();
+
+            if (!projetosVisiveis.Any())
+            {
+                MessageBox.Show("Não há dados na tabela atual para exportar o relatório.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var sfd = new SaveFileDialog
+            {
+                Filter = "PDF|*.pdf",
+                FileName = $"Relatorio_Projetos_{DateTime.Now:yyyyMMdd_HHmmss}"
+            };
+
+            if (sfd.ShowDialog() == true)
+            {
+                try
+                {
+                    // Invoca o método de geração no PdfService passando os dados visíveis
+                    new PdfService().GerarRelatorioTabelaProjetos(projetosVisiveis, sfd.FileName);
+
+                    MessageBox.Show("Relatório de listagem exportado com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao exportar o relatório de projetos: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         /// <summary>

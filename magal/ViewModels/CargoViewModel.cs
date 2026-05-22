@@ -6,6 +6,9 @@ using System.ComponentModel;
 using System.Windows.Data;
 using magal.Models;
 using magal.Data.Repositories;
+using magal.Services; // Adicionado para enxergar o PdfService
+using Microsoft.Win32; // Adicionado para usar o SaveFileDialog
+using System.Collections.Generic;
 
 namespace magal.ViewModels
 {
@@ -18,6 +21,7 @@ namespace magal.ViewModels
         #region Atributos e Campos Privados
 
         private readonly CargoRepository _repository;
+        private readonly PdfService _pdfService; // Adicionado o campo do serviço de PDF
         private Cargo _cargoSelecionado;
         private string _filtroTexto;
 
@@ -86,6 +90,11 @@ namespace magal.ViewModels
         /// </summary>
         public RelayCommand EditarCommand { get; }
 
+        /// <summary>
+        /// NOVO: Comando para exportar a listagem atual de cargos em formato PDF.
+        /// </summary>
+        public RelayCommand ExportarPdfCommand { get; }
+
         #endregion
 
         #region Construtores
@@ -96,6 +105,7 @@ namespace magal.ViewModels
         public CargoViewModel()
         {
             _repository = new CargoRepository();
+            _pdfService = new PdfService(); // Instanciando o serviço de geração de PDFs
 
             // Configuração do mecanismo de filtragem do WPF
             CargosView = CollectionViewSource.GetDefaultView(Cargos);
@@ -106,6 +116,9 @@ namespace magal.ViewModels
             AtualizarCommand = new RelayCommand(_ => CarregarCargos());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Cargo));
+
+            // NOVO: Inicializando o comando de exportação de PDF para cargos
+            ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
 
             CarregarCargos();
         }
@@ -201,6 +214,50 @@ namespace magal.ViewModels
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
                 CarregarCargos();
+        }
+
+        /// <summary>
+        /// NOVO: Abre a caixa de diálogo para salvar o arquivo e dispara a geração do PDF com os cargos filtrados na tela.
+        /// </summary>
+        private void ExecutarExportacaoPdf()
+        {
+            // Captura apenas os registros de cargos que estão atualmente passando pelo filtro do DataGrid
+            var cargosFiltrados = CargosView.Cast<Cargo>().ToList();
+
+            if (!cargosFiltrados.Any())
+            {
+                MessageBox.Show("Não há registros na tabela para exportar.", "Aero Concepts",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Pega o caminho real da pasta de Downloads do usuário logado no Windows
+            string pastaDownloads = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Arquivos PDF (*.pdf)|*.pdf",
+                FileName = $"Relatorio_Cargos_{DateTime.Now:yyyyMMdd_HHmm}.pdf",
+                InitialDirectory = System.IO.Directory.Exists(pastaDownloads) ? pastaDownloads : string.Empty, // Abre direto em Downloads
+                Title = "Salvar Relatório de Cargos"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Chama o novo método criado no PdfService para gerar o relatório real de cargos
+                    _pdfService.GerarRelatorioTabelaCargos(cargosFiltrados, saveFileDialog.FileName);
+
+                    MessageBox.Show("Relatório de cargos gerado com sucesso!", "Sucesso",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao exportar PDF: {ex.Message}", "Erro",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         #endregion

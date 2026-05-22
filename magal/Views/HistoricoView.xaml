@@ -54,12 +54,38 @@
                        FontSize="28" FontWeight="Bold"
                        Foreground="{StaticResource AzulAero}"
                        VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
 
-            <Button Content="ATUALIZAR LISTA" 
-                    Command="{Binding AtualizarCommand}"
-                    Style="{StaticResource PrimaryBtn}"
-                    HorizontalAlignment="Right" 
-                    VerticalAlignment="Center"/>
+                <Button Command="{Binding AtualizarCommand}"
+            Style="{StaticResource PrimaryBtn}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72C;" 
+                       FontFamily="Segoe MDL2 Assets" 
+                       FontSize="12" 
+                       VerticalAlignment="Center" 
+                       Margin="0,0,8,0"/>
+                        <TextBlock Text="ATUALIZAR LISTA" 
+                       VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding ExportarPdfCommand}"
+            Style="{StaticResource PrimaryBtn}"
+            Margin="10,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72D;" 
+                       FontFamily="Segoe MDL2 Assets" 
+                       FontSize="12" 
+                       VerticalAlignment="Center" 
+                       Margin="0,0,8,0"/>
+                        <TextBlock Text="EXPORTAR RELATÓRIO" 
+                       VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+
+
         </Grid>
 
         <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,25">

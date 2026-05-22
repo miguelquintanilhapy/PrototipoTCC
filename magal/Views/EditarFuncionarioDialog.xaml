@@ -132,9 +132,6 @@
 
         </ComboBox>
 
-        <!-- CUSTO -->
-        <TextBlock Text="CUSTO/HORA (R$)"
-                   Style="{StaticResource LabelStyle}"/>       
 
         <!-- TIPO VÍNCULO -->
         <TextBlock Text="TIPO VÍNCULO"

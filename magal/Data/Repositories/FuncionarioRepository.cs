@@ -20,10 +20,11 @@ namespace magal.Data.Repositories
                             f.nome,
                             f.id_cargo,
                             f.nivel,
-                            f.custo_hora,
                             f.tipo_vinculo,
                             f.status,
-                            c.nome AS cargo_nome
+
+                            c.nome AS cargo_nome,
+                            c.custo_medio_hora
                            
 
                         FROM funcionario f
@@ -54,10 +55,7 @@ namespace magal.Data.Repositories
 
                                     nivel = reader.GetString(
                                         reader.GetOrdinal("nivel")),
-
-                                    custo_hora = reader.GetDecimal(
-                                        reader.GetOrdinal("custo_hora")),
-
+                                                                       
                                     tipo_vinculo = reader.GetString(
                                         reader.GetOrdinal("tipo_vinculo")),
 
@@ -72,7 +70,9 @@ namespace magal.Data.Repositories
                                         nome = reader.GetString(
                                             reader.GetOrdinal("cargo_nome")),
 
-                                        
+                                        custo_medio_hora = reader.GetDecimal(
+                                            reader.GetOrdinal("custo_medio_hora"))
+
                                     }
                                 };
 
@@ -103,8 +103,7 @@ namespace magal.Data.Repositories
                     (
                         id_cargo,
                         nome,
-                        nivel,
-                        custo_hora,
+                        nivel,                        
                         tipo_vinculo,
                         status
                     )
@@ -113,7 +112,6 @@ namespace magal.Data.Repositories
                         @id_cargo,
                         @nome,
                         @nivel,
-                        @custo_hora,
                         @tipo_vinculo,
                         @status
                     )";
@@ -128,9 +126,6 @@ namespace magal.Data.Repositories
 
                     cmd.Parameters.AddWithValue(
                         "@nivel", funcionario.nivel);
-
-                    cmd.Parameters.AddWithValue(
-                        "@custo_hora", funcionario.custo_hora);
 
                     cmd.Parameters.AddWithValue(
                         "@tipo_vinculo", funcionario.tipo_vinculo);
@@ -156,7 +151,6 @@ namespace magal.Data.Repositories
                         nome = @nome,
                         id_cargo = @id_cargo,
                         nivel = @nivel,
-                        custo_hora = @custo_hora,
                         tipo_vinculo = @tipo_vinculo,
                         status = @status
                     WHERE id_funcionario = @id_funcionario";
@@ -171,9 +165,6 @@ namespace magal.Data.Repositories
 
                     cmd.Parameters.AddWithValue(
                         "@nivel", funcionario.nivel);
-
-                    cmd.Parameters.AddWithValue(
-                        "@custo_hora", funcionario.custo_hora);
 
                     cmd.Parameters.AddWithValue(
                         "@tipo_vinculo", funcionario.tipo_vinculo);

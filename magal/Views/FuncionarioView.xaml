@@ -178,6 +178,12 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
+                        <DataGridTextColumn Header="NÍVEL" 
+                                            Binding="{Binding nivel}" 
+                                            Width="120" 
+                                            FontSize="14" 
+                                            FontWeight="SemiBold" />
+                        
                         <DataGridTextColumn Header="CUSTO/HORA" 
                                             Binding="{Binding custo_hora, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
                                             Width="160" 

@@ -40,9 +40,7 @@ namespace magal.Views
         private void PreencherCampos()
         {
             TxtNome.Text = _funcionario.nome;
-
-            TxtCustoHora.Text = _funcionario.custo_hora.ToString("F2");
-
+            
             ComboCargo.SelectedValue = _funcionario.id_cargo;
 
             // NÍVEL
@@ -80,8 +78,7 @@ namespace magal.Views
         {
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
                 ComboCargo.SelectedValue == null ||
-                ComboNivel.SelectedItem == null ||
-                string.IsNullOrWhiteSpace(TxtCustoHora.Text) ||
+                ComboNivel.SelectedItem == null ||                
                 ComboTipoVinculo.SelectedItem == null ||
                 ComboStatus.SelectedItem == null)
             {
@@ -94,20 +91,7 @@ namespace magal.Views
                 return;
             }
 
-            if (!decimal.TryParse(
-                    TxtCustoHora.Text,
-                    System.Globalization.NumberStyles.Any,
-                    System.Globalization.CultureInfo.CurrentCulture,
-                    out decimal custoHora))
-            {
-                MessageBox.Show(
-                    "Custo/Hora inválido.",
-                    "Aero Concepts",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                return;
-            }
+           
 
             try
             {
@@ -118,9 +102,7 @@ namespace magal.Views
                 _funcionario.nivel = ((ComboBoxItem)ComboNivel.SelectedItem)
                     .Content
                     .ToString();
-
-                _funcionario.custo_hora = custoHora;
-
+            
                 _funcionario.tipo_vinculo = ((ComboBoxItem)ComboTipoVinculo.SelectedItem)
                     .Content
                     .ToString();

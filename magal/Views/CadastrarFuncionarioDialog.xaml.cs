@@ -32,9 +32,8 @@ namespace magal.Views
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
-                ComboCargo.SelectedValue == null ||
+                ComboCargo.SelectedItem == null ||
                 ComboNivel.SelectedItem == null ||
-                string.IsNullOrWhiteSpace(TxtCustoHora.Text) ||
                 ComboTipoVinculo.SelectedItem == null ||
                 ComboStatus.SelectedItem == null)
             {
@@ -47,31 +46,43 @@ namespace magal.Views
                 return;
             }
 
-            if (!decimal.TryParse(TxtCustoHora.Text, out decimal custoHora))
-            {
-                MessageBox.Show(
-                    "Custo/Hora inválido.",
-                    "Aero Concepts",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                return;
-            }
-
             try
             {
+                var cargoSelecionado = (Cargo)ComboCargo.SelectedItem;
+
+                string nivel = ((ComboBoxItem)ComboNivel.SelectedItem)
+                    .Content
+                    .ToString();
+
+                decimal custoHora = cargoSelecionado.custo_medio_hora;
+
+                switch (nivel)
+                {
+                    case "Júnior":
+                        custoHora = cargoSelecionado.custo_medio_hora / 1.75m;
+                        break;
+
+                    case "Pleno":
+                        custoHora = cargoSelecionado.custo_medio_hora;
+                        break;
+
+                    case "Sênior":
+                        custoHora = cargoSelecionado.custo_medio_hora * 1.5m;
+                        break;
+
+                    case "Especialista":
+                        custoHora = cargoSelecionado.custo_medio_hora * 2m;
+                        break;
+                }
+
                 var funcionario = new Funcionario
                 {
                     nome = TxtNome.Text.Trim(),
 
-                    id_cargo = (int)ComboCargo.SelectedValue,
+                    id_cargo = cargoSelecionado.id_cargo,
 
-                    nivel = ((ComboBoxItem)ComboNivel.SelectedItem)
-                        .Content
-                        .ToString(),
-
-                    custo_hora = custoHora,
-
+                    nivel = nivel,
+                  
                     tipo_vinculo = ((ComboBoxItem)ComboTipoVinculo.SelectedItem)
                         .Content
                         .ToString(),

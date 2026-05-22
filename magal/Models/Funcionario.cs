@@ -14,8 +14,6 @@ namespace magal.Models
 
         public string nivel { get; set; }
 
-        public decimal custo_hora { get; set; }
-
         public string tipo_vinculo { get; set; }
 
         public string status { get; set; }
@@ -57,6 +55,32 @@ namespace magal.Models
                     partes[0][0].ToString() +
                     partes[partes.Length - 1][0].ToString()
                 ).ToUpper();
+            }
+        }
+        public decimal custo_hora
+        {
+            get
+            {
+                if (Cargo == null)
+                    return 0;
+
+                switch (nivel)
+                {
+                    case "Júnior":
+                        return Cargo.custo_medio_hora / 1.75m;
+
+                    case "Pleno":
+                        return Cargo.custo_medio_hora;
+
+                    case "Sênior":
+                        return Cargo.custo_medio_hora * 1.5m;
+
+                    case "Especialista":
+                        return Cargo.custo_medio_hora * 2m;
+
+                    default:
+                        return 0;
+                }
             }
         }
     }

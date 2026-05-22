@@ -1,138 +1,197 @@
-﻿-- ==============================================================================
--- BACKUP DE ESTRUTURA DO BANCO DE DADOS - AERO CONCEPTS (SAD PRECIFICAÇÃO)
--- DATA: 14/05/2026
--- ==============================================================================
-
---CREATE DATABASE IF NOT EXISTS sad_precificacao;
---USE sad_precificacao;
-
---CREATE TABLE IF NOT EXISTS usuario (
---    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
---    nome VARCHAR(255) NOT NULL,
---    email VARCHAR(255) NOT NULL UNIQUE,
---    senha VARCHAR(255) NOT NULL,
---    status VARCHAR(50) DEFAULT 'Ativo'
---);
-
---CREATE TABLE IF NOT EXISTS cliente (
---    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
---    nome VARCHAR(255) NOT NULL,
---    tipo VARCHAR(50),
---    cpf_cnpj VARCHAR(20),
---    cidade VARCHAR(100),
---    estado VARCHAR(50),
---    contato VARCHAR(100)
---);
-
---CREATE TABLE IF NOT EXISTS cargo (
---    id_cargo INT AUTO_INCREMENT PRIMARY KEY,
---    nome VARCHAR(255) NOT NULL
---);
-
---CREATE TABLE IF NOT EXISTS funcionario (
---    id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
---    id_cargo INT NOT NULL,
---    nome VARCHAR(255) NOT NULL,
---    nivel VARCHAR(50),
---    custo_hora DECIMAL(18,2) NOT NULL,
---    tipo_vinculo VARCHAR(50),
---    status VARCHAR(50) DEFAULT 'Ativo',
---    FOREIGN KEY (id_cargo) REFERENCES cargo(id_cargo)
---);
-
---CREATE TABLE IF NOT EXISTS projeto (
---    id_projeto INT AUTO_INCREMENT PRIMARY KEY,
---    id_usuario INT NOT NULL,
---    id_cliente INT NOT NULL,
---    nome VARCHAR(255) NOT NULL,
---    tipo VARCHAR(100),
---    status VARCHAR(50) DEFAULT 'Rascunho',
---    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
---    data_conclusao_prevista DATE,
---    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
---    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
---);
-
---CREATE TABLE IF NOT EXISTS tarefa (
---    id_tarefa INT AUTO_INCREMENT PRIMARY KEY,
---    id_projeto INT NOT NULL,
---    id_funcionario INT NOT NULL,
---    descricao VARCHAR(255),
---    horas_estimadas DECIMAL(18,2) DEFAULT 0,
---    horas_reais DECIMAL(18,2) DEFAULT 0,
---    custo_real DECIMAL(18,2) DEFAULT 0,
---    status VARCHAR(50) DEFAULT 'Pendente',
---    FOREIGN KEY (id_projeto) REFERENCES projeto(id_projeto) ON DELETE CASCADE,
---    FOREIGN KEY (id_funcionario) REFERENCES funcionario(id_funcionario)
---);
-
---CREATE TABLE IF NOT EXISTS custo (
---    id_custo INT AUTO_INCREMENT PRIMARY KEY,
---    id_projeto INT NOT NULL,
---    nome VARCHAR(255) NOT NULL,
---    categoria VARCHAR(100),
---    tipo VARCHAR(50),
---    valor DECIMAL(18,2) NOT NULL,
---    unidade VARCHAR(50),
---    data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
---    FOREIGN KEY (id_projeto) REFERENCES projeto(id_projeto) ON DELETE CASCADE
---);
-
---CREATE TABLE IF NOT EXISTS orcamento (
---    id_orcamento INT AUTO_INCREMENT PRIMARY KEY,
---    id_projeto INT NOT NULL UNIQUE,
---    custo_base DECIMAL(18,2) DEFAULT 0,
---    percentual_impostos DECIMAL(18,2) DEFAULT 0,
---    valor_impostos DECIMAL(18,2) DEFAULT 0,
---    margem_percentual DECIMAL(18,2) DEFAULT 0,
---    valor_margem DECIMAL(18,2) DEFAULT 0,
---    valor_final DECIMAL(18,2) DEFAULT 0,
---    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
---    FOREIGN KEY (id_projeto) REFERENCES projeto(id_projeto) ON DELETE CASCADE
---);
-
---INSERT IGNORE INTO cargo (id_cargo, nome) VALUES
---(1, 'Engenheiro Elétrico'),
---(2, 'Supervisor Eletroeletrônico'),
---(3, 'Engenheiro Especialista Turbomáquinas'),
---(4, 'Coordenador Técnico de Serviços'),
---(5, 'Analista de Engenharia Industrial'),
---(6, 'Coordenador de Engenharia Industrial'),
---(7, 'Analista de PD&I'),
---(8, 'Engenheiro de PD&I'),
---(9, 'Gerente de Engenharia'),
---(10, 'Gerente de Projetos'),
---(11, 'Consultor Especialista PD&I/Eng');
-
---INSERT IGNORE INTO funcionario 
---(id_funcionario, id_cargo, nome, nivel, custo_hora, tipo_vinculo, status) 
---VALUES
---(1, 1, 'Paulino Rubião', 'Sr', 165.00, 'CLT', 'Ativo'),
---(2, 2, 'Eduardo Sedano', 'Pl', 135.00, 'CLT', 'Ativo'),
---(3, 3, 'Flavio Natal', 'Espec', 225.00, 'PJ', 'Ativo'),
---(4, 4, 'Antonio Aguida', 'Sr', 145.00, 'CLT', 'Ativo'),
---(5, 4, 'Roberto Souza Costa', 'Sr', 145.00, 'CLT', 'Ativo'),
---(6, 5, 'Luiz Menezes', 'Pl', 98.00, 'CLT', 'Ativo'),
---(7, 6, 'Evandro Lamberti', 'Sr', 160.00, 'CLT', 'Ativo'),
---(8, 7, 'Clayton Sant''ana', 'Pl', 110.00, 'CLT', 'Ativo'),
---(9, 7, 'Igor Alves', 'Pl', 110.00, 'CLT', 'Ativo'),
---(10, 7, 'Victor Hugo Noronha', 'Pl', 110.00, 'CLT', 'Ativo'),
---(11, 8, 'Lucilene Moraes', 'Sr', 180.00, 'CLT', 'Ativo'),
---(12, 8, 'Gerhard Egwarth', 'Sr', 180.00, 'PJ', 'Ativo'),
---(13, 9, 'Daniel Joaquim Pereira', 'Sr', 260.00, 'CLT', 'Ativo'),
---(14, 10, 'Eduard Müller', 'Sr', 240.00, 'CLT', 'Ativo'),
---(15, 11, 'Marco Antônio Carvalho', 'Espec', 310.00, 'PJ', 'Ativo');
-
---INSERT IGNORE INTO usuario (id_usuario, nome, email, senha, status) VALUES
---(1, 'Admin', 'admin@aeroconcepts.com', 'admin123', 'Ativo');
-
---INSERT IGNORE INTO cliente 
---(id_cliente, nome, tipo, cidade, estado, contato) 
---VALUES
---(1, 'Funcate', 'Jurídica', 'São José dos Campos', 'SP', 'Contato Comercial'),
---(2, 'Voith', 'Jurídica', 'São Paulo', 'SP', 'Departamento de Projetos'),
---(3, 'Arauco', 'Jurídica', 'Curitiba', 'PR', 'Suprimentos');
-
--- ==============================================================================
--- FIM DO SCRIPT DE BACKUP
--- ==============================================================================
+﻿-- CREATE DATABASE sad_precificacao;
+-- USE sad_precificacao;-- ==============================================================================
+-- -- TABELA USUÁRIO
+-- -- ==============================================================================CREATE TABLE usuario (
+--     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+--     nome VARCHAR(255) NOT NULL,
+--     email VARCHAR(255) NOT NULL UNIQUE,
+--     senha VARCHAR(255) NOT NULL,
+--     status VARCHAR(50) DEFAULT 'Ativo'
+-- );-- ==============================================================================
+-- -- TABELA CLIENTE
+-- -- ==============================================================================CREATE TABLE cliente (
+--     id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+--     nome VARCHAR(255) NOT NULL,
+--     tipo VARCHAR(50),
+--     cpf_cnpj VARCHAR(20),
+--     cidade VARCHAR(100),
+--     estado VARCHAR(50),
+--     contato VARCHAR(100)
+-- );-- ==============================================================================
+-- -- TABELA CARGO
+-- -- ==============================================================================CREATE TABLE cargo (
+--     id_cargo INT AUTO_INCREMENT PRIMARY KEY,
+--     nome VARCHAR(255) NOT NULL,
+--     custo_medio_hora DECIMAL(18,2) DEFAULT 0
+-- );-- ==============================================================================
+-- -- TABELA FUNCIONÁRIO
+-- -- ==============================================================================CREATE TABLE funcionario (
+--     id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+--     id_cargo INT NOT NULL,
+--     nome VARCHAR(255) NOT NULL,
+--     nivel VARCHAR(50),
+--     custo_hora DECIMAL(18,2) NOT NULL,
+--     tipo_vinculo VARCHAR(50),
+--     status VARCHAR(50) DEFAULT 'Ativo',
+-- 
+--     CONSTRAINT fk_funcionario_cargo
+--     FOREIGN KEY (id_cargo)
+--     REFERENCES cargo(id_cargo)
+-- );-- ==============================================================================
+-- -- TABELA PROJETO
+-- -- ==============================================================================CREATE TABLE projeto (
+--     id_projeto INT AUTO_INCREMENT PRIMARY KEY,
+--     id_usuario INT NOT NULL,
+--     id_cliente INT NOT NULL,
+-- 
+--     nome VARCHAR(255) NOT NULL,
+--     tipo VARCHAR(100),
+--     status VARCHAR(50) DEFAULT 'Rascunho',
+-- 
+--     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     data_conclusao_prevista DATE,
+-- 
+--     CONSTRAINT fk_projeto_usuario
+--     FOREIGN KEY (id_usuario)
+--     REFERENCES usuario(id_usuario),
+-- 
+--     CONSTRAINT fk_projeto_cliente
+--     FOREIGN KEY (id_cliente)
+--     REFERENCES cliente(id_cliente)
+-- );-- ==============================================================================
+-- -- TABELA TAREFA
+-- -- ==============================================================================CREATE TABLE tarefa (
+--     id_tarefa INT AUTO_INCREMENT PRIMARY KEY,
+-- 
+--     id_projeto INT NOT NULL,
+--     id_funcionario INT NOT NULL,
+-- 
+--     descricao VARCHAR(255),
+--     horas_estimadas DECIMAL(18,2) DEFAULT 0,
+--     horas_reais DECIMAL(18,2) DEFAULT 0,
+--     custo_real DECIMAL(18,2) DEFAULT 0,
+-- 
+--     status VARCHAR(50) DEFAULT 'Pendente',
+-- 
+--     CONSTRAINT fk_tarefa_projeto
+--     FOREIGN KEY (id_projeto)
+--     REFERENCES projeto(id_projeto)
+--     ON DELETE CASCADE,
+-- 
+--     CONSTRAINT fk_tarefa_funcionario
+--     FOREIGN KEY (id_funcionario)
+--     REFERENCES funcionario(id_funcionario)
+-- );-- ==============================================================================
+-- -- TABELA CUSTO
+-- -- ==============================================================================CREATE TABLE custo (
+--     id_custo INT AUTO_INCREMENT PRIMARY KEY,
+-- 
+--     id_projeto INT NOT NULL,
+-- 
+--     nome VARCHAR(255) NOT NULL,
+--     categoria VARCHAR(100),
+--     tipo VARCHAR(50),
+--     valor DECIMAL(18,2) NOT NULL,
+--     unidade VARCHAR(50),
+-- 
+--     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+-- 
+--     CONSTRAINT fk_custo_projeto
+--     FOREIGN KEY (id_projeto)
+--     REFERENCES projeto(id_projeto)
+--     ON DELETE CASCADE
+-- );-- ==============================================================================
+-- -- TABELA ORÇAMENTO
+-- -- ==============================================================================CREATE TABLE orcamento (
+--     id_orcamento INT AUTO_INCREMENT PRIMARY KEY,
+-- 
+--     id_projeto INT NOT NULL UNIQUE,
+-- 
+--     custo_base DECIMAL(18,2) DEFAULT 0,
+--     percentual_impostos DECIMAL(18,2) DEFAULT 0,
+--     valor_impostos DECIMAL(18,2) DEFAULT 0,
+-- 
+--     margem_percentual DECIMAL(18,2) DEFAULT 0,
+--     valor_margem DECIMAL(18,2) DEFAULT 0,
+-- 
+--     valor_final DECIMAL(18,2) DEFAULT 0,
+-- 
+--     validade_dias INT DEFAULT 30,
+-- 
+--     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+-- 
+--     CONSTRAINT fk_orcamento_projeto
+--     FOREIGN KEY (id_projeto)
+--     REFERENCES projeto(id_projeto)
+--     ON DELETE CASCADE
+-- );-- ==============================================================================
+-- -- USUÁRIOS
+-- -- ==============================================================================INSERT INTO usuario (nome, email, senha, status)VALUES
+-- ('Administrador', 'admin@aeroconcepts.com', 'admin123', 'Ativo');-- ==============================================================================
+-- -- CLIENTES
+-- -- ==============================================================================INSERT INTO cliente
+-- (nome, tipo, cpf_cnpj, cidade, estado, contato)VALUES
+-- ('FUNCATE', 'Jurídica', '12.345.678/0001-01', 'São José dos Campos', 'SP', 'Contato Comercial'),
+-- ('VOITH', 'Jurídica', '22.456.789/0001-55', 'São Paulo', 'SP', 'Departamento Técnico'),
+-- ('ARAUCO', 'Jurídica', '98.111.222/0001-10', 'Curitiba', 'PR', 'Setor Industrial'),
+-- ('EMBRAER', 'Jurídica', '10.200.300/0001-77', 'São José dos Campos', 'SP', 'Engenharia'),
+-- ('DCTA', 'Governo', '55.444.333/0001-12', 'São José dos Campos', 'SP', 'Diretoria');-- ==============================================================================
+-- -- CARGOS
+-- -- ==============================================================================INSERT INTO cargo
+-- (nome, custo_medio_hora)VALUES
+-- ('Engenheiro Elétrico', 165.00),
+-- ('Supervisor Eletroeletrônico', 135.00),
+-- ('Especialista em Turbomáquinas', 225.00),
+-- ('Coordenador Técnico', 145.00),
+-- ('Analista Industrial', 98.00),
+-- ('Gerente de Projetos', 240.00),
+-- ('Consultor Especialista', 310.00),
+-- ('Analista PD&I', 110.00);-- ==============================================================================
+-- -- FUNCIONÁRIOS
+-- -- ==============================================================================INSERT INTO funcionario
+-- (id_cargo, nome, nivel, custo_hora, tipo_vinculo, status)VALUES
+-- (1, 'Paulo Rubens', 'Sênior', 170.00, 'CLT', 'Ativo'),
+-- (2, 'Eduardo Silva', 'Pleno', 140.00, 'CLT', 'Ativo'),
+-- (3, 'Flávio Nascimento', 'Especialista', 230.00, 'PJ', 'Ativo'),
+-- (4, 'Roberto Costa', 'Sênior', 150.00, 'CLT', 'Ativo'),
+-- (5, 'Lucas Menezes', 'Júnior', 100.00, 'CLT', 'Ativo'),
+-- (6, 'Marcos Almeida', 'Sênior', 245.00, 'CLT', 'Ativo'),
+-- (7, 'Carlos Andrade', 'Especialista', 320.00, 'PJ', 'Ativo'),
+-- (8, 'Igor Oliveira', 'Pleno', 115.00, 'CLT', 'Ativo');-- ==============================================================================
+-- -- PROJETOS
+-- -- ==============================================================================INSERT INTO projeto
+-- (id_usuario, id_cliente, nome, tipo, status, data_conclusao_prevista)VALUES
+-- (1, 1, 'Modernização de Turbinas', 'Engenharia', 'Em andamento', '2026-09-15'),
+-- (1, 2, 'Automação Industrial', 'Automação', 'Planejamento', '2026-10-20'),
+-- (1, 3, 'Pesquisa em Turbomáquinas', 'PD&I', 'Em andamento', '2026-12-05'),
+-- (1, 4, 'Sistema Supervisório', 'Software', 'Concluído', '2026-04-30'),
+-- (1, 5, 'Infraestrutura Elétrica', 'Infraestrutura', 'Em andamento', '2026-11-18');-- ==============================================================================
+-- -- TAREFAS
+-- -- ==============================================================================INSERT INTO tarefa
+-- (id_projeto, id_funcionario, descricao, horas_estimadas, horas_reais, custo_real, status)VALUES
+-- (1, 1, 'Análise técnica inicial', 20, 18, 3060.00, 'Concluído'),
+-- (1, 3, 'Diagnóstico de turbinas', 35, 30, 6900.00, 'Concluído'),
+-- (2, 8, 'Pesquisa de sensores', 18, 10, 1150.00, 'Em andamento'),
+-- (2, 6, 'Gerenciamento do projeto', 12, 5, 1225.00, 'Em andamento'),
+-- (3, 7, 'Consultoria especializada', 25, 15, 4800.00, 'Em andamento'),
+-- (4, 5, 'Modelagem industrial', 22, 20, 2000.00, 'Concluído'),
+-- (5, 4, 'Instalação de painéis', 40, 12, 1800.00, 'Em andamento');-- ==============================================================================
+-- -- CUSTOS
+-- -- ==============================================================================INSERT INTO custo
+-- (id_projeto, nome, categoria, tipo, valor, unidade)VALUES
+-- (1, 'Rolamentos Industriais', 'Equipamentos', 'Material', 8500.00, 'Unidade'),
+-- (1, 'Cabos Elétricos', 'Elétrica', 'Material', 3200.00, 'Metro'),
+-- (2, 'Servidor Industrial', 'TI', 'Equipamento', 9200.00, 'Unidade'),
+-- (2, 'Sensores Inteligentes', 'Automação', 'Material', 5600.00, 'Unidade'),
+-- (3, 'Protótipo Experimental', 'Pesquisa', 'Equipamento', 14000.00, 'Unidade'),
+-- (4, 'Licença SCADA', 'Software', 'Licença', 7800.00, 'Licença'),
+-- (5, 'Painel Elétrico', 'Elétrica', 'Equipamento', 9900.00, 'Unidade');-- ==============================================================================
+-- -- ORÇAMENTOS
+-- -- ==============================================================================INSERT INTO orcamento
+-- (id_projeto, custo_base, percentual_impostos, valor_impostos,
+-- margem_percentual, valor_margem, valor_final, validade_dias)VALUES
+-- (1, 25000.00, 12.00, 3000.00, 20.00, 5000.00, 33000.00, 30),
+-- (2, 18000.00, 10.00, 1800.00, 18.00, 3240.00, 23040.00, 30),
+-- (3, 32000.00, 15.00, 4800.00, 25.00, 8000.00, 44800.00, 45),
+-- (4, 14000.00, 8.00, 1120.00, 15.00, 2100.00, 17220.00, 20),
+-- (5, 22000.00, 10.00, 2200.00, 22.00, 4840.00, 29040.00, 30);ALTER TABLE funcionario DROP COLUMN custo_hora;

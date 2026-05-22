@@ -51,9 +51,10 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="CardBorder" Property="BorderBrush" Value="{StaticResource AeroAccent}"/>
+                                <Setter TargetName="CardBorder" Property="Background" Value="#F4F9FF"/>
                                 <Setter Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect BlurRadius="30" ShadowDepth="5" Opacity="0.12" Color="#3B82F6"/>
+                                        <DropShadowEffect BlurRadius="30" ShadowDepth="6" Opacity="0.15" Color="#3B82F6"/>
                                     </Setter.Value>
                                 </Setter>
                                 <Setter TargetName="IconBg" Property="Background" Value="#E1EFFF"/>
@@ -146,18 +147,18 @@
                         Tag="Funcionários"
                         ToolTip="Gerencie os funcionários, dados pessoais, contratos e informações profissionais." 
                         Click="BtnFuncionarios_Click"/>
-                
+
                 <Button Style="{StaticResource CardButtonStyle}" 
                         Content="💼" 
                         Tag="Cargos" 
                         ToolTip="Cadastre e gerencie os cargos da empresa, salários e atribuições." 
                         Click="BtnCargos_Click"/>
-                
+
                 <Button Style="{StaticResource CardButtonStyle}"
                         Content="🏢" 
                         Tag="Clientes" 
                         ToolTip="Gerencie os clientes, contatos, endereços e informações comerciais."/>
-                
+
                 <Button Style="{StaticResource CardButtonStyle}" 
                         Content="💰" 
                         Tag="Custos" 

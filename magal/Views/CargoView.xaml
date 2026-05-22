@@ -90,7 +90,7 @@ Margin="10,0,0,0">
         </Grid>
 
         <StackPanel Grid.Row="1" Margin="0,0,0,15">
-            <TextBlock Text="FILTRE POR NOME OU NÍVEL" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
+            <TextBlock Text="FILTRE POR NOME" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
             <Grid>
                 <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
                          Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"

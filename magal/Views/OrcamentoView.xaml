@@ -411,15 +411,14 @@
                                                                    Margin="0,0,0,4"/>
                                                         <ComboBox ItemsSource="{Binding ItensFiltrados}"
                                                                   SelectedItem="{Binding ItemSelecionado, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                  DisplayMemberPath="Nome"
-                                                                  FontSize="14" 
+                                                                  DisplayMemberPath="nome" FontSize="14" 
                                                                   Height="40" 
                                                                   FontWeight="SemiBold" 
                                                                   VerticalContentAlignment="Center"
                                                                   Cursor="Hand" 
-                                                                  BorderThickness="1.5" 
+                                                                  BorderThickness="0.4" 
                                                                   BorderBrush="{StaticResource AeroBorder}"
-                                                                  Background="#F8FAFC"/>
+                                                                  Background="#F8FAFC"/>    
                                                     </StackPanel>
 
                                                     <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="10,0">
@@ -428,10 +427,11 @@
                                                                   SelectedItem="{Binding categoria, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                   FontSize="12" 
                                                                   Height="40"
+                                                                 
                                                                   FontWeight="SemiBold"
                                                                   VerticalContentAlignment="Center"
                                                                   Cursor="Hand" 
-                                                                  BorderThickness="1.5" 
+                                                                  BorderThickness="0" 
                                                                   BorderBrush="{StaticResource AeroBorder}" 
                                                                   Background="#F8FAFC"/>
                                                     </StackPanel>

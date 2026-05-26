@@ -97,6 +97,48 @@ namespace magal.Data.Repositories
             }
         }
 
+
+        public List<Custo> ListarTodosDoCatalogo()
+        {
+            var lista = new List<Custo>();
+
+            try
+            {
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
+                {
+                    conn.Open();
+
+                    // Buscamos direto da tabela que contém o cadastro base dos itens
+                    string sql = "SELECT id_catalogo_custo, nome, categoria, valor FROM catalogo_custo ORDER BY nome ASC";
+
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                lista.Add(new Custo
+                                {
+                                    // Mapeia o ID do catálogo para sabermos qual item foi escolhido posteriormente
+                                    id_custo = reader.GetInt32(reader.GetOrdinal("id_catalogo_custo")),
+                                    nome = reader.GetString(reader.GetOrdinal("nome")),
+                                    categoria = reader.IsDBNull(reader.GetOrdinal("categoria")) ? string.Empty : reader.GetString(reader.GetOrdinal("categoria")),
+                                    valor = reader.GetDecimal(reader.GetOrdinal("valor")),
+                                    tipo = "Direto" // Valor padrão inicial
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao listar o catálogo de custos: " + ex.Message);
+            }
+
+            return lista;
+        }
+
         public void ExcluirCustoDoProjeto(int idCusto)
         {
             try

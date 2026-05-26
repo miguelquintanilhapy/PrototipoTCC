@@ -20,7 +20,6 @@ namespace magal.ViewModels
     {
         #region Atributos e Campos Privados
 
-        // CORRIGIDO: Agora aponta para o repositório correto do catálogo global
         private readonly CatalogoCustoRepository _repository;
         private readonly PdfService _pdfService;
         private CatalogoCusto _custoSelecionado;
@@ -105,7 +104,6 @@ namespace magal.ViewModels
         /// </summary>
         public CustoViewModel()
         {
-            // CORRIGIDO: Inicializa o repositório do catálogo para bater com os métodos chamados
             _repository = new CatalogoCustoRepository();
             _pdfService = new PdfService();
 
@@ -136,7 +134,6 @@ namespace magal.ViewModels
             {
                 FiltroTexto = string.Empty;
 
-                // CORRETO: Agora o _repository possui a definição de ListarTodos()
                 var lista = _repository.ListarTodos();
 
                 Custos.Clear();
@@ -184,7 +181,6 @@ namespace magal.ViewModels
             {
                 try
                 {
-                    // CORRETO: Agora o _repository possui a definição de Excluir() recebendo o ID do catálogo
                     _repository.Excluir(custo.id_catalogo_custo);
                     Custos.Remove(custo);
                 }

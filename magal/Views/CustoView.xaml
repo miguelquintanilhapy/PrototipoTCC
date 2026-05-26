@@ -167,8 +167,6 @@
 
                         <DataGridTextColumn Header="CATEGORIA" Binding="{Binding categoria}" Width="180" FontSize="14" FontWeight="SemiBold" />
 
-                        <DataGridTextColumn Header="TIPO" Binding="{Binding tipo}" Width="150" FontSize="14" FontWeight="SemiBold" />
-
                         <DataGridTextColumn Header="VALOR" Binding="{Binding valor, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" Width="160" FontSize="16" FontWeight="Bold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">

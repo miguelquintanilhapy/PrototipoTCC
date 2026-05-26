@@ -15,10 +15,8 @@ namespace magal.Views
 
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
-            // Validação dos campos obrigatórios (sem o combo de projeto)
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
                 ComboCategoria.SelectedItem == null ||
-                ComboTipo.SelectedItem == null ||
                 string.IsNullOrWhiteSpace(TxtValor.Text))
             {
                 MessageBox.Show(
@@ -29,11 +27,10 @@ namespace magal.Views
                 return;
             }
 
-            // Validação do formato do valor numérico
             if (!decimal.TryParse(TxtValor.Text.Trim(), out decimal valorConvertido) || valorConvertido < 0)
             {
                 MessageBox.Show(
-                    "Por favor, insira um valor numérico válido e positivo para o custo.",
+                    "Por favor, insira um valor numérico válido e positivo.",
                     "Aero Concepts",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -42,28 +39,20 @@ namespace magal.Views
 
             try
             {
-                // Instancia o modelo apenas com as informações locais da tela
-                var custo = new Custo
+                // Usando a Model correta: CatalogoCusto
+                var novoCustoItem = new CatalogoCusto
                 {
                     nome = TxtNome.Text.Trim(),
-
-                    categoria = ((ComboBoxItem)ComboCategoria.SelectedItem)
-                        .Content
-                        .ToString(),
-
-                    tipo = ((ComboBoxItem)ComboTipo.SelectedItem)
-                        .Content
-                        .ToString(),
-
+                    categoria = ((ComboBoxItem)ComboCategoria.SelectedItem).Content.ToString(),
                     valor = valorConvertido
                 };
 
-                // Executa a persistência através do repositório
-                var repo = new CustoRepository();
-                repo.Inserir(custo);
+                // CORRIGIDO: Instancia o repositório do Catálogo, que aceita o objeto 'CatalogoCusto'
+                var repo = new CatalogoCustoRepository();
+                repo.Inserir(novoCustoItem);
 
                 MessageBox.Show(
-                    "Custo lançado com sucesso!",
+                    "Item adicionado ao catálogo com sucesso!",
                     "Aero Concepts",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -74,7 +63,7 @@ namespace magal.Views
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Erro ao salvar custo: " + ex.Message,
+                    "Erro ao salvar: " + ex.Message,
                     "Aero Concepts",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

@@ -9,10 +9,16 @@ namespace magal.Views
 {
     public partial class CustoView : UserControl
     {
+        // Mantém uma referência fixa ao ViewModel da tela
+        private readonly CustoViewModel _viewModel;
+
         public CustoView()
         {
             InitializeComponent();
-            DataContext = new CustoViewModel();
+
+            // Instancia o ViewModel apenas uma vez na inicialização
+            _viewModel = new CustoViewModel();
+            DataContext = _viewModel;
         }
 
         private void BtnNovoCusto_Click(object sender, RoutedEventArgs e)
@@ -22,19 +28,14 @@ namespace magal.Views
 
             if (dialog.ShowDialog() == true)
             {
-                // Recarrega o ViewModel para atualizar a listagem na tela
-                DataContext = new CustoViewModel();
+                // Em vez de dar 'new', apenas manda o ViewModel recarregar os dados do banco
+                _viewModel.CarregarCustos();
             }
         }
 
         private void BtnEditar_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            if (button == null)
-                return;
-
-            var custo = button.DataContext as Custo;
-            if (custo == null)
+            if (sender is not Button button || button.DataContext is not CatalogoCusto custo)
                 return;
 
             var dialog = new EditarCustoDialog(custo);
@@ -42,19 +43,14 @@ namespace magal.Views
 
             if (dialog.ShowDialog() == true)
             {
-                // Recarrega o ViewModel para refletir as alterações
-                DataContext = new CustoViewModel();
+                // Atualiza a listagem de forma limpa
+                _viewModel.CarregarCustos();
             }
         }
 
         private void BtnExcluir_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            if (button == null)
-                return;
-
-            var custo = button.DataContext as Custo;
-            if (custo == null)
+            if (sender is not Button button || button.DataContext is not CatalogoCusto custo)
                 return;
 
             var resultado = MessageBox.Show(
@@ -68,10 +64,9 @@ namespace magal.Views
 
             try
             {
-                var repo = new CustoRepository();
-
-                // Adapte para a propriedade exata do ID na sua model de Custo (ex: id_custo)
-                repo.Excluir(custo.id_custo);
+                // CORRIGIDO: Instancia o repositório do catálogo para deletar o item global
+                var repo = new CatalogoCustoRepository();
+                repo.Excluir(custo.id_catalogo_custo);
 
                 MessageBox.Show(
                     "Custo excluído com sucesso!",
@@ -79,8 +74,8 @@ namespace magal.Views
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
-                // Atualiza a grade após a exclusão
-                DataContext = new CustoViewModel();
+                // Atualiza a grade reaproveitando a instância
+                _viewModel.CarregarCustos();
             }
             catch (Exception ex)
             {

@@ -17,7 +17,9 @@ namespace magal.ViewModels
         private readonly FuncionarioRepository _funcionarioRepo;
         private readonly ClienteRepository _clienteRepo;
         private readonly CargoRepository _cargoRepo;
-        private readonly CustoRepository _custoRepo;
+
+        // CORRIGIDO: Agora aponta para o repositório do catálogo global para obter o total de itens cadastrados
+        private readonly CatalogoCustoRepository _catalogoCustoRepo;
 
         private string _totalFuncionarios;
         private string _totalClientes;
@@ -77,7 +79,9 @@ namespace magal.ViewModels
             _funcionarioRepo = new FuncionarioRepository();
             _clienteRepo = new ClienteRepository();
             _cargoRepo = new CargoRepository();
-            _custoRepo = new CustoRepository();
+
+            // CORRIGIDO: Inicialização do repositório correto
+            _catalogoCustoRepo = new CatalogoCustoRepository();
 
             CarregarIndicadores();
         }
@@ -102,7 +106,8 @@ namespace magal.ViewModels
                 var cargos = _cargoRepo.ListarTodos();
                 TotalCargos = (cargos?.Count ?? 0).ToString("D2");
 
-                var custos = _custoRepo.ListarTodos();
+                // CORRIGIDO: Agora chama ListarTodos() a partir de CatalogoCustoRepo para contar os itens globais
+                var custos = _catalogoCustoRepo.ListarTodos();
                 TotalCustos = (custos?.Count ?? 0).ToString("D2");
             }
             catch (Exception ex)

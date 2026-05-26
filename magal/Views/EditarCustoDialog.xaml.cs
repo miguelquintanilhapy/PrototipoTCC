@@ -8,40 +8,25 @@ namespace magal.Views
 {
     public partial class EditarCustoDialog : Window
     {
-        private readonly Custo _custo;
+        private readonly CatalogoCusto _custoItem;
 
-        public EditarCustoDialog(Custo custo)
+        public EditarCustoDialog(CatalogoCusto custoItem)
         {
             InitializeComponent();
-
-            _custo = custo;
-
+            _custoItem = custoItem;
             PreencherCampos();
         }
 
         private void PreencherCampos()
         {
-            TxtNome.Text = _custo.nome;
+            TxtNome.Text = _custoItem.nome;
+            TxtValor.Text = _custoItem.valor.ToString();
 
-            // Atribui o valor convertendo para string (pode usar .ToString("F2") se preferir fixar duas casas decimais)
-            TxtValor.Text = _custo.valor.ToString();
-
-            // Seleciona a CATEGORIA correspondente no ComboBox
             foreach (ComboBoxItem item in ComboCategoria.Items)
             {
-                if (item.Content.ToString() == _custo.categoria)
+                if (item.Content.ToString() == _custoItem.categoria)
                 {
                     ComboCategoria.SelectedItem = item;
-                    break;
-                }
-            }
-
-            // Seleciona o TIPO correspondente no ComboBox
-            foreach (ComboBoxItem item in ComboTipo.Items)
-            {
-                if (item.Content.ToString() == _custo.tipo)
-                {
-                    ComboTipo.SelectedItem = item;
                     break;
                 }
             }
@@ -49,10 +34,8 @@ namespace magal.Views
 
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
-            // Validação dos campos obrigatórios
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
                 ComboCategoria.SelectedItem == null ||
-                ComboTipo.SelectedItem == null ||
                 string.IsNullOrWhiteSpace(TxtValor.Text))
             {
                 MessageBox.Show(
@@ -60,15 +43,13 @@ namespace magal.Views
                     "Aero Concepts",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
-
                 return;
             }
 
-            // Validação do formato numérico do valor
             if (!decimal.TryParse(TxtValor.Text.Trim(), out decimal valorConvertido) || valorConvertido < 0)
             {
                 MessageBox.Show(
-                    "Por favor, insira um valor numérico válido e positivo para o custo.",
+                    "Por favor, insira um valor numérico válido e positivo.",
                     "Aero Concepts",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -77,24 +58,16 @@ namespace magal.Views
 
             try
             {
-                // Atualiza o objeto com os dados modificados da tela
-                _custo.nome = TxtNome.Text.Trim();
-                _custo.valor = valorConvertido;
+                _custoItem.nome = TxtNome.Text.Trim();
+                _custoItem.categoria = ((ComboBoxItem)ComboCategoria.SelectedItem).Content.ToString();
+                _custoItem.valor = valorConvertido;
 
-                _custo.categoria = ((ComboBoxItem)ComboCategoria.SelectedItem)
-                    .Content
-                    .ToString();
-
-                _custo.tipo = ((ComboBoxItem)ComboTipo.SelectedItem)
-                    .Content
-                    .ToString();
-
-                // Persiste as alterações no banco de dados via repositório
-                var repo = new CustoRepository();
-                repo.Atualizar(_custo);
+                // CORRIGIDO: Instancia o repositório mestre do catálogo para salvar as alterações globais
+                var repo = new CatalogoCustoRepository();
+                repo.Atualizar(_custoItem);
 
                 MessageBox.Show(
-                    "Custo atualizado com sucesso!",
+                    "Item do catálogo atualizado com sucesso!",
                     "Aero Concepts",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

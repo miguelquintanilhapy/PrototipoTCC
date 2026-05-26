@@ -86,7 +86,7 @@ namespace magal.Services
             {
                 container.Page(page =>
                 {
-                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem para leitura confortável
+                    page.Size(PageSizes.A4.Landscape());
                     page.Margin(1.5f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
@@ -107,7 +107,7 @@ namespace magal.Services
             {
                 container.Page(page =>
                 {
-                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem para leitura confortável
+                    page.Size(PageSizes.A4.Landscape());
                     page.Margin(1.5f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
@@ -128,7 +128,7 @@ namespace magal.Services
             {
                 container.Page(page =>
                 {
-                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem ideal para tabelas com muitos dados cadastrais
+                    page.Size(PageSizes.A4.Landscape());
                     page.Margin(1.5f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
@@ -141,9 +141,9 @@ namespace magal.Services
         }
 
         /// <summary>
-        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos custos.
+        /// ATUALIZADO: Gera e salva um relatório gerencial em PDF contendo os itens do Catálogo de Custos.
         /// </summary>
-        public void GerarRelatorioTabelaCustos(List<Custo> custos, string caminhoArquivo)
+        public void GerarRelatorioTabelaCustos(List<CatalogoCusto> custos, string caminhoArquivo)
         {
             Document.Create(container =>
             {
@@ -154,7 +154,7 @@ namespace magal.Services
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
 
-                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CUSTOS Lançados", custos.Count));
+                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CATÁLOGO DE CUSTOS", custos.Count));
                     page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioCustos(col, custos));
                     page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
                 });
@@ -511,27 +511,26 @@ namespace magal.Services
         }
 
         /// <summary>
-        /// NOVO: Monta a tabela do relatório gerencial de custos sem a coluna de unidade.
+        /// REFEITO: Monta a tabela do relatório gerencial de custos usando CatalogoCusto 
+        /// e removendo a coluna "Tipo" que não existe na nova tabela.
         /// </summary>
-        private void ConstruirTabelaRelatorioCustos(ColumnDescriptor col, List<Custo> custos)
+        private void ConstruirTabelaRelatorioCustos(ColumnDescriptor col, List<CatalogoCusto> custos)
         {
             col.Item().Table(table =>
             {
                 table.ColumnsDefinition(cols =>
                 {
-                    cols.ConstantColumn(50);   // ID
-                    cols.RelativeColumn(4.5f); // Nome do Custo
-                    cols.RelativeColumn(2.5f); // Categoria
-                    cols.RelativeColumn(2.0f); // Tipo
-                    cols.RelativeColumn(2.0f); // Valor
+                    cols.ConstantColumn(60);   // ID (id_catalogo_custo)
+                    cols.RelativeColumn(5.5f); // Nome do Item do Catálogo
+                    cols.RelativeColumn(3.5f); // Categoria
+                    cols.RelativeColumn(2.5f); // Valor Unitário
                 });
 
                 table.Header(header =>
                 {
                     header.Cell().Background("#2D3748").Padding(8).Text("ID").FontColor(Colors.White).Bold().FontSize(9.5f);
-                    header.Cell().Background("#2D3748").Padding(8).Text("NOME DO CUSTO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("ITEM / DESCRIÇÃO").FontColor(Colors.White).Bold().FontSize(9.5f);
                     header.Cell().Background("#2D3748").Padding(8).Text("CATEGORIA").FontColor(Colors.White).Bold().FontSize(9.5f);
-                    header.Cell().Background("#2D3748").Padding(8).Text("TIPO").FontColor(Colors.White).Bold().FontSize(9.5f);
                     header.Cell().Background("#2D3748").Padding(8).AlignRight().Text("VALOR").FontColor(Colors.White).Bold().FontSize(9.5f);
                 });
 
@@ -540,10 +539,10 @@ namespace magal.Services
                 {
                     string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
 
-                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_custo.ToString()).FontSize(10);
+                    // Alterado para ler as propriedades corretas da nova model CatalogoCusto
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_catalogo_custo.ToString()).FontSize(10);
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.nome ?? "-").FontSize(10).Bold();
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.categoria ?? "-").FontSize(10);
-                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.tipo ?? "-").FontSize(10);
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignRight().Text(c.valor.ToString("C2", _ptBR)).FontSize(10).Bold().FontColor("#009140");
 
                     listraAlternada = !listraAlternada;
@@ -557,7 +556,7 @@ namespace magal.Services
             {
                 t.ColumnsDefinition(c => { c.RelativeColumn(1); c.RelativeColumn(1.2f); });
 
-                t.Cell().Background("#1E3A5F").Padding(6).Text("Custo Total:").FontSize(10).FontColor(Colors.White).Bold();
+                t.Cell().Background("#1E3A5F").Padding(6).Text("Valor Acumulado:").FontSize(10).FontColor(Colors.White).Bold();
                 t.Cell().Background("#1E3A5F").Padding(6).AlignRight().Text(somaCustos.ToString("C2", _ptBR)).FontSize(10).FontColor(Colors.White).Bold();
             });
         }

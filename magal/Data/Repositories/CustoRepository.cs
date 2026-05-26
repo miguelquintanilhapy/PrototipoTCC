@@ -8,9 +8,10 @@ namespace magal.Data.Repositories
 {
     public class CustoRepository
     {
-        public List<Custo> ListarTodos()
+        // Este é o método que a sua CustoView vai chamar para listar na tabela da tela
+        public List<CustoExibicaoDto> ListarPorProjeto(int idProjeto)
         {
-            var lista = new List<Custo>();
+            var lista = new List<CustoExibicaoDto>();
 
             try
             {
@@ -18,24 +19,40 @@ namespace magal.Data.Repositories
                 {
                     conn.Open();
 
-                    // Ordenado por id_custo DESC como estava na sua query original
-                    string sql = "SELECT id_custo, id_projeto, id_catalogo_custo, nome, categoria, tipo, valor, data_cadastro FROM custo ORDER BY id_custo DESC";
+                    // Query corrigida que junta as tabelas e traz os IDs preenchidos
+                    string sql = @"
+                        SELECT 
+                            c.id_custo,
+                            c.id_projeto,
+                            c.id_catalogo_custo,
+                            cc.nome,
+                            cc.categoria,
+                            cc.valor,
+                            c.tipo,
+                            c.unidade
+                        FROM custo c
+                        INNER JOIN catalogo_custo cc ON c.id_catalogo_custo = cc.id_catalogo_custo
+                        WHERE c.id_projeto = @idProjeto
+                        ORDER BY c.id_custo DESC";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
+                        cmd.Parameters.AddWithValue("@idProjeto", idProjeto);
+
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                lista.Add(new Custo
+                                lista.Add(new CustoExibicaoDto
                                 {
                                     id_custo = reader.GetInt32(reader.GetOrdinal("id_custo")),
                                     id_projeto = reader.GetInt32(reader.GetOrdinal("id_projeto")),
+                                    id_catalogo_custo = reader.GetInt32(reader.GetOrdinal("id_catalogo_custo")),
                                     nome = reader.GetString(reader.GetOrdinal("nome")),
                                     categoria = reader.IsDBNull(reader.GetOrdinal("categoria")) ? string.Empty : reader.GetString(reader.GetOrdinal("categoria")),
-                                    tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? string.Empty : reader.GetString(reader.GetOrdinal("tipo")),
                                     valor = reader.GetDecimal(reader.GetOrdinal("valor")),
-                                    data_cadastro = reader.GetDateTime(reader.GetOrdinal("data_cadastro"))
+                                    tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? string.Empty : reader.GetString(reader.GetOrdinal("tipo")),
+                                    unidade = reader.IsDBNull(reader.GetOrdinal("unidade")) ? string.Empty : reader.GetString(reader.GetOrdinal("unidade"))
                                 });
                             }
                         }
@@ -44,13 +61,14 @@ namespace magal.Data.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro no CustoRepository ao listar: " + ex.Message);
+                throw new Exception("Erro ao listar os custos do projeto: " + ex.Message);
             }
 
             return lista;
         }
 
-        public void Inserir(Custo custo)
+        // Método para quando o usuário adicionar um item do catálogo no projeto
+        public void InserirCustoNoProjeto(int idProjeto, int idCatalogoCusto, string tipo, string unidade)
         {
             try
             {
@@ -59,35 +77,15 @@ namespace magal.Data.Repositories
                     conn.Open();
 
                     string sql = @"
-                        INSERT INTO custo (
-                            id_projeto,
-                            id_catalogo_custo,
-                            nome,
-                            categoria,
-                            tipo,
-                            valor
-                        )
-                        VALUES
-                        (
-                            @id_projeto,
-                            @id_catalogo_custo,
-                            @nome,
-                            @categoria,
-                            @tipo,
-                            @valor
-                        )";
+                        INSERT INTO custo (id_projeto, id_catalogo_custo, tipo, unidade)
+                        VALUES (@idProjeto, @idCatalogoCusto, @tipo, @unidade)";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
-                        cmd.Parameters.AddWithValue("@id_projeto", custo.id_projeto);
-
-                        // Tratamento para chave estrangeira opcional do catálogo
-                        cmd.Parameters.AddWithValue("@id_catalogo_custo", DBNull.Value); // Pode ser alterado caso use vínculo com catálogo posteriormente
-
-                        cmd.Parameters.AddWithValue("@nome", custo.nome);
-                        cmd.Parameters.AddWithValue("@categoria", custo.categoria ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@tipo", custo.tipo ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@valor", custo.valor);
+                        cmd.Parameters.AddWithValue("@idProjeto", idProjeto);
+                        cmd.Parameters.AddWithValue("@idCatalogoCusto", idCatalogoCusto);
+                        cmd.Parameters.AddWithValue("@tipo", tipo ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@unidade", unidade ?? (object)DBNull.Value);
 
                         cmd.ExecuteNonQuery();
                     }
@@ -95,48 +93,11 @@ namespace magal.Data.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro ao inserir custo: " + ex.Message);
+                throw new Exception("Erro ao vincular custo ao projeto: " + ex.Message);
             }
         }
 
-        public void Atualizar(Custo custo)
-        {
-            try
-            {
-                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
-                {
-                    conn.Open();
-
-                    string sql = @"
-                        UPDATE custo
-                        SET
-                            id_projeto = @id_projeto,
-                            nome = @nome,
-                            categoria = @categoria,
-                            tipo = @tipo,
-                            valor = @valor
-                        WHERE id_custo = @id";
-
-                    using (var cmd = new MySqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@id", custo.id_custo);
-                        cmd.Parameters.AddWithValue("@id_projeto", custo.id_projeto);
-                        cmd.Parameters.AddWithValue("@nome", custo.nome);
-                        cmd.Parameters.AddWithValue("@categoria", custo.categoria ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@tipo", custo.tipo ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@valor", custo.valor);
-
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao atualizar custo: " + ex.Message);
-            }
-        }
-
-        public void Excluir(int idCusto)
+        public void ExcluirCustoDoProjeto(int idCusto)
         {
             try
             {
@@ -149,14 +110,13 @@ namespace magal.Data.Repositories
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", idCusto);
-
                         cmd.ExecuteNonQuery();
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro ao excluir custo: " + ex.Message);
+                throw new Exception("Erro ao excluir custo do projeto: " + ex.Message);
             }
         }
     }

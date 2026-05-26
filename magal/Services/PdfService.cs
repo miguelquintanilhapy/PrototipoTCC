@@ -23,6 +23,16 @@ namespace magal.Services
 
         #endregion
 
+        #region Construtor Estático
+
+        static PdfService()
+        {
+            // Define a licença do QuestPDF uma única vez na inicialização da aplicação
+            QuestPDF.Settings.License = LicenseType.Community;
+        }
+
+        #endregion
+
         #region Métodos Públicos
 
         /// <summary>
@@ -30,8 +40,6 @@ namespace magal.Services
         /// </summary>
         public void GerarPropostaTecnica(Projeto projeto, List<Custo> custosExtras, string caminhoArquivo)
         {
-            QuestPDF.Settings.License = LicenseType.Community;
-
             Document.Create(container =>
             {
                 container.Page(page =>
@@ -53,8 +61,6 @@ namespace magal.Services
         /// </summary>
         public void GerarRelatorioTabelaProjetos(List<Projeto> projetos, string caminhoArquivo)
         {
-            QuestPDF.Settings.License = LicenseType.Community;
-
             Document.Create(container =>
             {
                 container.Page(page =>
@@ -72,12 +78,10 @@ namespace magal.Services
         }
 
         /// <summary>
-        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos funcionários filtrados.
+        /// Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos funcionários filtrados.
         /// </summary>
         public void GerarRelatorioTabelaFuncionarios(List<Funcionario> funcionarios, string caminhoArquivo)
         {
-            QuestPDF.Settings.License = LicenseType.Community;
-
             Document.Create(container =>
             {
                 container.Page(page =>
@@ -89,6 +93,48 @@ namespace magal.Services
 
                     page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "FUNCIONÁRIOS", funcionarios.Count));
                     page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioFuncionarios(col, funcionarios));
+                    page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
+                });
+            }).GeneratePdf(caminhoArquivo);
+        }
+
+        /// <summary>
+        /// Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos cargos.
+        /// </summary>
+        public void GerarRelatorioTabelaCargos(List<Cargo> cargos, string caminhoArquivo)
+        {
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem para leitura confortável
+                    page.Margin(1.5f, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
+
+                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CARGOS", cargos.Count));
+                    page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioCargos(col, cargos));
+                    page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
+                });
+            }).GeneratePdf(caminhoArquivo);
+        }
+
+        /// <summary>
+        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos clientes.
+        /// </summary>
+        public void GerarRelatorioTabelaClientes(List<Cliente> clientes, string caminhoArquivo)
+        {
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem ideal para tabelas com muitos dados cadastrais
+                    page.Margin(1.5f, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
+
+                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CLIENTES", clientes.Count));
+                    page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioClientes(col, clientes));
                     page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
                 });
             }).GeneratePdf(caminhoArquivo);
@@ -325,31 +371,6 @@ namespace magal.Services
             });
         }
 
-
-
-        /// <summary>
-        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos cargos.
-        /// </summary>
-        public void GerarRelatorioTabelaCargos(List<Cargo> cargos, string caminhoArquivo)
-        {
-            QuestPDF.Settings.License = LicenseType.Community;
-
-            Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Size(PageSizes.A4.Landscape()); // Modo Paisagem para leitura confortável
-                    page.Margin(1.5f, Unit.Centimetre);
-                    page.PageColor(Colors.White);
-                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
-
-                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CARGOS", cargos.Count));
-                    page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioCargos(col, cargos));
-                    page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
-                });
-            }).GeneratePdf(caminhoArquivo);
-        }
-
         private void ConstruirTabelaRelatorioCargos(ColumnDescriptor col, List<Cargo> cargos)
         {
             col.Item().Table(table =>
@@ -358,7 +379,7 @@ namespace magal.Services
                 {
                     cols.ConstantColumn(60);   // ID
                     cols.RelativeColumn(6);    // Nome do Cargo
-                    cols.RelativeColumn(3);    // Custo Médio/Hora (Com bastante espaço e respiro)
+                    cols.RelativeColumn(3);    // Custo Médio/Hora
                 });
 
                 table.Header(header =>
@@ -376,7 +397,6 @@ namespace magal.Services
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_cargo.ToString()).FontSize(10);
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.nome ?? "-").FontSize(10).Bold();
 
-                    // Exibe o custo hora formatado em PT-BR com a cor VerdeAero da marca
                     decimal custoHora = c.custo_medio_hora;
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter()
                         .Text(custoHora.ToString("C2", _ptBR)).FontSize(10).Bold().FontColor("#009140");
@@ -395,8 +415,8 @@ namespace magal.Services
                     cols.ConstantColumn(50);   // ID
                     cols.RelativeColumn(4);    // Nome Completo
                     cols.RelativeColumn(2.5f); // Tipo de Vínculo
-                    cols.RelativeColumn(2.2f); // Custo/Hora -> Agora com mais espaço interno
-                    cols.RelativeColumn(1.5f); // Status -> Isolado na ponta direita
+                    cols.RelativeColumn(2.2f); // Custo/Hora
+                    cols.RelativeColumn(1.5f); // Status
                 });
 
                 table.Header(header =>
@@ -417,11 +437,9 @@ namespace magal.Services
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(f.nome ?? "-").FontSize(10).Bold();
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(f.tipo_vinculo ?? "-").FontSize(10);
 
-                    // Puxando o valor correto direto do funcionário como combinado!
                     decimal custoHora = f.custo_hora;
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignLeft().Text(custoHora.ToString("C2", _ptBR)).FontSize(10);
 
-                    // Agora usando a cor exata da sua View XAML
                     string corStatus = (f.status?.ToLower() == "ativo") ? "#009140" : "#EF4444";
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(f.status?.ToUpper() ?? "N/D").FontSize(10).Bold().FontColor(corStatus);
 
@@ -429,6 +447,54 @@ namespace magal.Services
                 }
             });
         }
+
+        /// <summary>
+        /// CORRIGIDO: Estrutura alinhada com as propriedades da tabela de clientes (ID, NOME, TIPO, CPF/CNPJ, LOCALIZAÇÃO, CONTATO).
+        /// </summary>
+        private void ConstruirTabelaRelatorioClientes(ColumnDescriptor col, List<Cliente> clientes)
+        {
+            col.Item().Table(table =>
+            {
+                // Definição exata das 6 colunas proporcionais para evitar o vazamento horizontal
+                table.ColumnsDefinition(cols =>
+                {
+                    cols.ConstantColumn(45);   // ID
+                    cols.RelativeColumn(3.0f); // Nome / Razão Social
+                    cols.RelativeColumn(1.0f); // Tipo (Física / Jurídica)
+                    cols.RelativeColumn(1.8f); // CPF / CNPJ
+                    cols.RelativeColumn(2.2f); // Localização (Cidade - UF)
+                    cols.RelativeColumn(1.8f); // Contato (Telefone/Celular)
+                });
+
+                // Títulos das colunas no cabeçalho cinza (Exatamente 6 células)
+                table.Header(header =>
+                {
+                    header.Cell().Background("#2D3748").Padding(8).Text("ID").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("NOME / RAZÃO SOCIAL").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("TIPO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("CPF / CNPJ").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("LOCALIZAÇÃO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("CONTATO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                });
+
+                bool listraAlternada = false;
+                foreach (var c in clientes)
+                {
+                    string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
+
+                    // Renderização de cada célula correspondente (Exatamente 6 células por iteração)
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_cliente.ToString()).FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.nome ?? "-").FontSize(10).Bold();
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.tipo ?? "-").FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.cpf_cnpj ?? "-").FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text($"{c.cidade ?? "-"} - {c.estado ?? "-"}").FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.contato ?? "-").FontSize(10);
+
+                    listraAlternada = !listraAlternada;
+                }
+            });
+        }
+
         private void ConstruirRodape(RowDescriptor row)
         {
             row.RelativeItem().Text("Aero Concepts — Tecnologia em Engenharia Aeronáutica").FontSize(8).FontColor("#AAAAAA");

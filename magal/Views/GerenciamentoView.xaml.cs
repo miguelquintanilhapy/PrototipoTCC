@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using magal.ViewModels; 
+using magal.ViewModels;
 
 namespace magal.Views
 {
@@ -17,7 +17,6 @@ namespace magal.Views
             this.DataContext = _viewModel;
         }
 
-      
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             _viewModel.CarregarIndicadores();
@@ -41,8 +40,14 @@ namespace magal.Views
             }
         }
 
+        // Método atualizado para abrir a tela de Clientes
         private void BtnClientes_Click(object sender, RoutedEventArgs e)
         {
+            var janelaPrincipal = Window.GetWindow(this) as MainWindow;
+            if (janelaPrincipal != null)
+            {
+                janelaPrincipal.MainContentControl.Content = new ClienteView();
+            }
         }
     }
 }

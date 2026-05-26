@@ -152,12 +152,13 @@
                         Tag="Cargos" 
                         ToolTip="Cadastre e gerencie os cargos da empresa, salários e atribuições." 
                         Click="BtnCargos_Click"/>
-                
+
                 <Button Style="{StaticResource CardButtonStyle}"
                         Content="🏢" 
                         Tag="Clientes" 
-                        ToolTip="Gerencie os clientes, contatos, endereços e informações comerciais."/>
-                
+                        ToolTip="Gerencie os clientes, contatos, endereços e informações comerciais."
+                        Click="BtnClientes_Click"/>
+
                 <Button Style="{StaticResource CardButtonStyle}" 
                         Content="💰" 
                         Tag="Custos" 

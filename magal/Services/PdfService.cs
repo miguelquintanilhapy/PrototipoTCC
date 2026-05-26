@@ -120,7 +120,7 @@ namespace magal.Services
         }
 
         /// <summary>
-        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos clientes.
+        /// Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos clientes.
         /// </summary>
         public void GerarRelatorioTabelaClientes(List<Cliente> clientes, string caminhoArquivo)
         {
@@ -135,6 +135,27 @@ namespace magal.Services
 
                     page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CLIENTES", clientes.Count));
                     page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioClientes(col, clientes));
+                    page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
+                });
+            }).GeneratePdf(caminhoArquivo);
+        }
+
+        /// <summary>
+        /// NOVO: Gera e salva um relatório gerencial em PDF contendo a listagem tabular dos custos.
+        /// </summary>
+        public void GerarRelatorioTabelaCustos(List<Custo> custos, string caminhoArquivo)
+        {
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4.Landscape());
+                    page.Margin(1.5f, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
+
+                    page.Header().Column(col => ConstruirCabecalhoRelatorio(col, "CUSTOS Lançados", custos.Count));
+                    page.Content().PaddingTop(16).Column(col => ConstruirTabelaRelatorioCustos(col, custos));
                     page.Footer().BorderTop(1).BorderColor("#E0E0E0").PaddingTop(8).Row(ConstruirRodape);
                 });
             }).GeneratePdf(caminhoArquivo);
@@ -297,7 +318,7 @@ namespace magal.Services
             {
                 row.RelativeItem().Column(c =>
                 {
-                    c.Item().Text($"RELATÓRIO GERENCIAL DE {tipoRelatorio}").FontSize(18).Bold().FontColor(Colors.White);
+                    c.Item().Text($"RELATÓRIO GERENCIAL DE {tipoRelatorio.ToUpper()}").FontSize(18).Bold().FontColor(Colors.White);
                     c.Item().Text("AERO CONCEPTS — SISTEMA INTERNO DE HISTÓRICO").FontSize(10).FontColor("#A8C4E0");
                 });
 
@@ -448,14 +469,10 @@ namespace magal.Services
             });
         }
 
-        /// <summary>
-        /// CORRIGIDO: Estrutura alinhada com as propriedades da tabela de clientes (ID, NOME, TIPO, CPF/CNPJ, LOCALIZAÇÃO, CONTATO).
-        /// </summary>
         private void ConstruirTabelaRelatorioClientes(ColumnDescriptor col, List<Cliente> clientes)
         {
             col.Item().Table(table =>
             {
-                // Definição exata das 6 colunas proporcionais para evitar o vazamento horizontal
                 table.ColumnsDefinition(cols =>
                 {
                     cols.ConstantColumn(45);   // ID
@@ -466,7 +483,6 @@ namespace magal.Services
                     cols.RelativeColumn(1.8f); // Contato (Telefone/Celular)
                 });
 
-                // Títulos das colunas no cabeçalho cinza (Exatamente 6 células)
                 table.Header(header =>
                 {
                     header.Cell().Background("#2D3748").Padding(8).Text("ID").FontColor(Colors.White).Bold().FontSize(9.5f);
@@ -482,7 +498,6 @@ namespace magal.Services
                 {
                     string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
 
-                    // Renderização de cada célula correspondente (Exatamente 6 células por iteração)
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_cliente.ToString()).FontSize(10);
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.nome ?? "-").FontSize(10).Bold();
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.tipo ?? "-").FontSize(10);
@@ -492,6 +507,58 @@ namespace magal.Services
 
                     listraAlternada = !listraAlternada;
                 }
+            });
+        }
+
+        /// <summary>
+        /// NOVO: Monta a tabela do relatório gerencial de custos sem a coluna de unidade.
+        /// </summary>
+        private void ConstruirTabelaRelatorioCustos(ColumnDescriptor col, List<Custo> custos)
+        {
+            col.Item().Table(table =>
+            {
+                table.ColumnsDefinition(cols =>
+                {
+                    cols.ConstantColumn(50);   // ID
+                    cols.RelativeColumn(4.5f); // Nome do Custo
+                    cols.RelativeColumn(2.5f); // Categoria
+                    cols.RelativeColumn(2.0f); // Tipo
+                    cols.RelativeColumn(2.0f); // Valor
+                });
+
+                table.Header(header =>
+                {
+                    header.Cell().Background("#2D3748").Padding(8).Text("ID").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("NOME DO CUSTO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("CATEGORIA").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).Text("TIPO").FontColor(Colors.White).Bold().FontSize(9.5f);
+                    header.Cell().Background("#2D3748").Padding(8).AlignRight().Text("VALOR").FontColor(Colors.White).Bold().FontSize(9.5f);
+                });
+
+                bool listraAlternada = false;
+                foreach (var c in custos)
+                {
+                    string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
+
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_custo.ToString()).FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.nome ?? "-").FontSize(10).Bold();
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.categoria ?? "-").FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.tipo ?? "-").FontSize(10);
+                    table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignRight().Text(c.valor.ToString("C2", _ptBR)).FontSize(10).Bold().FontColor("#009140");
+
+                    listraAlternada = !listraAlternada;
+                }
+            });
+
+            // Somatório dos custos filtrados para o rodapé da tabela
+            decimal somaCustos = custos.Sum(c => c.valor);
+
+            col.Item().PaddingTop(12).AlignRight().Width(250).Table(t =>
+            {
+                t.ColumnsDefinition(c => { c.RelativeColumn(1); c.RelativeColumn(1.2f); });
+
+                t.Cell().Background("#1E3A5F").Padding(6).Text("Custo Total:").FontSize(10).FontColor(Colors.White).Bold();
+                t.Cell().Background("#1E3A5F").Padding(6).AlignRight().Text(somaCustos.ToString("C2", _ptBR)).FontSize(10).FontColor(Colors.White).Bold();
             });
         }
 

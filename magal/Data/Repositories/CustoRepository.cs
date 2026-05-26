@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 using magal.Models;
 using magal.Data;
-using MySql.Data.MySqlClient;
 
 namespace magal.Data.Repositories
 {
@@ -11,29 +11,31 @@ namespace magal.Data.Repositories
         public List<Custo> ListarTodos()
         {
             var lista = new List<Custo>();
+
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    // Busca todos os custos, independente do projeto
-                    string query = "SELECT * FROM custo ORDER BY id_custo DESC";
+                    conn.Open();
 
-                    using (var cmd = new MySqlCommand(query, conn))
+                    // Ordenado por id_custo DESC como estava na sua query original
+                    string sql = "SELECT id_custo, id_projeto, id_catalogo_custo, nome, categoria, tipo, valor, data_cadastro FROM custo ORDER BY id_custo DESC";
+
+                    using (var cmd = new MySqlCommand(sql, conn))
                     {
-                        conn.Open();
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 lista.Add(new Custo
                                 {
-                                    id_custo = Convert.ToInt32(reader["id_custo"]),
-                                    id_projeto = reader["id_projeto"] != DBNull.Value ? Convert.ToInt32(reader["id_projeto"]) : 0,
-                                    nome = reader["nome"].ToString(),
-                                    categoria = reader["categoria"].ToString(),
-                                    tipo = reader["tipo"].ToString(),
-                                    valor = Convert.ToDecimal(reader["valor"]),
-                                    unidade = reader["unidade"].ToString()
+                                    id_custo = reader.GetInt32(reader.GetOrdinal("id_custo")),
+                                    id_projeto = reader.GetInt32(reader.GetOrdinal("id_projeto")),
+                                    nome = reader.GetString(reader.GetOrdinal("nome")),
+                                    categoria = reader.IsDBNull(reader.GetOrdinal("categoria")) ? string.Empty : reader.GetString(reader.GetOrdinal("categoria")),
+                                    tipo = reader.IsDBNull(reader.GetOrdinal("tipo")) ? string.Empty : reader.GetString(reader.GetOrdinal("tipo")),
+                                    valor = reader.GetDecimal(reader.GetOrdinal("valor")),
+                                    data_cadastro = reader.GetDateTime(reader.GetOrdinal("data_cadastro"))
                                 });
                             }
                         }
@@ -42,9 +44,120 @@ namespace magal.Data.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro ao listar custos: " + ex.Message);
+                throw new Exception("Erro no CustoRepository ao listar: " + ex.Message);
             }
+
             return lista;
+        }
+
+        public void Inserir(Custo custo)
+        {
+            try
+            {
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
+                {
+                    conn.Open();
+
+                    string sql = @"
+                        INSERT INTO custo (
+                            id_projeto,
+                            id_catalogo_custo,
+                            nome,
+                            categoria,
+                            tipo,
+                            valor
+                        )
+                        VALUES
+                        (
+                            @id_projeto,
+                            @id_catalogo_custo,
+                            @nome,
+                            @categoria,
+                            @tipo,
+                            @valor
+                        )";
+
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id_projeto", custo.id_projeto);
+
+                        // Tratamento para chave estrangeira opcional do catálogo
+                        cmd.Parameters.AddWithValue("@id_catalogo_custo", DBNull.Value); // Pode ser alterado caso use vínculo com catálogo posteriormente
+
+                        cmd.Parameters.AddWithValue("@nome", custo.nome);
+                        cmd.Parameters.AddWithValue("@categoria", custo.categoria ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@tipo", custo.tipo ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@valor", custo.valor);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao inserir custo: " + ex.Message);
+            }
+        }
+
+        public void Atualizar(Custo custo)
+        {
+            try
+            {
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
+                {
+                    conn.Open();
+
+                    string sql = @"
+                        UPDATE custo
+                        SET
+                            id_projeto = @id_projeto,
+                            nome = @nome,
+                            categoria = @categoria,
+                            tipo = @tipo,
+                            valor = @valor
+                        WHERE id_custo = @id";
+
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", custo.id_custo);
+                        cmd.Parameters.AddWithValue("@id_projeto", custo.id_projeto);
+                        cmd.Parameters.AddWithValue("@nome", custo.nome);
+                        cmd.Parameters.AddWithValue("@categoria", custo.categoria ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@tipo", custo.tipo ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@valor", custo.valor);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao atualizar custo: " + ex.Message);
+            }
+        }
+
+        public void Excluir(int idCusto)
+        {
+            try
+            {
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
+                {
+                    conn.Open();
+
+                    string sql = "DELETE FROM custo WHERE id_custo = @id";
+
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", idCusto);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao excluir custo: " + ex.Message);
+            }
         }
     }
 }

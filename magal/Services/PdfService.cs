@@ -539,7 +539,6 @@ namespace magal.Services
                 {
                     string corFundo = listraAlternada ? "#F8FAFC" : "#FFFFFF";
 
-                    // Alterado para ler as propriedades corretas da nova model CatalogoCusto
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).AlignCenter().Text(c.id_catalogo_custo.ToString()).FontSize(10);
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.nome ?? "-").FontSize(10).Bold();
                     table.Cell().Background(corFundo).BorderBottom(1).BorderColor("#E2E8F0").Padding(8).Text(c.categoria ?? "-").FontSize(10);

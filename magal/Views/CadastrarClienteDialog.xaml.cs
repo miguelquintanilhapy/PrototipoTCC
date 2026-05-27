@@ -39,9 +39,7 @@ namespace magal.Views
                 {
                     nome = TxtNome.Text.Trim(),
 
-                    tipo = ((ComboBoxItem)ComboTipo.SelectedItem)
-                        .Content
-                        .ToString(),
+                    tipo = ((ComboBoxItem)ComboTipo.SelectedItem).Content.ToString(),
 
                     cpf_cnpj = TxtCpfCnpj.Text.Trim(),
                     cidade = TxtCidade.Text.Trim(),

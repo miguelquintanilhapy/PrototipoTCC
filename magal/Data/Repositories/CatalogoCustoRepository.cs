@@ -8,7 +8,7 @@ namespace magal.Data.Repositories
 {
     public class CatalogoCustoRepository
     {
-        // NOVO: Busca apenas as categorias únicas para o primeiro ComboBox
+        // Busca apenas as categorias únicas para o primeiro ComboBox
         public List<string> ListarCategoriasUnicas()
         {
             var lista = new List<string>();
@@ -18,7 +18,7 @@ namespace magal.Data.Repositories
                 {
                     conn.Open();
                     string sql = "SELECT DISTINCT categoria FROM catalogo_custo WHERE categoria IS NOT NULL AND categoria != '' ORDER BY categoria ASC";
-
+                    
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         using (var reader = cmd.ExecuteReader())
@@ -38,7 +38,7 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        // NOVO: Busca os itens específicos da categoria escolhida para o segundo ComboBox
+        // Busca os itens específicos da categoria escolhida para o segundo ComboBox
         public List<CatalogoCusto> ListarItensPorCategoria(string categoria)
         {
             var lista = new List<CatalogoCusto>();
@@ -48,7 +48,7 @@ namespace magal.Data.Repositories
                 {
                     conn.Open();
                     string sql = "SELECT id_catalogo_custo, nome, categoria, valor FROM catalogo_custo WHERE categoria = @categoria ORDER BY nome ASC";
-
+                    
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@categoria", categoria);

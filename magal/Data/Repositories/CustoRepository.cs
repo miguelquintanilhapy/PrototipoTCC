@@ -8,10 +8,9 @@ namespace magal.Data.Repositories
 {
     public class CustoRepository
     {
-        // Este é o método que a sua CustoView vai chamar para listar na tabela da tela
-        public List<CustoExibicaoDto> ListarPorProjeto(int idProjeto)
+        public List<Custo> ListarPorProjeto(int idProjeto)
         {
-            var lista = new List<CustoExibicaoDto>();
+            var lista = new List<Custo>();
 
             try
             {
@@ -19,7 +18,6 @@ namespace magal.Data.Repositories
                 {
                     conn.Open();
 
-                    // Query corrigida que junta as tabelas e traz os IDs preenchidos
                     string sql = @"
                         SELECT 
                             c.id_custo,
@@ -43,7 +41,7 @@ namespace magal.Data.Repositories
                         {
                             while (reader.Read())
                             {
-                                lista.Add(new CustoExibicaoDto
+                                lista.Add(new Custo
                                 {
                                     id_custo = reader.GetInt32(reader.GetOrdinal("id_custo")),
                                     id_projeto = reader.GetInt32(reader.GetOrdinal("id_projeto")),
@@ -67,7 +65,6 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        // Método para quando o usuário adicionar um item do catálogo no projeto
         public void InserirCustoNoProjeto(int idProjeto, int idCatalogoCusto, string tipo, string unidade)
         {
             try
@@ -95,48 +92,6 @@ namespace magal.Data.Repositories
             {
                 throw new Exception("Erro ao vincular custo ao projeto: " + ex.Message);
             }
-        }
-
-
-        public List<Custo> ListarTodosDoCatalogo()
-        {
-            var lista = new List<Custo>();
-
-            try
-            {
-                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
-                {
-                    conn.Open();
-
-                    // Buscamos direto da tabela que contém o cadastro base dos itens
-                    string sql = "SELECT id_catalogo_custo, nome, categoria, valor FROM catalogo_custo ORDER BY nome ASC";
-
-                    using (var cmd = new MySqlCommand(sql, conn))
-                    {
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                lista.Add(new Custo
-                                {
-                                    // Mapeia o ID do catálogo para sabermos qual item foi escolhido posteriormente
-                                    id_custo = reader.GetInt32(reader.GetOrdinal("id_catalogo_custo")),
-                                    nome = reader.GetString(reader.GetOrdinal("nome")),
-                                    categoria = reader.IsDBNull(reader.GetOrdinal("categoria")) ? string.Empty : reader.GetString(reader.GetOrdinal("categoria")),
-                                    valor = reader.GetDecimal(reader.GetOrdinal("valor")),
-                                    tipo = "Direto" // Valor padrão inicial
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao listar o catálogo de custos: " + ex.Message);
-            }
-
-            return lista;
         }
 
         public void ExcluirCustoDoProjeto(int idCusto)

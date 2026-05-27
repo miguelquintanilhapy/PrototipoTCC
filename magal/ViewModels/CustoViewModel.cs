@@ -107,7 +107,6 @@ namespace magal.ViewModels
             _repository = new CatalogoCustoRepository();
             _pdfService = new PdfService();
 
-            // Configuração do mecanismo de filtragem do WPF
             CustosView = CollectionViewSource.GetDefaultView(Custos);
             CustosView.Filter = FiltroDeCustos;
 

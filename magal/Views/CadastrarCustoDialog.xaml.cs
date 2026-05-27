@@ -39,7 +39,6 @@ namespace magal.Views
 
             try
             {
-                // Usando a Model correta: CatalogoCusto
                 var novoCustoItem = new CatalogoCusto
                 {
                     nome = TxtNome.Text.Trim(),
@@ -47,7 +46,6 @@ namespace magal.Views
                     valor = valorConvertido
                 };
 
-                // CORRIGIDO: Instancia o repositório do Catálogo, que aceita o objeto 'CatalogoCusto'
                 var repo = new CatalogoCustoRepository();
                 repo.Inserir(novoCustoItem);
 

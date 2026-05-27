@@ -62,7 +62,6 @@ namespace magal.Views
                 _custoItem.categoria = ((ComboBoxItem)ComboCategoria.SelectedItem).Content.ToString();
                 _custoItem.valor = valorConvertido;
 
-                // CORRIGIDO: Instancia o repositório mestre do catálogo para salvar as alterações globais
                 var repo = new CatalogoCustoRepository();
                 repo.Atualizar(_custoItem);
 

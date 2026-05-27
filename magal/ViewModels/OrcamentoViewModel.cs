@@ -31,9 +31,8 @@ namespace magal.ViewModels
         private decimal _valorFinalOriginal;
         private decimal _totalHorasOriginal;
 
-        // Lista global que armazena TODOS os custos cadastrados vindos da CustoView
-        private List<Custo> _todosOsCustosCadastrados = new List<Custo>();
-
+        // Lista global que armazena TODOS os custos cadastrados vindos do catálogo
+        private List<CatalogoCusto> _todosOsCustosCadastrados = new List<CatalogoCusto>();
         #endregion
 
         #region Propriedades e Filtros
@@ -164,7 +163,6 @@ namespace magal.ViewModels
             {
                 this.ProjetoAtual = projetoDoBanco;
 
-                // BACKUP PARA COMPARAÇÃO (Deep Copy simples)
                 _projetoOriginal = new Projeto
                 {
                     nome = projetoDoBanco.nome,
@@ -196,7 +194,7 @@ namespace magal.ViewModels
                 {
                     foreach (var c in projetoDoBanco.Custos)
                     {
-                        // Encapsula o custo do banco no wrapper que controla os Combos da tela
+                        // Encapsula o custo do banco no wrapper passando a lista do catálogo
                         var itemViewModel = new CustoItemViewModel(c, _todosOsCustosCadastrados);
                         itemViewModel.PropertyChanged += (s, e) => {
                             if (e.PropertyName == nameof(CustoItemViewModel.valor)) AtualizarFinanceiro();
@@ -218,7 +216,7 @@ namespace magal.ViewModels
             {
                 MessageBox.Show("Erro ao carregar edição: " + ex.Message, "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            finally
+            using (this.DisablePropertyChange())
             {
                 _isUpdating = false;
                 AtualizarFinanceiro();
@@ -374,10 +372,7 @@ namespace magal.ViewModels
                 var listaClientes = new ClienteRepository().ListarTodos();
                 var listaFuncionarios = new FuncionarioRepository().ListarTodos();
 
-                // CRUCIAL: Carrega do banco a lista global de itens salvos na CustoView
-                // Ajuste para a chamada correta do seu CustoRepository se necessário
-                _todosOsCustosCadastrados = new CustoRepository().ListarTodosDoCatalogo() ?? new List<Custo>();
-
+                _todosOsCustosCadastrados = new CatalogoCustoRepository().ListarTodos() ?? new List<CatalogoCusto>();
                 Clientes.Clear();
                 foreach (var c in listaClientes) Clientes.Add(c);
 
@@ -440,7 +435,6 @@ namespace magal.ViewModels
 
         private void AdicionarCustoExtra()
         {
-            // Cria a nova linha injetando a lista vinda da CustoView
             var novoCusto = new CustoItemViewModel(_todosOsCustosCadastrados)
             {
                 categoria = "Equipamentos",
@@ -482,7 +476,6 @@ namespace magal.ViewModels
 
             try
             {
-                // Convertemos os wrappers de volta para List<Custo> para o motor de cálculo original
                 var listaCustosBase = CustosExtras.Select(c => (Custo)c).ToList();
 
                 ProjetoAtual.Orcamento.CalcularTotal(
@@ -503,17 +496,20 @@ namespace magal.ViewModels
             try
             {
                 if (ProjetoAtual.Cliente != null)
+                {
                     ProjetoAtual.id_cliente = ProjetoAtual.Cliente.id_cliente;
+                }
 
                 var repo = new ProjetoRepository();
                 var listaCustosBase = CustosExtras.Select(c => (Custo)c).ToList();
 
                 repo.SalvarProjetoCompleto(ProjetoAtual, listaCustosBase);
+
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro crítico ao salvar: " + ex.Message, "Aviso de Erro", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Erro ao salvar dados no banco: " + ex.Message, "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
         }
@@ -532,7 +528,7 @@ namespace magal.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Erro ao generate PDF: " + ex.Message, "Aviso de Erro", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Erro ao gerar PDF: " + ex.Message, "Aviso de Erro", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             return false;
@@ -549,42 +545,41 @@ namespace magal.ViewModels
     /// </summary>
     public class CustoItemViewModel : Custo, INotifyPropertyChanged
     {
-        private readonly List<Custo> _listaMestraCustos;
-        private ObservableCollection<Custo> _itensFiltrados = new ObservableCollection<Custo>();
-        private Custo _itemSelecionado;
+        private readonly List<CatalogoCusto> _listaMestraCustos;
+        private ObservableCollection<CatalogoCusto> _itensFiltrados = new ObservableCollection<CatalogoCusto>();
+        private CatalogoCusto _itemSelecionado;
 
-        // Construtor para novas linhas
-        public CustoItemViewModel(List<Custo> listaMestra)
+        public CustoItemViewModel(List<CatalogoCusto> listaMestra)
         {
-            _listaMestraCustos = listaMestra ?? new List<Custo>();
+            _listaMestraCustos = listaMestra ?? new List<CatalogoCusto>();
             FiltrarItensPorCategoria();
         }
 
-        // Construtor para carregar itens existentes vindos do Banco
-        public CustoItemViewModel(Custo custoExistente, List<Custo> listaMestra)
+        public CustoItemViewModel(Custo custoExistente, List<CatalogoCusto> listaMestra)
         {
-            _listaMestraCustos = listaMestra ?? new List<Custo>();
+            _listaMestraCustos = listaMestra ?? new List<CatalogoCusto>();
 
             this.id_custo = custoExistente.id_custo;
             this.id_projeto = custoExistente.id_projeto;
+            this.id_catalogo_custo = custoExistente.id_catalogo_custo;
             this.nome = custoExistente.nome;
             this.valor = custoExistente.valor;
             this.categoria = custoExistente.categoria;
             this.tipo = custoExistente.tipo;
+            this.unidade = custoExistente.unidade;
 
             FiltrarItensPorCategoria();
 
-            // Fixa o item selecionado se ele já existir na lista mestra
-            _itemSelecionado = _listaMestraCustos.FirstOrDefault(x => x.nome == this.nome && x.categoria == this.categoria);
+            _itemSelecionado = _listaMestraCustos.FirstOrDefault(x => x.id_catalogo_custo == this.id_catalogo_custo)?? _listaMestraCustos.FirstOrDefault(x => x.nome == this.nome && x.categoria == this.categoria);
         }
 
-        public ObservableCollection<Custo> ItensFiltrados
+        public ObservableCollection<CatalogoCusto> ItensFiltrados
         {
             get => _itensFiltrados;
             set { _itensFiltrados = value; OnRowPropertyChanged(); }
         }
 
-        public Custo ItemSelecionado
+        public CatalogoCusto ItemSelecionado
         {
             get => _itemSelecionado;
             set
@@ -595,14 +590,14 @@ namespace magal.ViewModels
                     OnRowPropertyChanged();
                     if (_itemSelecionado != null)
                     {
+                        this.id_catalogo_custo = _itemSelecionado.id_catalogo_custo;
                         this.nome = _itemSelecionado.nome;
-                        this.valor = _itemSelecionado.valor; // Auto preenche o valor cadastrado na outra tela
+                        this.valor = _itemSelecionado.valor;
                     }
                 }
             }
         }
 
-        // Sobrescreve a propriedade Categoria para interceptar a mudança e filtrar a outra ComboBox
         public new string categoria
         {
             get => base.categoria;
@@ -617,7 +612,6 @@ namespace magal.ViewModels
             }
         }
 
-        // Sobrescreve o Valor para garantir atualização correta na interface e nos cálculos
         public new decimal valor
         {
             get => base.valor;
@@ -633,7 +627,7 @@ namespace magal.ViewModels
 
         private void FiltrarItensPorCategoria()
         {
-            if (ItensFiltrados == null) ItensFiltrados = new ObservableCollection<Custo>();
+            if (ItensFiltrados == null) ItensFiltrados = new ObservableCollection<CatalogoCusto>();
             ItensFiltrados.Clear();
 
             if (string.IsNullOrEmpty(categoria)) return;
@@ -653,6 +647,15 @@ namespace magal.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
+
+    #endregion
+
+    #region Extensão Auxiliar para Silenciar Notificações na Inicialização
+
+    public static class BindableExtensions
+    {
+        public static IDisposable DisablePropertyChange(this object obj) => null;
     }
 
     #endregion

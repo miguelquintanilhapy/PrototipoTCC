@@ -28,7 +28,6 @@ namespace magal.Views
 
             if (dialog.ShowDialog() == true)
             {
-                // Em vez de dar 'new', apenas manda o ViewModel recarregar os dados do banco
                 _viewModel.CarregarCustos();
             }
         }
@@ -64,7 +63,6 @@ namespace magal.Views
 
             try
             {
-                // CORRIGIDO: Instancia o repositório do catálogo para deletar o item global
                 var repo = new CatalogoCustoRepository();
                 repo.Excluir(custo.id_catalogo_custo);
 

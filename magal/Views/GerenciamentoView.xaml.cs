@@ -49,7 +49,7 @@ namespace magal.Views
             }
         }
 
-        // Novo método adicionado para abrir a tela de Custos
+        // método adicionado para abrir a tela de Custos
         private void BtnCustos_Click(object sender, RoutedEventArgs e)
         {
             var janelaPrincipal = Window.GetWindow(this) as MainWindow;

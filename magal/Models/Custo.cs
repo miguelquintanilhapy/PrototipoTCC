@@ -6,6 +6,7 @@ namespace magal.Models
     {
         public int id_custo { get; set; }
         public int id_projeto { get; set; }
+        public int id_catalogo_custo { get; set; } 
         public string nome { get; set; }
         public string categoria { get; set; }
         public string tipo { get; set; }
@@ -19,7 +20,7 @@ namespace magal.Models
                 if (_valor != value)
                 {
                     _valor = value;
-                    OnPropertyChanged(nameof(valor)); 
+                    OnPropertyChanged(nameof(valor));
                 }
             }
         }

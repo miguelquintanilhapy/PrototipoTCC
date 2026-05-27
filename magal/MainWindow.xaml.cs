@@ -60,22 +60,47 @@ namespace magal
         private void BtnHistorico_Click(object sender, RoutedEventArgs e) => AbrirHistorico();
         private void BtnGerenciamento_Click(object sender, RoutedEventArgs e) => AbrirGerenciamento();
 
+        // Novo método para alternar a classe/tag ativa dos botões
+        private void AtualizarBotaoAtivo(Button botaoAtivo)
+        {
+            // Lista com todos os seus botões da sidebar
+            var botoes = new[] { BtnHome, BtnOrcamentos, BtnHistorico, BtnGerenciamento };
+
+            foreach (var btn in botoes)
+            {
+                if (btn == null) continue;
+
+                if (btn == botaoAtivo)
+                {
+                    // Define uma Tag que avisa ao XAML para fixar o estilo ativo
+                    btn.Tag = "Ativo";
+                }
+                else
+                {
+                    btn.Tag = null;
+                }
+            }
+        }
+
         public void AbrirHome()
         {
             if (_homeView == null) _homeView = new HomeView();
             MainContent.Content = _homeView;
+            AtualizarBotaoAtivo(BtnHome); // <-- ADICIONE AQUI
         }
 
         public void AbrirOrcamento()
         {
             _orcamentoView = new OrcamentoView();
             MainContent.Content = _orcamentoView;
+            AtualizarBotaoAtivo(BtnOrcamentos); // <-- ADICIONE AQUI
         }
 
         public void AbrirHistorico()
         {
             if (_historicoView == null) _historicoView = new HistoricoView();
             MainContent.Content = _historicoView;
+            AtualizarBotaoAtivo(BtnHistorico); // <-- ADICIONE AQUI
         }
 
         private void BtnGraficos_Click(object sender, RoutedEventArgs e)
@@ -86,6 +111,7 @@ namespace magal
         public void AbrirGerenciamento()
         {
             MainContent.Content = new GerenciamentoView();
+            AtualizarBotaoAtivo(BtnGerenciamento); // <-- ADICIONE AQUI
         }
 
         public void IrParaEdicao(Projeto projetoSimplificado)
@@ -99,6 +125,8 @@ namespace magal
             var view = new OrcamentoView();
             view.DataContext = viewModel;
             MainContent.Content = view;
+
+            AtualizarBotaoAtivo(BtnOrcamentos); 
         }
 
         // --- PERFIL E USUÁRIO ---

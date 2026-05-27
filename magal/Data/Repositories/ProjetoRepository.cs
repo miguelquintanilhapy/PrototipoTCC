@@ -23,41 +23,22 @@ namespace magal.Data.Repositories
                         {
                             // INSERIR NOVO PROJETO
                             using (var cmd = new MySqlCommand(@"
-                                INSERT INTO projeto
-                                (
-                                    nome,
-                                    id_cliente,
-                                    id_usuario,
-                                    data_criacao,
-                                    tipo,
-                                    status
-                                )
-                                VALUES
-                                (
-                                    @nome,
-                                    @idCliente,
-                                    @idUsuario,
-                                    @data,
-                                    @tipo,
-                                    @status
-                                );
-                            ", conn, transaction))
+                        INSERT INTO projeto
+                        (nome, id_cliente, id_usuario, data_criacao, tipo, status)
+                        VALUES
+                        (@nome, @idCliente, @idUsuario, @data, @tipo, @status);
+                    ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@nome", projeto.nome);
                                 cmd.Parameters.AddWithValue("@idCliente", projeto.id_cliente);
                                 cmd.Parameters.AddWithValue("@idUsuario", projeto.id_usuario == 0 ? 1 : projeto.id_usuario);
-                                cmd.Parameters.AddWithValue("@data",
-                                    projeto.data_criacao == DateTime.MinValue
-                                        ? DateTime.Now
-                                        : projeto.data_criacao);
-
+                                cmd.Parameters.AddWithValue("@data", projeto.data_criacao == DateTime.MinValue ? DateTime.Now : projeto.data_criacao);
                                 cmd.Parameters.AddWithValue("@tipo", projeto.tipo ?? "Serviço");
                                 cmd.Parameters.AddWithValue("@status", projeto.status ?? "Rascunho");
 
                                 cmd.ExecuteNonQuery();
 
                                 cmd.CommandText = "SELECT LAST_INSERT_ID();";
-
                                 projeto.id_projeto = Convert.ToInt32(cmd.ExecuteScalar());
                             }
                         }
@@ -65,14 +46,10 @@ namespace magal.Data.Repositories
                         {
                             // ATUALIZAR PROJETO
                             using (var cmd = new MySqlCommand(@"
-                                UPDATE projeto
-                                SET
-                                    nome = @nome,
-                                    id_cliente = @idCliente,
-                                    status = @status,
-                                    tipo = @tipo
-                                WHERE id_projeto = @idProj
-                            ", conn, transaction))
+                        UPDATE projeto
+                        SET nome = @nome, id_cliente = @idCliente, status = @status, tipo = @tipo
+                        WHERE id_projeto = @idProj
+                    ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@nome", projeto.nome);
                                 cmd.Parameters.AddWithValue("@idCliente", projeto.id_cliente);
@@ -83,51 +60,18 @@ namespace magal.Data.Repositories
                                 cmd.ExecuteNonQuery();
                             }
 
-                            // LIMPAR DADOS ANTIGOS
-                            new MySqlCommand(
-                                $"DELETE FROM orcamento WHERE id_projeto = {projeto.id_projeto}",
-                                conn,
-                                transaction
-                            ).ExecuteNonQuery();
-
-                            new MySqlCommand(
-                                $"DELETE FROM tarefa WHERE id_projeto = {projeto.id_projeto}",
-                                conn,
-                                transaction
-                            ).ExecuteNonQuery();
-
-                            new MySqlCommand(
-                                $"DELETE FROM custo WHERE id_projeto = {projeto.id_projeto}",
-                                conn,
-                                transaction
-                            ).ExecuteNonQuery();
+                            // LIMPAR TAREFAS E CUSTOS ANTIGOS (Isso não afeta a FK do orçamento)
+                            new MySqlCommand($"DELETE FROM tarefa WHERE id_projeto = {projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
+                            new MySqlCommand($"DELETE FROM custo WHERE id_projeto = {projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
                         }
 
-                        // INSERIR ORÇAMENTO
+                        // INSERIR OU ATUALIZAR ORÇAMENTO (Usando REPLACE INTO para evitar o erro de Foreign Key)
                         using (var cmd = new MySqlCommand(@"
-                            INSERT INTO orcamento
-                            (
-                                id_projeto,
-                                custo_base,
-                                percentual_impostos,
-                                margem_percentual,
-                                valor_margem,
-                                valor_impostos,
-                                valor_final,
-                                validade_dias
-                            )
-                            VALUES
-                            (
-                                @idProj,
-                                @custo,
-                                @percImp,
-                                @margPerc,
-                                @vMarg,
-                                @vImp,
-                                @final,
-                                @validade
-                            );
-                        ", conn, transaction))
+                    REPLACE INTO orcamento
+                    (id_projeto, custo_base, percentual_impostos, margem_percentual, valor_margem, valor_impostos, valor_final, validade_dias)
+                    VALUES
+                    (@idProj, @custo, @percImp, @margPerc, @vMarg, @vImp, @final, @validade);
+                ", conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
                             cmd.Parameters.AddWithValue("@custo", projeto.Orcamento.custo_base);
@@ -145,23 +89,11 @@ namespace magal.Data.Repositories
                         foreach (var tarefa in projeto.Tarefas)
                         {
                             using (var cmd = new MySqlCommand(@"
-                                INSERT INTO tarefa
-                                (
-                                    id_projeto,
-                                    descricao,
-                                    id_funcionario,
-                                    horas_estimadas,
-                                    status
-                                )
-                                VALUES
-                                (
-                                    @idProj,
-                                    @desc,
-                                    @idFunc,
-                                    @horas,
-                                    @status
-                                );
-                            ", conn, transaction))
+                        INSERT INTO tarefa
+                        (id_projeto, descricao, id_funcionario, horas_estimadas, status)
+                        VALUES
+                        (@idProj, @desc, @idFunc, @horas, @status);
+                    ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
                                 cmd.Parameters.AddWithValue("@desc", tarefa.descricao);
@@ -173,29 +105,15 @@ namespace magal.Data.Repositories
                             }
                         }
 
-                        // INSERIR CUSTOS
+                        // INSERIR CUSTOS (Adicionado o campo id_catalogo_custo para sanar o erro 2)
                         foreach (var custo in custosExtras)
                         {
                             using (var cmd = new MySqlCommand(@"
-                                INSERT INTO custo
-                                (
-                                    id_projeto,
-                                    nome,
-                                    categoria,
-                                    tipo,
-                                    valor,
-                                    unidade
-                                )
-                                VALUES
-                                (
-                                    @idProj,
-                                    @nome,
-                                    @cat,
-                                    @tipo,
-                                    @valor,
-                                    @unidade
-                                );
-                            ", conn, transaction))
+                        INSERT INTO custo
+                        (id_projeto, nome, categoria, tipo, valor, unidade, id_catalogo_custo)
+                        VALUES
+                        (@idProj, @nome, @cat, @tipo, @valor, @unidade, @idCatalogo);
+                    ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
                                 cmd.Parameters.AddWithValue("@nome", custo.nome);
@@ -203,6 +121,8 @@ namespace magal.Data.Repositories
                                 cmd.Parameters.AddWithValue("@tipo", custo.tipo ?? "Direto");
                                 cmd.Parameters.AddWithValue("@valor", custo.valor);
                                 cmd.Parameters.AddWithValue("@unidade", custo.unidade ?? "Unitário");
+
+                                cmd.Parameters.AddWithValue("@idCatalogo", 1);
 
                                 cmd.ExecuteNonQuery();
                             }
@@ -213,10 +133,7 @@ namespace magal.Data.Repositories
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-
-                        throw new Exception(
-                            "Erro ao processar transação no MySQL: " + ex.Message
-                        );
+                        throw new Exception("Erro ao processar transação no MySQL: " + ex.Message);
                     }
                 }
             }

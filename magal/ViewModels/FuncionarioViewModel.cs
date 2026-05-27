@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Windows.Data;
 using magal.Models;
 using magal.Data.Repositories;
-using magal.Services; // Certifique-se de que o namespace do seu PdfService está aqui
+using magal.Services;
 using Microsoft.Win32;
 using System.Collections.Generic;
 
@@ -116,8 +116,6 @@ namespace magal.ViewModels
             AtualizarCommand = new RelayCommand(_ => CarregarFuncionarios());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Funcionario));
-
-            // NOVO: Inicializando o comando de exportação de PDF
             ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
 
             CarregarFuncionarios();
@@ -248,7 +246,6 @@ namespace magal.ViewModels
             {
                 try
                 {
-                    // AQUI ESTÁ A CORREÇÃO: Chamando o serviço para criar o PDF real no disco!
                     _pdfService.GerarRelatorioTabelaFuncionarios(funcionariosFiltrados, saveFileDialog.FileName);
 
                     MessageBox.Show("Relatório gerado com sucesso!", "Sucesso",

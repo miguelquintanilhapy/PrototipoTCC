@@ -39,6 +39,11 @@
                     <Setter Property="Background" Value="{StaticResource AzulHover}"/>
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
+
+                <Trigger Property="Tag" Value="Ativo">
+                    <Setter Property="Background" Value="{StaticResource AzulHover}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
@@ -62,6 +67,7 @@
                     <Border BorderBrush="#2D3748" 
                             BorderThickness="0,1,0,0" 
                             Margin="0,10,0,1"/>
+
                     <Button x:Name="BtnHome" Content="Home" 
                             Style="{StaticResource MenuButtonStyle}" 
                             Padding="20,0,0,0"

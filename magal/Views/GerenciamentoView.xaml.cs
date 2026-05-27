@@ -40,13 +40,22 @@ namespace magal.Views
             }
         }
 
-        // Método atualizado para abrir a tela de Clientes
         private void BtnClientes_Click(object sender, RoutedEventArgs e)
         {
             var janelaPrincipal = Window.GetWindow(this) as MainWindow;
             if (janelaPrincipal != null)
             {
                 janelaPrincipal.MainContentControl.Content = new ClienteView();
+            }
+        }
+
+        // método adicionado para abrir a tela de Custos
+        private void BtnCustos_Click(object sender, RoutedEventArgs e)
+        {
+            var janelaPrincipal = Window.GetWindow(this) as MainWindow;
+            if (janelaPrincipal != null)
+            {
+                janelaPrincipal.MainContentControl.Content = new CustoView();
             }
         }
     }

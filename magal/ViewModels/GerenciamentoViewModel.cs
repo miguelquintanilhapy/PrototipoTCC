@@ -17,7 +17,7 @@ namespace magal.ViewModels
         private readonly FuncionarioRepository _funcionarioRepo;
         private readonly ClienteRepository _clienteRepo;
         private readonly CargoRepository _cargoRepo;
-        private readonly CustoRepository _custoRepo;
+        private readonly CatalogoCustoRepository _catalogoCustoRepo;
 
         private string _totalFuncionarios;
         private string _totalClientes;
@@ -77,7 +77,7 @@ namespace magal.ViewModels
             _funcionarioRepo = new FuncionarioRepository();
             _clienteRepo = new ClienteRepository();
             _cargoRepo = new CargoRepository();
-            _custoRepo = new CustoRepository();
+            _catalogoCustoRepo = new CatalogoCustoRepository();
 
             CarregarIndicadores();
         }
@@ -102,7 +102,7 @@ namespace magal.ViewModels
                 var cargos = _cargoRepo.ListarTodos();
                 TotalCargos = (cargos?.Count ?? 0).ToString("D2");
 
-                var custos = _custoRepo.ListarTodos();
+                var custos = _catalogoCustoRepo.ListarTodos();
                 TotalCustos = (custos?.Count ?? 0).ToString("D2");
             }
             catch (Exception ex)
@@ -113,7 +113,6 @@ namespace magal.ViewModels
                 TotalCargos = "00";
                 TotalCustos = "00";
 
-                // Log para depuração no console do Visual Studio
                 System.Diagnostics.Debug.WriteLine($"[Erro GerenciamentoVM]: {ex.Message}");
             }
         }

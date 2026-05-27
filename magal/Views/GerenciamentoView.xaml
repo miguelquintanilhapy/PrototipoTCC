@@ -1,7 +1,8 @@
 ﻿<UserControl x:Class="magal.Views.GerenciamentoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="#F8FAFC">
+             Background="#F8FAFC"
+             Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
         <SolidColorBrush x:Key="AeroAccent" Color="#3B82F6"/>
@@ -146,7 +147,7 @@
                         Tag="Funcionários"
                         ToolTip="Gerencie os funcionários, dados pessoais, contratos e informações profissionais." 
                         Click="BtnFuncionarios_Click"/>
-                
+
                 <Button Style="{StaticResource CardButtonStyle}" 
                         Content="💼" 
                         Tag="Cargos" 
@@ -162,7 +163,8 @@
                 <Button Style="{StaticResource CardButtonStyle}" 
                         Content="💰" 
                         Tag="Custos" 
-                        ToolTip="Gerencie os custos diretos e indiretos utilizados nos orçamentos."/>
+                        ToolTip="Gerencie os custos diretos e indiretos utilizados nos orçamentos."
+                        Click="BtnCustos_Click"/>
             </UniformGrid>
         </ScrollViewer>
     </Grid>

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="magal.Views.ClienteView"
+﻿<UserControl x:Class="magal.Views.CustoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -49,13 +49,13 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Height="80" Margin="0,0,0,10">
-            <TextBlock Text="Gestão de Clientes" 
+            <TextBlock Text="Gestão de Custos" 
                        FontSize="28" FontWeight="Bold"
                        Foreground="{StaticResource AzulAero}"
                        VerticalAlignment="Center"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="+ NOVO CLIENTE" 
+                <Button Content="+ NOVO CUSTO" 
                         Style="{StaticResource PrimaryBtn}"
                         Margin="0,0,10,0"
                         Command="{Binding CriarCommand}"/>
@@ -85,7 +85,7 @@
         </Grid>
 
         <StackPanel Grid.Row="1" Margin="0,0,0,15">
-            <TextBlock Text="FILTRE POR NOME, DOCUMENTO OU LOCALIZAÇÃO" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
+            <TextBlock Text="FILTRE POR NOME, CATEGORIA OU TIPO" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
             <Grid>
                 <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
                          Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"
@@ -107,7 +107,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <DataGrid ItemsSource="{Binding ClientesView}" 
+                <DataGrid ItemsSource="{Binding CustosView}" 
                           AutoGenerateColumns="False" IsReadOnly="True"
                           Background="Transparent" BorderThickness="0"
                           GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
@@ -153,9 +153,9 @@
                     </DataGrid.Resources>
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding id_cliente}" Width="80" FontSize="14" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="ID" Binding="{Binding id_catalogo_custo}" Width="80" FontSize="14" FontWeight="SemiBold" />
 
-                        <DataGridTextColumn Header="RAZÃO SOCIAL / NOME" Binding="{Binding nome}" Width="*" FontSize="15" FontWeight="SemiBold">
+                        <DataGridTextColumn Header="NOME DO CUSTO" Binding="{Binding nome}" Width="*" FontSize="15" FontWeight="SemiBold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -165,23 +165,18 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="TIPO" Binding="{Binding tipo}" Width="150" FontSize="14" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="CATEGORIA" Binding="{Binding categoria}" Width="180" FontSize="14" FontWeight="SemiBold" />
 
-                        <DataGridTextColumn Header="CPF / CNPJ" Binding="{Binding cpf_cnpj}" Width="160" FontSize="14" FontWeight="SemiBold" />
-
-                        <DataGridTextColumn Header="CIDADE" Binding="{Binding cidade}" Width="150" FontSize="14" FontWeight="SemiBold" />
-
-                        <DataGridTextColumn Header="UF" Binding="{Binding estado}" Width="70" FontSize="14" FontWeight="SemiBold" >
+                        <DataGridTextColumn Header="VALOR" Binding="{Binding valor, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" Width="160" FontSize="16" FontWeight="Bold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
                                     <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Foreground" Value="{StaticResource VerdeAero}"/>
+                                    <Setter Property="Padding" Value="0,0,30,0"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="CONTATO" Binding="{Binding contato}" Width="150" FontSize="14" FontWeight="SemiBold"/>
 
                         <DataGridTemplateColumn Header="AÇÕES" Width="170">
                             <DataGridTemplateColumn.CellTemplate>
@@ -206,7 +201,7 @@
                 </DataGrid>
 
                 <Border Grid.Row="1" Background="#F8FAFC" BorderThickness="0,1,0,0" BorderBrush="#F1F5F9" CornerRadius="0,0,16,16" Padding="20,12">
-                    <TextBlock Text="{Binding ClientesView.Count, StringFormat='{}{0} clientes encontrados'}"
+                    <TextBlock Text="{Binding CustosView.Count, StringFormat='{}{0} custos encontrados'}"
                                FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
                 </Border>
             </Grid>

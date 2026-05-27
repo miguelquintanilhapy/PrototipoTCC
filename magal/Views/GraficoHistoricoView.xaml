@@ -310,11 +310,10 @@
                                    Margin="0,0,0,20"/>
 
                         <lvc:PieChart Series="{Binding SeriesTipo}"
-                                  LegendLocation="Bottom"
-                                  HoverPushOut="15"
-                                  InnerRadius="40"
-                                  Height="470"
-                                  Margin="0,0,0,15"/>
+                                      LegendLocation="Bottom"
+                                      HoverPushOut="15"
+                                      InnerRadius="40"
+                                      Height="420"/>
 
                     </StackPanel>
 

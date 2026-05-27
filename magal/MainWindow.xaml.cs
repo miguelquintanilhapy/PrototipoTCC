@@ -64,7 +64,7 @@ namespace magal
         private void AtualizarBotaoAtivo(Button botaoAtivo)
         {
             // Lista com todos os seus botões da sidebar
-            var botoes = new[] { BtnHome, BtnOrcamentos, BtnHistorico, BtnGerenciamento };
+            var botoes = new[] { BtnHome, BtnOrcamentos, BtnHistorico, BtnGraficos, BtnGerenciamento };
 
             foreach (var btn in botoes)
             {
@@ -106,6 +106,8 @@ namespace magal
         private void BtnGraficos_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new GraficoHistoricoView();
+
+            AtualizarBotaoAtivo(BtnGraficos);
         }
 
         public void AbrirGerenciamento()

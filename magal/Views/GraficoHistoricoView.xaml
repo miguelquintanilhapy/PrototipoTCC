@@ -181,23 +181,7 @@
                 </Border>
 
             </UniformGrid>
-
-            <!-- TITULO -->
-            <StackPanel Grid.Row="2"
-                        Margin="0,0,0,15">
-
-                <TextBlock Text="ANÁLISE VISUAL DOS PROJETOS"
-                           FontSize="11"
-                           FontWeight="Bold"
-                           Foreground="{StaticResource AzulAero}"
-                           Margin="0,0,0,4"/>
-
-                <TextBlock Text="Distribuição financeira e organizacional"
-                           FontSize="13"
-                           Foreground="{StaticResource AeroTextMuted}"/>
-
-            </StackPanel>
-
+			
             <!-- GRAFICO DE LUCRO -->
             <Border Grid.Row="3"
                     Background="White"

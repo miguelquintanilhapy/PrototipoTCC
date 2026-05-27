@@ -94,6 +94,29 @@ namespace magal.ViewModels
 
         #region Construtor
 
+        private string _periodoSelecionado;
+
+        public List<string> Periodos { get; set; } = new ()
+            {
+                "7 Dias",
+                "30 Dias",
+                "3 Meses",
+                "6 Meses",
+                "1 Ano",
+                "Tudo"
+            };
+
+        public string PeriodoSelecionado
+        {
+            get => _periodoSelecionado;
+            set
+            {
+                _periodoSelecionado = value;
+                OnPropertyChanged();
+
+                CarregarDados();
+            }
+        }
         public GraficoHistoricoViewModel()
         {
             _repository = new ProjetoRepository();
@@ -101,6 +124,8 @@ namespace magal.ViewModels
             AtualizarCommand = new RelayCommand(_ => CarregarDados());
 
             Formatter = value => value.ToString("C0", _ptBR);
+            
+            PeriodoSelecionado = "6 Meses";
 
             CarregarDados();
         }
@@ -114,6 +139,39 @@ namespace magal.ViewModels
             try
             {
                 var projetos = _repository.BuscarTodosPorUsuario(1);
+
+                DateTime dataLimite = DateTime.MinValue;
+
+                switch (PeriodoSelecionado)
+                {
+                    case "7 Dias":
+                        dataLimite = DateTime.Now.AddDays(-7);
+                        break;
+
+                    case "30 Dias":
+                        dataLimite = DateTime.Now.AddDays(-30);
+                        break;
+
+                    case "3 Meses":
+                        dataLimite = DateTime.Now.AddMonths(-3);
+                        break;
+
+                    case "6 Meses":
+                        dataLimite = DateTime.Now.AddMonths(-6);
+                        break;
+
+                    case "1 Ano":
+                        dataLimite = DateTime.Now.AddYears(-1);
+                        break;
+
+                    case "Tudo":
+                        dataLimite = DateTime.MinValue;
+                        break;
+                }
+
+                projetos = projetos
+                    .Where(p => p.data_criacao >= dataLimite)
+                    .ToList();
 
                 // Evita lista nula
                 if (projetos == null)
@@ -180,7 +238,7 @@ namespace magal.ViewModels
                 })
                 .ToList();
 
-            SeriesStatus.Clear();
+            SeriesStatus = new SeriesCollection();
 
             // Paleta mais elegante/coerente com o sistema
             string[] cores =
@@ -234,7 +292,7 @@ namespace magal.ViewModels
                 })
                 .ToList();
 
-            SeriesTipo.Clear();
+            SeriesTipo = new SeriesCollection();
 
             string[] cores =
             {
@@ -281,7 +339,6 @@ namespace magal.ViewModels
             if (projetos == null || projetos.Count == 0)
             {
                 ValoresLucroMensal = new ChartValues<double>();
-
                 ValoresFaturamentoMensal = new ChartValues<double>();
                 LabelsMeses = Array.Empty<string>();
 
@@ -292,36 +349,67 @@ namespace magal.ViewModels
                 return;
             }
 
-            var agrupadoPorMes = projetos
-                .Where(p =>
-                    p != null &&
-                    p.Orcamento != null)
-                .GroupBy(p => new
-                {
-                    Ano = p.data_criacao.Year,
-                    Mes = p.data_criacao.Month
-                })
-                .OrderBy(g => g.Key.Ano)
-                .ThenBy(g => g.Key.Mes)
-                .Select(g => new
-                {
-                    Mes = new DateTime(g.Key.Ano, g.Key.Mes, 1),
-                    TotalLucro = g.Sum(p => p.Orcamento?.valor_margem ?? 0),
-                    TotalFaturamento = g.Sum(p => p.Orcamento?.valor_final ?? 0)
-                })
-                .ToList();
+            bool agruparPorDia =
+                PeriodoSelecionado == "7 Dias" ||
+                PeriodoSelecionado == "30 Dias";
 
-            ValoresLucroMensal = new ChartValues<double>(
-                agrupadoPorMes.Select(x => (double)x.TotalLucro)
-            );
+            if (agruparPorDia)
+            {
+                var agrupadoPorDia = projetos
+                    .Where(p => p != null && p.Orcamento != null)
+                    .GroupBy(p => p.data_criacao.Date)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new
+                    {
+                        Data = g.Key,
+                        TotalLucro = g.Sum(p => p.Orcamento?.valor_margem ?? 0),
+                        TotalFaturamento = g.Sum(p => p.Orcamento?.valor_final ?? 0)
+                    })
+                    .ToList();
 
-            ValoresFaturamentoMensal = new ChartValues<double>(
-                agrupadoPorMes.Select(x => (double)x.TotalFaturamento)
-            );
+                ValoresLucroMensal = new ChartValues<double>(
+                    agrupadoPorDia.Select(x => (double)x.TotalLucro)
+                );
 
-            LabelsMeses = agrupadoPorMes
-                .Select(x => x.Mes.ToString("MMM/yy"))
-                .ToArray();
+                ValoresFaturamentoMensal = new ChartValues<double>(
+                    agrupadoPorDia.Select(x => (double)x.TotalFaturamento)
+                );
+
+                LabelsMeses = agrupadoPorDia
+                    .Select(x => x.Data.ToString("dd/MM"))
+                    .ToArray();
+            }
+            else
+            {
+                var agrupadoPorMes = projetos
+                    .Where(p => p != null && p.Orcamento != null)
+                    .GroupBy(p => new
+                    {
+                        Ano = p.data_criacao.Year,
+                        Mes = p.data_criacao.Month
+                    })
+                    .OrderBy(g => g.Key.Ano)
+                    .ThenBy(g => g.Key.Mes)
+                    .Select(g => new
+                    {
+                        Data = new DateTime(g.Key.Ano, g.Key.Mes, 1),
+                        TotalLucro = g.Sum(p => p.Orcamento?.valor_margem ?? 0),
+                        TotalFaturamento = g.Sum(p => p.Orcamento?.valor_final ?? 0)
+                    })
+                    .ToList();
+
+                ValoresLucroMensal = new ChartValues<double>(
+                    agrupadoPorMes.Select(x => (double)x.TotalLucro)
+                );
+
+                ValoresFaturamentoMensal = new ChartValues<double>(
+                    agrupadoPorMes.Select(x => (double)x.TotalFaturamento)
+                );
+
+                LabelsMeses = agrupadoPorMes
+                    .Select(x => x.Data.ToString("MMM/yy"))
+                    .ToArray();
+            }
 
             OnPropertyChanged(nameof(ValoresLucroMensal));
             OnPropertyChanged(nameof(ValoresFaturamentoMensal));

@@ -236,14 +236,41 @@ namespace magal.ViewModels
 
             SeriesTipo.Clear();
 
+            string[] cores =
+            {
+                "#1E3A8A", // azul forte
+                "#0F766E", // verde petróleo
+                "#7C3AED", // roxo elegante
+                "#EA580C", // laranja queimado
+                "#BE123C", // vinho
+                "#0891B2", // ciano escuro
+                "#4D7C0F", // verde oliva
+                "#475569"  // cinza slate
+            };
+
+            int index = 0;
+
             foreach (var item in agrupado)
             {
+                var cor = (System.Windows.Media.Color)
+                    System.Windows.Media.ColorConverter.ConvertFromString(
+                        cores[index % cores.Length]);
+
                 SeriesTipo.Add(new PieSeries
                 {
                     Title = item.Nome,
                     Values = new ChartValues<double> { item.Quantidade },
-                    DataLabels = true
+                    DataLabels = true,
+
+                    Fill = new System.Windows.Media.SolidColorBrush(cor),
+
+                    Foreground = System.Windows.Media.Brushes.White,
+
+                    StrokeThickness = 2,
+                    Stroke = System.Windows.Media.Brushes.White
                 });
+
+                index++;
             }
 
             OnPropertyChanged(nameof(SeriesTipo));

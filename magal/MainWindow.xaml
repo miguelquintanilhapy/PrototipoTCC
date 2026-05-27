@@ -86,11 +86,11 @@
                             FontWeight="SemiBold"
                             Click="BtnHistorico_Click"/>
 
-                    <Button x:Name="BtnGraficos" Content="Gráficos" 
+                    <Button x:Name="BtnDashboard" Content="Dashboard" 
                             Style="{StaticResource MenuButtonStyle}" 
                             Padding="20,0,0,0"
                             FontWeight="SemiBold"
-                            Click="BtnGraficos_Click"/>         
+                            Click="BtnDashboard_Click"/>         
 
                     <Button x:Name="BtnGerenciamento" Content="Gerenciamento" 
                             Style="{StaticResource MenuButtonStyle}" 

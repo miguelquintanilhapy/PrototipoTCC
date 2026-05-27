@@ -103,7 +103,7 @@ namespace magal.ViewModels
                 "3 Meses",
                 "6 Meses",
                 "1 Ano",
-                "Tudo"
+                "Período completo"
             };
 
         public string PeriodoSelecionado
@@ -164,7 +164,7 @@ namespace magal.ViewModels
                         dataLimite = DateTime.Now.AddYears(-1);
                         break;
 
-                    case "Tudo":
+                    case "Período completo":
                         dataLimite = DateTime.MinValue;
                         break;
                 }

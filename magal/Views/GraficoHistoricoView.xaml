@@ -286,8 +286,7 @@
                                   LegendLocation="Bottom"
                                   HoverPushOut="15"
                                   InnerRadius="40"
-                                  Height="470"
-                                  Margin="0,0,0,15"/>
+                                  Height="420"/>
 
                     </StackPanel>
 

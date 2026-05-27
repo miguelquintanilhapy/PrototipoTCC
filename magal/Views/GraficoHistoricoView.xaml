@@ -6,7 +6,7 @@
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d"
              Language="pt-BR"
-             d:DesignHeight="900"
+             d:DesignHeight="1000"
              d:DesignWidth="1200"
              Background="#F0F4FA">
 
@@ -63,6 +63,7 @@
         <Grid Margin="32,28">
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -181,7 +182,7 @@
 
             </UniformGrid>
 
-            <!-- TÍTULO -->
+            <!-- TITULO -->
             <StackPanel Grid.Row="2"
                         Margin="0,0,0,15">
 
@@ -191,14 +192,73 @@
                            Foreground="{StaticResource AzulAero}"
                            Margin="0,0,0,4"/>
 
-                <TextBlock Text="Distribuição por status e tipo"
+                <TextBlock Text="Distribuição financeira e organizacional"
                            FontSize="13"
                            Foreground="{StaticResource AeroTextMuted}"/>
 
             </StackPanel>
 
-            <!-- GRÁFICOS -->
-            <Grid Grid.Row="3">
+            <!-- GRAFICO DE LUCRO -->
+            <Border Grid.Row="3"
+                    Background="White"
+                    CornerRadius="16"
+                    Padding="20"
+                    Margin="0,0,0,20"
+                    BorderBrush="{StaticResource AeroBorder}"
+                    BorderThickness="1">
+
+                <StackPanel>
+
+                    <TextBlock Text="LUCRO / FATURAMENTO MENSAL"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource AzulAero}"
+                               Margin="0,0,0,15"/>
+
+                    <lvc:CartesianChart Height="340"
+                    LegendLocation="Right"
+                    Margin="0,0,25,0">
+
+                        <lvc:CartesianChart.Series>
+
+                            <!-- Lucro -->
+                            <lvc:ColumnSeries Title="Lucro"
+                                              Values="{Binding ValoresLucroMensal}"
+                                              DataLabels="True"/>
+
+                            <!-- Faturamento -->
+                            <lvc:ColumnSeries Title="Faturamento"
+                                              Values="{Binding ValoresFaturamentoMensal}"
+                                              DataLabels="True"/>
+
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsMeses}"
+                                  FontSize="11"
+                                  Foreground="#64748B">     
+
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="1"/>
+                                </lvc:Axis.Separator>
+
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}"
+                              FontSize="11"
+                              Foreground="#64748B"/>        
+                        </lvc:CartesianChart.AxisY>
+
+                    </lvc:CartesianChart>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- GRAFICOS DE PIZZA -->
+            <Grid Grid.Row="4">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -223,10 +283,11 @@
                                    Margin="0,0,0,20"/>
 
                         <lvc:PieChart Series="{Binding SeriesStatus}"
-                                      LegendLocation="Bottom"
-                                      HoverPushOut="15"
-                                      InnerRadius="30"
-                                      Height="420"/>
+                                  LegendLocation="Bottom"
+                                  HoverPushOut="15"
+                                  InnerRadius="40"
+                                  Height="470"
+                                  Margin="0,0,0,15"/>
 
                     </StackPanel>
 
@@ -249,10 +310,11 @@
                                    Margin="0,0,0,20"/>
 
                         <lvc:PieChart Series="{Binding SeriesTipo}"
-                                      LegendLocation="Bottom"
-                                      HoverPushOut="15"
-                                      InnerRadius="30"
-                                      Height="420"/>
+                                  LegendLocation="Bottom"
+                                  HoverPushOut="15"
+                                  InnerRadius="40"
+                                  Height="470"
+                                  Margin="0,0,0,15"/>
 
                     </StackPanel>
 

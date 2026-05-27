@@ -1,12 +1,12 @@
-﻿using System;
+﻿using LiveCharts;
+using LiveCharts.Wpf;
+using magal.Data.Repositories;
+using magal.Models;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using System.Collections.Generic;
-using magal.Models;
-using magal.Data.Repositories;
-using LiveCharts;
-using LiveCharts.Wpf;
 
 namespace magal.ViewModels
 {
@@ -65,11 +65,24 @@ namespace magal.ViewModels
 
         #endregion
 
-        #region Gráficos
+        #region Gráficos Pizza
 
-        public SeriesCollection SeriesStatus { get; set; }
+        public SeriesCollection SeriesStatus { get; set; } = new();
 
-        public SeriesCollection SeriesTipo { get; set; }
+        public SeriesCollection SeriesTipo { get; set; } = new();
+
+        #endregion
+
+        #region Gráfico Coluna
+
+        public ChartValues<double> ValoresLucroMensal { get; set; } = new();
+
+        public ChartValues<double> ValoresFaturamentoMensal { get; set; } = new();
+        public Func<double, string> Formatter { get; set; } =
+            value => value.ToString("C0", CultureInfo.GetCultureInfo("pt-BR"));
+
+        public string[] LabelsMeses { get; set; } = Array.Empty<string>();
+
 
         #endregion
 
@@ -87,6 +100,8 @@ namespace magal.ViewModels
 
             AtualizarCommand = new RelayCommand(_ => CarregarDados());
 
+            Formatter = value => value.ToString("C0", _ptBR);
+
             CarregarDados();
         }
 
@@ -100,22 +115,36 @@ namespace magal.ViewModels
             {
                 var projetos = _repository.BuscarTodosPorUsuario(1);
 
+                // Evita lista nula
+                if (projetos == null)
+                {
+                    projetos = new List<Projeto>();
+                }
+
+                // Corrige objetos nulos
                 foreach (var projeto in projetos)
                 {
                     if (projeto.Orcamento == null)
                     {
                         projeto.Orcamento = new Orcamento();
                     }
+
+                    // evita data padrão/nula
+                    if (projeto.data_criacao == DateTime.MinValue)
+                    {
+                        projeto.data_criacao = DateTime.Now;
+                    }
                 }
 
                 AtualizarIndicadores(projetos);
+                AtualizarGraficoMensal(projetos);
                 AtualizarGraficoStatus(projetos);
                 AtualizarGraficoTipo(projetos);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"Erro ao carregar gráficos: {ex.Message}",
+                    $"Erro ao carregar gráficos:\n\n{ex}",
                     "Erro",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
@@ -148,16 +177,17 @@ namespace magal.ViewModels
                 {
                     Nome = g.Key,
                     Quantidade = g.Count()
-                });
+                })
+                .ToList();
 
-            SeriesStatus = new SeriesCollection();
+            SeriesStatus.Clear();
 
             foreach (var item in agrupado)
             {
                 SeriesStatus.Add(new PieSeries
                 {
                     Title = item.Nome,
-                    Values = new ChartValues<int> { item.Quantidade },
+                    Values = new ChartValues<double> { item.Quantidade },
                     DataLabels = true
                 });
             }
@@ -173,21 +203,74 @@ namespace magal.ViewModels
                 {
                     Nome = g.Key,
                     Quantidade = g.Count()
-                });
+                })
+                .ToList();
 
-            SeriesTipo = new SeriesCollection();
+            SeriesTipo.Clear();
 
             foreach (var item in agrupado)
             {
                 SeriesTipo.Add(new PieSeries
                 {
                     Title = item.Nome,
-                    Values = new ChartValues<int> { item.Quantidade },
+                    Values = new ChartValues<double> { item.Quantidade },
                     DataLabels = true
                 });
             }
 
             OnPropertyChanged(nameof(SeriesTipo));
+        }
+
+        private void AtualizarGraficoMensal(List<Projeto> projetos)
+        {
+            if (projetos == null || projetos.Count == 0)
+            {
+                ValoresLucroMensal = new ChartValues<double>();
+
+                ValoresFaturamentoMensal = new ChartValues<double>();
+                LabelsMeses = Array.Empty<string>();
+
+                OnPropertyChanged(nameof(ValoresLucroMensal));
+                OnPropertyChanged(nameof(ValoresFaturamentoMensal));
+                OnPropertyChanged(nameof(LabelsMeses));
+
+                return;
+            }
+
+            var agrupadoPorMes = projetos
+                .Where(p =>
+                    p != null &&
+                    p.Orcamento != null)
+                .GroupBy(p => new
+                {
+                    Ano = p.data_criacao.Year,
+                    Mes = p.data_criacao.Month
+                })
+                .OrderBy(g => g.Key.Ano)
+                .ThenBy(g => g.Key.Mes)
+                .Select(g => new
+                {
+                    Mes = new DateTime(g.Key.Ano, g.Key.Mes, 1),
+                    TotalLucro = g.Sum(p => p.Orcamento?.valor_margem ?? 0),
+                    TotalFaturamento = g.Sum(p => p.Orcamento?.valor_final ?? 0)
+                })
+                .ToList();
+
+            ValoresLucroMensal = new ChartValues<double>(
+                agrupadoPorMes.Select(x => (double)x.TotalLucro)
+            );
+
+            ValoresFaturamentoMensal = new ChartValues<double>(
+                agrupadoPorMes.Select(x => (double)x.TotalFaturamento)
+            );
+
+            LabelsMeses = agrupadoPorMes
+                .Select(x => x.Mes.ToString("MMM/yy"))
+                .ToArray();
+
+            OnPropertyChanged(nameof(ValoresLucroMensal));
+            OnPropertyChanged(nameof(ValoresFaturamentoMensal));
+            OnPropertyChanged(nameof(LabelsMeses));
         }
 
         #endregion

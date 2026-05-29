@@ -95,6 +95,11 @@ namespace magal.ViewModels
         /// </summary>
         public RelayCommand ExportarPdfCommand { get; }
 
+        /// <summary>
+        /// Comando para voltar ao painel principal do sistema.
+        /// </summary>
+        public RelayCommand VoltarCommand { get; }
+
         #endregion
 
         #region Construtores

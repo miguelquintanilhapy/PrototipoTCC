@@ -34,7 +34,6 @@ namespace magal.Views
 
             if (mainWindow != null)
             {
-                // Executa o método de navegação da sua janela principal
                 mainWindow.AbrirGerenciamento();
             }
         }

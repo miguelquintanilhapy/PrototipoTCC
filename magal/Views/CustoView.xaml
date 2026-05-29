@@ -17,6 +17,27 @@
         <SolidColorBrush x:Key="AeroBorder"      Color="#E2E8F0"/>
         <SolidColorBrush x:Key="VerdeAero"       Color="#009140"/>
 
+        <Style x:Key="BackBtnStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" Padding="8,4" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E2E8F0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="PrimaryBtn" TargetType="Button">
             <Setter Property="Background"   Value="{StaticResource AzulAero}"/>
             <Setter Property="Foreground"   Value="White"/>
@@ -49,10 +70,19 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Height="80" Margin="0,0,0,10">
-            <TextBlock Text="Gestão de Custos" 
-                       FontSize="28" FontWeight="Bold"
-                       Foreground="{StaticResource AzulAero}"
-                       VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Button Style="{StaticResource BackBtnStyle}"
+                        Content="" 
+                        FontFamily="Segoe MDL2 Assets" 
+                        FontSize="16"
+                        Margin="0,0,15,0"
+                        Click="BtnVoltar_Click"/>
+
+                <TextBlock Text="Gestão de Custos" 
+                           FontSize="28" FontWeight="Bold"
+                           Foreground="{StaticResource AzulAero}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Button Content="+ NOVO CUSTO" 

@@ -28,7 +28,6 @@ namespace magal.Views
         /// </summary>
         private void BtnVoltar_Click(object sender, RoutedEventArgs e)
         {
-            // Busca a janela principal que está aberta na aplicação
             var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
 
             if (mainWindow != null)

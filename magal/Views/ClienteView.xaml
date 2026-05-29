@@ -18,24 +18,29 @@
         <SolidColorBrush x:Key="VerdeAero"       Color="#009140"/>
 
         <Style x:Key="BackBtnStyle" TargetType="Button">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
-            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" Padding="8,4" CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="20">
+                            <ContentPresenter x:Name="ContentIcon" 
+                              HorizontalAlignment="Center" 
+                              VerticalAlignment="Center" 
+                              TextBlock.Foreground="#64748B"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#E2EBF5"/>
+                                <Setter TargetName="ContentIcon" Property="TextBlock.Foreground" Value="#131C49"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E2E8F0"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
         <Style x:Key="PrimaryBtn" TargetType="Button">

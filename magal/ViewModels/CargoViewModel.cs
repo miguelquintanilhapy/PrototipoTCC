@@ -6,8 +6,8 @@ using System.ComponentModel;
 using System.Windows.Data;
 using magal.Models;
 using magal.Data.Repositories;
-using magal.Services; // Adicionado para enxergar o PdfService
-using Microsoft.Win32; // Adicionado para usar o SaveFileDialog
+using magal.Services;
+using Microsoft.Win32;
 using System.Collections.Generic;
 
 namespace magal.ViewModels
@@ -21,7 +21,7 @@ namespace magal.ViewModels
         #region Atributos e Campos Privados
 
         private readonly CargoRepository _repository;
-        private readonly PdfService _pdfService; // Adicionado o campo do serviço de PDF
+        private readonly PdfService _pdfService;
         private Cargo _cargoSelecionado;
         private string _filtroTexto;
 
@@ -91,7 +91,7 @@ namespace magal.ViewModels
         public RelayCommand EditarCommand { get; }
 
         /// <summary>
-        /// NOVO: Comando para exportar a listagem atual de cargos em formato PDF.
+        /// Comando para exportar a listagem atual de cargos em formato PDF.
         /// </summary>
         public RelayCommand ExportarPdfCommand { get; }
 
@@ -105,7 +105,7 @@ namespace magal.ViewModels
         public CargoViewModel()
         {
             _repository = new CargoRepository();
-            _pdfService = new PdfService(); // Instanciando o serviço de geração de PDFs
+            _pdfService = new PdfService();
 
             // Configuração do mecanismo de filtragem do WPF
             CargosView = CollectionViewSource.GetDefaultView(Cargos);
@@ -116,8 +116,6 @@ namespace magal.ViewModels
             AtualizarCommand = new RelayCommand(_ => CarregarCargos());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Cargo));
-
-            // NOVO: Inicializando o comando de exportação de PDF para cargos
             ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
 
             CarregarCargos();
@@ -159,8 +157,6 @@ namespace magal.ViewModels
         /// <summary>
         /// Avalia se um cargo deve ser exibido no DataGrid com base no texto inserido no campo de busca.
         /// </summary>
-        /// <param name="obj">O objeto de cargo encapsulado pela view.</param>
-        /// <returns><c>true</c> se o cargo corresponder aos critérios de busca; caso contrário, <c>false</c>.</returns>
         private bool FiltroDeCargos(object obj)
         {
             if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
@@ -185,10 +181,12 @@ namespace magal.ViewModels
                 {
                     _repository.Excluir(cargo.id_cargo);
                     Cargos.Remove(cargo);
+                    CargosView?.Refresh();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show($"Erro ao excluir cargo: {ex.Message}", "Erro",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -217,11 +215,10 @@ namespace magal.ViewModels
         }
 
         /// <summary>
-        /// NOVO: Abre a caixa de diálogo para salvar o arquivo e dispara a geração do PDF com os cargos filtrados na tela.
+        /// Abre a caixa de diálogo para salvar o arquivo e dispara a geração do PDF com os cargos filtrados na tela.
         /// </summary>
         private void ExecutarExportacaoPdf()
         {
-            // Captura apenas os registros de cargos que estão atualmente passando pelo filtro do DataGrid
             var cargosFiltrados = CargosView.Cast<Cargo>().ToList();
 
             if (!cargosFiltrados.Any())
@@ -231,14 +228,13 @@ namespace magal.ViewModels
                 return;
             }
 
-            // Pega o caminho real da pasta de Downloads do usuário logado no Windows
             string pastaDownloads = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
 
             var saveFileDialog = new SaveFileDialog
             {
                 Filter = "Arquivos PDF (*.pdf)|*.pdf",
                 FileName = $"Relatorio_Cargos_{DateTime.Now:yyyyMMdd_HHmm}.pdf",
-                InitialDirectory = System.IO.Directory.Exists(pastaDownloads) ? pastaDownloads : string.Empty, // Abre direto em Downloads
+                InitialDirectory = System.IO.Directory.Exists(pastaDownloads) ? pastaDownloads : string.Empty,
                 Title = "Salvar Relatório de Cargos"
             };
 
@@ -246,7 +242,6 @@ namespace magal.ViewModels
             {
                 try
                 {
-                    // Chama o novo método criado no PdfService para gerar o relatório real de cargos
                     _pdfService.GerarRelatorioTabelaCargos(cargosFiltrados, saveFileDialog.FileName);
 
                     MessageBox.Show("Relatório de cargos gerado com sucesso!", "Sucesso",

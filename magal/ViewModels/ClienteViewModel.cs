@@ -8,14 +8,9 @@ using magal.Models;
 using magal.Data.Repositories;
 using magal.Services;
 using Microsoft.Win32;
-using System.Collections.Generic;
 
 namespace magal.ViewModels
 {
-    /// <summary>
-    /// ViewModel responsável por gerenciar a tela de clientes,
-    /// controlando filtros de busca, listagem e ações de criação, edição e exclusão.
-    /// </summary>
     public class ClienteViewModel : BaseModel
     {
         #region Atributos e Campos Privados
@@ -29,9 +24,6 @@ namespace magal.ViewModels
 
         #region Propriedades e Filtros
 
-        /// <summary>
-        /// Obtém ou define o texto de busca utilizado para filtrar os clientes na tela em tempo real.
-        /// </summary>
         public string FiltroTexto
         {
             get => _filtroTexto;
@@ -43,9 +35,6 @@ namespace magal.ViewModels
             }
         }
 
-        /// <summary>
-        /// Obtém ou define o cliente atualmente selecionado na listagem (DataGrid).
-        /// </summary>
         public Cliente ClienteSelecionado
         {
             get => _clienteSelecionado;
@@ -56,22 +45,14 @@ namespace magal.ViewModels
 
         #region Coleções e Visões de Dados
 
-        /// <summary>
-        /// Lista observável de clientes carregados do banco de dados.
-        /// </summary>
         public ObservableCollection<Cliente> Clientes { get; } = new ObservableCollection<Cliente>();
-
-        /// <summary>
-        /// Visão customizada da coleção de clientes que permite a aplicação de filtros em tempo real.
-        /// </summary>
         public ICollectionView ClientesView { get; private set; }
 
         #endregion
 
-        #region Comandos disparados pela View
+        #region Comandos
 
         public RelayCommand ExcluirCommand { get; }
-        public RelayCommand PatualizarCommand { get; } // Nota: Mantido para padronizar com a chamada AtualizarCommand da View
         public RelayCommand AtualizarCommand { get; }
         public RelayCommand CriarCommand { get; }
         public RelayCommand EditarCommand { get; }
@@ -86,11 +67,9 @@ namespace magal.ViewModels
             _repository = new ClienteRepository();
             _pdfService = new PdfService();
 
-            // Configuração do mecanismo de filtragem do WPF
             ClientesView = CollectionViewSource.GetDefaultView(Clientes);
             ClientesView.Filter = FiltroDeClientes;
 
-            // Inicialização dos comandos
             ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as Cliente));
             AtualizarCommand = new RelayCommand(_ => CarregarClientes());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
@@ -104,9 +83,6 @@ namespace magal.ViewModels
 
         #region Métodos Públicos
 
-        /// <summary>
-        /// Busca a lista atualizada de clientes do banco de dados.
-        /// </summary>
         public void CarregarClientes()
         {
             try
@@ -131,11 +107,8 @@ namespace magal.ViewModels
 
         #endregion
 
-        #region Métodos Auxiliares / Privados
+        #region Métodos Auxiliares
 
-        /// <summary>
-        /// Avalia se um cliente deve ser exibido no DataGrid com base no texto inserido.
-        /// </summary>
         private bool FiltroDeClientes(object obj)
         {
             if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
@@ -150,9 +123,6 @@ namespace magal.ViewModels
                    (cli.tipo?.ToLower().Contains(busca) ?? false);
         }
 
-        /// <summary>
-        /// Solicita a confirmação do usuário e deleta o cliente.
-        /// </summary>
         private void ExecutarExclusao(Cliente cliente)
         {
             if (cliente == null) return;
@@ -172,9 +142,6 @@ namespace magal.ViewModels
             }
         }
 
-        /// <summary>
-        /// Abre a janela de cadastro de clientes.
-        /// </summary>
         private void ExecutarCriar()
         {
             var dialog = new magal.Views.CadastrarClienteDialog();
@@ -183,9 +150,6 @@ namespace magal.ViewModels
                 CarregarClientes();
         }
 
-        /// <summary>
-        /// Abre a janela de edição preenchida com os dados do cliente selecionado.
-        /// </summary>
         private void ExecutarEdicao(Cliente cliente)
         {
             if (cliente == null) return;
@@ -195,9 +159,6 @@ namespace magal.ViewModels
                 CarregarClientes();
         }
 
-        /// <summary>
-        /// Dispara a geração do PDF contendo os clientes visíveis (filtrados).
-        /// </summary>
         private void ExecutarExportacaoPdf()
         {
             var clientesFiltrados = ClientesView.Cast<Cliente>().ToList();
@@ -223,7 +184,6 @@ namespace magal.ViewModels
             {
                 try
                 {
-                    // Nota: Lembre-se de criar o método correspondente no seu PdfService para receber List<Cliente>
                     _pdfService.GerarRelatorioTabelaClientes(clientesFiltrados, saveFileDialog.FileName);
 
                     MessageBox.Show("Relatório de clientes gerado com sucesso!", "Sucesso",

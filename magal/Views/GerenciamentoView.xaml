@@ -31,7 +31,7 @@
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="CardBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="20" Padding="35">
                             <Border.Effect>
-                                <DropShadowEffect BlurRadius="25" ShadowDepth="2" Opacity="0.05" Color="#000000"/>
+                                <DropShadowEffect x:Name="CardShadow" BlurRadius="20" ShadowDepth="2" Opacity="0.04" Color="#000000"/>
                             </Border.Effect>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -39,25 +39,46 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Border x:Name="IconBg" Width="90" Height="90" CornerRadius="45" Background="#F0F7FF" VerticalAlignment="Center">
+
+                                <Border x:Name="IconBg" Width="90" Height="90" CornerRadius="45" Background="#F8FAFC" VerticalAlignment="Center">
                                     <TextBlock Text="{TemplateBinding Content}" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
+
                                 <StackPanel Grid.Column="1" Margin="25,0,15,0" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AzulAero}"/>
                                     <TextBlock Text="{Binding ToolTip, RelativeSource={RelativeSource AncestorType=Button}}" FontSize="15" Foreground="{StaticResource AeroTextMuted}" TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="22"/>
                                 </StackPanel>
-                                <TextBlock Grid.Column="2" Text="" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource AeroAccent}" VerticalAlignment="Center" Opacity="0.8"/>
+
+                                <TextBlock Grid.Column="2" Text="" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource AeroAccent}" VerticalAlignment="Center" Opacity="0.6"/>
                             </Grid>
                         </Border>
+
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="CardBorder" Property="Background" Value="#F4F9FF"/>
-                                <Setter Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect BlurRadius="30" ShadowDepth="6" Opacity="0.15" Color="#3B82F6"/>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter TargetName="IconBg" Property="Background" Value="#E1EFFF"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" To="#F0F4FA" Duration="0:0:0.12"/>
+                                            <ColorAnimation Storyboard.TargetName="IconBg" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" To="#E2EBF5" Duration="0:0:0.12"/>
+
+                                            <DoubleAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.BlurRadius)" To="28" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)" To="0.10" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.ShadowDepth)" To="5" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" To="White" Duration="0:0:0.12"/>
+                                            <ColorAnimation Storyboard.TargetName="IconBg" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" To="#F8FAFC" Duration="0:0:0.12"/>
+
+                                            <DoubleAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.BlurRadius)" To="20" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)" To="0.04" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="CardBorder" Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.ShadowDepth)" To="2" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

@@ -39,6 +39,32 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="BackBtnStyle" TargetType="Button">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="20">
+                            <ContentPresenter x:Name="ContentIcon" 
+                                              HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center" 
+                                              TextBlock.Foreground="#64748B"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#E2EBF5"/>
+                                <Setter TargetName="ContentIcon" Property="TextBlock.Foreground" Value="#131C49"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid Margin="32,28">
@@ -49,45 +75,53 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Height="80" Margin="0,0,0,10">
-            <TextBlock Text="Gestão de Funcionários" 
-                       FontSize="28" FontWeight="Bold"
-                       Foreground="{StaticResource AzulAero}"
-                       VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Button Style="{StaticResource BackBtnStyle}"
+                        Content="" 
+                        FontFamily="Segoe MDL2 Assets" 
+                        FontSize="16"
+                        Margin="0,0,15,0"
+                        Click="BtnVoltar_Click"/>
+
+                <TextBlock Text="Gestão de Funcionários" 
+                           FontSize="28" FontWeight="Bold"
+                           Foreground="{StaticResource AzulAero}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Button Content="+ NOVO FUNCIONÁRIO" 
                         Style="{StaticResource PrimaryBtn}"
                         Margin="0,0,10,0"
                         Command="{Binding CriarCommand}"/>
-              
-                    <Button Command="{Binding AtualizarCommand}"
- Style="{StaticResource PrimaryBtn}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE72C;" 
-            FontFamily="Segoe MDL2 Assets" 
-            FontSize="12" 
-            VerticalAlignment="Center" 
-            Margin="0,0,8,0"/>
-                            <TextBlock Text="ATUALIZAR LISTA" 
-            VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
 
-                    <Button Command="{Binding ExportarPdfCommand}"
- Style="{StaticResource PrimaryBtn}"
- Margin="10,0,0,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE72D;" 
-            FontFamily="Segoe MDL2 Assets" 
-            FontSize="12" 
-            VerticalAlignment="Center" 
-            Margin="0,0,8,0"/>
-                            <TextBlock Text="EXPORTAR RELATÓRIO" 
-            VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
+                <Button Command="{Binding AtualizarCommand}"
+                        Style="{StaticResource PrimaryBtn}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72C;" 
+                                   FontFamily="Segoe MDL2 Assets" 
+                                   FontSize="12" 
+                                   VerticalAlignment="Center" 
+                                   Margin="0,0,8,0"/>
+                        <TextBlock Text="ATUALIZAR LISTA" 
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
 
-                </StackPanel>
+                <Button Command="{Binding ExportarPdfCommand}"
+                        Style="{StaticResource PrimaryBtn}"
+                        Margin="10,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72D;" 
+                                   FontFamily="Segoe MDL2 Assets" 
+                                   FontSize="12" 
+                                   VerticalAlignment="Center" 
+                                   Margin="0,0,8,0"/>
+                        <TextBlock Text="EXPORTAR RELATÓRIO" 
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </Grid>
 
         <StackPanel Grid.Row="1" Margin="0,0,0,15">
@@ -118,10 +152,10 @@
                           Background="Transparent" BorderThickness="0"
                           GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
                           HeadersVisibility="Column"
-                            CanUserAddRows="False"
-                            CanUserDeleteRows="False"
-                            CanUserResizeColumns="False"
-                            CanUserReorderColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          CanUserResizeColumns="False"
+                          CanUserReorderColumns="False"
                           RowHeight="60" SelectionMode="Single"
                           FontSize="14">
 
@@ -187,7 +221,7 @@
                                             Width="120" 
                                             FontSize="14" 
                                             FontWeight="SemiBold" />
-                        
+
                         <DataGridTextColumn Header="CUSTO/HORA" 
                                             Binding="{Binding custo_hora, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
                                             Width="160" 

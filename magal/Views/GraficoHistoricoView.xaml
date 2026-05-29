@@ -137,7 +137,7 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="260"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="MARGEM MÉDIA" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AzulAero}" VerticalAlignment="Center"/>
+                            <TextBlock Text="MARGEM DE LUCRO MÉDIA" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AzulAero}" VerticalAlignment="Center"/>
                             <StackPanel Grid.Column="1">
                                 <TextBlock Text="AGRUPAR POR" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,-4,0,6"/>
                                 <ComboBox ItemsSource="{Binding CategoriasMargem}" SelectedItem="{Binding CategoriaMargemSelecionada}" Height="40" BorderThickness="0" VerticalContentAlignment="Center" FontWeight="SemiBold" Background="White" Foreground="{StaticResource AzulAero}"/>
@@ -146,7 +146,7 @@
 
                         <lvc:CartesianChart Height="340" LegendLocation="None" Margin="0,0,25,0" AnimationsSpeed="0">
                             <lvc:CartesianChart.Series>
-                                <lvc:ColumnSeries Title="Margem Média" Values="{Binding ValoresMargemMedia}" Fill="{StaticResource AeroAccent}" DataLabels="True" LabelPoint="{Binding MargemPontoFormatter}"/>
+                                <lvc:ColumnSeries Title="Margem Média" Values="{Binding ValoresMargemMedia}" Fill="{StaticResource VerdeAero}" DataLabels="True" LabelPoint="{Binding MargemPontoFormatter}"/>
                             </lvc:CartesianChart.Series>
                             <lvc:CartesianChart.AxisX>
                                 <lvc:Axis Labels="{Binding LabelsMargemX}" FontSize="11" Foreground="#64748B">

@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using System.ComponentModel;
-using System.Windows.Data;
+﻿using magal.Data.Repositories;
 using magal.Models;
-using magal.Data.Repositories;
 using magal.Services;
 using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace magal.ViewModels
 {
@@ -21,7 +22,7 @@ namespace magal.ViewModels
         #region Atributos e Campos Privados
 
         private readonly FuncionarioRepository _repository;
-        private readonly PdfService _pdfService; // Adicionado o campo do serviço de PDF
+        private readonly PdfService _pdfService;
         private Funcionario _funcionarioSelecionado;
         private string _filtroTexto;
 
@@ -91,7 +92,7 @@ namespace magal.ViewModels
         public RelayCommand EditarCommand { get; }
 
         /// <summary>
-        /// NOVO: Comando para exportar a listagem atual de funcionários em formato PDF.
+        /// Comando para exportar a listagem atual de funcionários em formato PDF.
         /// </summary>
         public RelayCommand ExportarPdfCommand { get; }
 
@@ -105,7 +106,7 @@ namespace magal.ViewModels
         public FuncionarioViewModel()
         {
             _repository = new FuncionarioRepository();
-            _pdfService = new PdfService(); // Instanciando o serviço de geração de PDFs
+            _pdfService = new PdfService();
 
             // Configuração do mecanismo de filtragem do WPF
             FuncionariosView = CollectionViewSource.GetDefaultView(Funcionarios);
@@ -157,8 +158,6 @@ namespace magal.ViewModels
         /// <summary>
         /// Avalia se um funcionário deve ser exibido no DataGrid com base no texto inserido no campo de busca.
         /// </summary>
-        /// <param name="obj">O objeto de funcionário encapsulado pela view.</param>
-        /// <returns><c>true</c> se o funcionário corresponder aos critérios de busca; caso contrário, <c>false</c>.</returns>
         private bool FiltroDeFuncionarios(object obj)
         {
             if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
@@ -185,10 +184,14 @@ namespace magal.ViewModels
                 {
                     _repository.Excluir(funcionario.id_funcionario);
                     Funcionarios.Remove(funcionario);
+
+                    // Força a atualização da contagem no rodapé após remover do ObservableCollection
+                    FuncionariosView?.Refresh();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show($"Erro ao excluir funcionário: {ex.Message}", "Erro",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -221,7 +224,6 @@ namespace magal.ViewModels
         /// </summary>
         private void ExecutarExportacaoPdf()
         {
-            // Captura apenas os registros que estão atualmente passando pelo filtro do DataGrid
             var funcionariosFiltrados = FuncionariosView.Cast<Funcionario>().ToList();
 
             if (!funcionariosFiltrados.Any())
@@ -231,14 +233,13 @@ namespace magal.ViewModels
                 return;
             }
 
-            // Pega o caminho real da pasta de Downloads do usuário logado no Windows
             string pastaDownloads = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
 
             var saveFileDialog = new SaveFileDialog
             {
                 Filter = "Arquivos PDF (*.pdf)|*.pdf",
                 FileName = $"Relatorio_Funcionarios_{DateTime.Now:yyyyMMdd_HHmm}.pdf",
-                InitialDirectory = System.IO.Directory.Exists(pastaDownloads) ? pastaDownloads : string.Empty, // Abre direto em Downloads
+                InitialDirectory = System.IO.Directory.Exists(pastaDownloads) ? pastaDownloads : string.Empty,
                 Title = "Salvar Relatório de Funcionários"
             };
 

@@ -1,0 +1,215 @@
+<UserControl x:Class="magal.Views.GraficoHistoricoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d"
+             Language="pt-BR"
+             d:DesignHeight="1200"
+             d:DesignWidth="1200"
+             Background="#F0F4FA">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
+        <SolidColorBrush x:Key="AeroAccent" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="AeroDanger" Color="#EF4444"/>
+        <SolidColorBrush x:Key="AeroTextMuted" Color="#64748B"/>
+        <SolidColorBrush x:Key="AeroTextHint" Color="#94A3B8"/>
+        <SolidColorBrush x:Key="AeroBorder" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="VerdeAero" Color="#009140"/>
+
+        <lvc:ColorsCollection x:Key="PizzaCoresSchema">
+            <Color>#131C49</Color>
+            <Color>#009140</Color>
+            <Color>#3B82F6</Color>
+            <Color>#64748B</Color>
+            <Color>#1E3A8A</Color>
+            <Color>#94A3B8</Color>
+        </lvc:ColorsCollection>
+
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8" Padding="14,7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#1E3A8A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="32,28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Height="80" Margin="0,0,0,10">
+            <TextBlock Text="Dashboard Financeiro" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AzulAero}" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Command="{Binding AtualizarCommand}" Style="{StaticResource PrimaryBtn}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="ATUALIZAR GRÁFICOS" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,25">
+            <Border Background="White" CornerRadius="12" Margin="0,0,10,0" Padding="20,15" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                <StackPanel>
+                    <TextBlock Text="PROJETOS TOTAIS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding QuantidadeProjetos}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AzulAero}"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource AzulAero}" CornerRadius="12" Margin="5,0" Padding="20,15">
+                <StackPanel>
+                    <TextBlock Text="VALOR TOTAL DAS PROPOSTAS" FontSize="10" FontWeight="Bold" Foreground="#93C5FD" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding TotalFinanceiro}" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="12" Margin="10,0,0,0" Padding="20,15" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
+                <StackPanel>
+                    <TextBlock Text="LUCRO TOTAL ESTIMADO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding TotalLucro}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource VerdeAero}"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible" Padding="0,0,10,0">
+            <StackPanel>
+
+                <Border Background="White" CornerRadius="16" Padding="20" Margin="0,0,0,20" BorderBrush="{StaticResource AeroBorder}" BorderThickness="1">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="220"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="LUCRO / FATURAMENTO" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AzulAero}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="PERÍODO" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,-4,0,6"/>
+                                <ComboBox ItemsSource="{Binding Periodos}" SelectedItem="{Binding PeriodoSelecionado}" Height="40" BorderThickness="0" VerticalContentAlignment="Center" FontWeight="SemiBold" Background="White" Foreground="{StaticResource AzulAero}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <lvc:CartesianChart Height="340" LegendLocation="Right" Margin="0,0,25,0" AnimationsSpeed="0">
+                            <lvc:CartesianChart.Series>
+                                <lvc:ColumnSeries Title="Lucro" Values="{Binding ValoresLucroMensal}" Fill="{StaticResource VerdeAero}" DataLabels="True"/>
+                                <lvc:ColumnSeries Title="Faturamento" Values="{Binding ValoresFaturamentoMensal}" Fill="{StaticResource AzulAero}" DataLabels="True"/>
+                            </lvc:CartesianChart.Series>
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding LabelsMeses}" FontSize="11" Foreground="#64748B">
+                                    <lvc:Axis.Separator>
+                                        <lvc:Separator Step="1"/>
+                                    </lvc:Axis.Separator>
+                                </lvc:Axis>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis LabelFormatter="{Binding Formatter}" FontSize="11" Foreground="#64748B"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" CornerRadius="16" Padding="20" Margin="0,0,0,20" BorderBrush="{StaticResource AeroBorder}" BorderThickness="1">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="260"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="MARGEM MÉDIA" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AzulAero}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="AGRUPAR POR" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextHint}" Margin="0,-4,0,6"/>
+                                <ComboBox ItemsSource="{Binding CategoriasMargem}" SelectedItem="{Binding CategoriaMargemSelecionada}" Height="40" BorderThickness="0" VerticalContentAlignment="Center" FontWeight="SemiBold" Background="White" Foreground="{StaticResource AzulAero}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <lvc:CartesianChart Height="340" LegendLocation="None" Margin="0,0,25,0" AnimationsSpeed="0">
+                            <lvc:CartesianChart.Series>
+                                <lvc:ColumnSeries Title="Margem Média" Values="{Binding ValoresMargemMedia}" Fill="{StaticResource AeroAccent}" DataLabels="True" LabelPoint="{Binding MargemPontoFormatter}"/>
+                            </lvc:CartesianChart.Series>
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding LabelsMargemX}" FontSize="11" Foreground="#64748B">
+                                    <lvc:Axis.Separator>
+                                        <lvc:Separator Step="1"/>
+                                    </lvc:Axis.Separator>
+                                </lvc:Axis>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis LabelFormatter="{Binding MargemFormatter}" FontSize="11" Foreground="#64748B"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </StackPanel>
+                </Border>
+
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="White" CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="PROJETOS POR STATUS" FontSize="15" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,20"/>
+                            <lvc:PieChart Series="{Binding SeriesStatus}" LegendLocation="Bottom" HoverPushOut="15" InnerRadius="40" Height="420" AnimationsSpeed="0">
+                                <lvc:PieChart.Resources>
+                                    <Style TargetType="lvc:PieSeries">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Title}" Value="Aprovado">
+                                                <Setter Property="Fill" Value="#131C49"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Title}" Value="Concluído">
+                                                <Setter Property="Fill" Value="#009140"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Title}" Value="Cancelado">
+                                                <Setter Property="Fill" Value="#EF4444"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Title}" Value="Rascunho">
+                                                <Setter Property="Fill" Value="#F59E0B"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Title}" Value="Executando">
+                                                <Setter Property="Fill" Value="#8B5CF6"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Title}" Value="Orçado">
+                                                <Setter Property="Fill" Value="#3B82F6"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </lvc:PieChart.Resources>
+                            </lvc:PieChart>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="White" CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="PROJETOS POR TIPO" FontSize="15" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,20"/>
+                            <lvc:PieChart Series="{Binding SeriesTipo}" SeriesColors="{StaticResource PizzaCoresSchema}" LegendLocation="Bottom" HoverPushOut="15" InnerRadius="40" Height="420" AnimationsSpeed="0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -53,6 +53,7 @@
 	</ItemGroup>
 	
   <ItemGroup>
+    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.6" />
     <PackageReference Include="MySql.Data" Version="9.6.0" />
     <PackageReference Include="QuestPDF" Version="2026.2.4" />

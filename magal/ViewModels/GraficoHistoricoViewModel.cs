@@ -69,10 +69,8 @@ namespace magal.ViewModels
         public ChartValues<double> ValoresMargemMedia { get; set; } = new();
         public string[] LabelsMargemX { get; set; } = Array.Empty<string>();
 
-        // Mantido para o Eixo Y (recebe double)
         public Func<double, string> MargemFormatter { get; set; } = value => $"{value:N1}%";
 
-        // ADICIONADO: Formatador correto para as barras do gráfico (recebe ChartPoint)
         public Func<LiveCharts.ChartPoint, string> MargemPontoFormatter { get; set; } = point => $"{point.Y:N1}%";
 
         public List<string> CategoriasMargem { get; set; } = new()
@@ -129,7 +127,6 @@ namespace magal.ViewModels
             AtualizarCommand = new RelayCommand(_ => CarregarDados());
             Formatter = value => value.ToString("C0", _ptBR);
 
-            // CORREÇÃO: Atribuição direta nas propriedades públicas para disparar o set, OnPropertyChanged e as atualizações de tela
             PeriodoSelecionado = Periodos.FirstOrDefault(p => p.Equals("30 Dias", StringComparison.OrdinalIgnoreCase)) ?? "30 Dias";
             CategoriaMargemSelecionada = CategoriasMargem.FirstOrDefault(c => c.Equals("Margem Média por periodo", StringComparison.OrdinalIgnoreCase)) ?? "Margem Média por periodo";
         }

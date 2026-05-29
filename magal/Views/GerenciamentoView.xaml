@@ -1,8 +1,14 @@
 ﻿<UserControl x:Class="magal.Views.GerenciamentoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.expression/blend/2008"
+             mc:Ignorable="d" 
+             Language="pt-BR"
+             d:DesignHeight="900" d:DesignWidth="1200"
              Background="#F8FAFC"
              Loaded="UserControl_Loaded">
+
     <UserControl.Resources>
         <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
         <SolidColorBrush x:Key="AeroAccent" Color="#3B82F6"/>
@@ -46,7 +52,7 @@
 
                                 <StackPanel Grid.Column="1" Margin="25,0,15,0" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AzulAero}"/>
-                                    <TextBlock Text="{Binding ToolTip, RelativeSource={RelativeSource AncestorType=Button}}" FontSize="15" Foreground="{StaticResource AeroTextMuted}" TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="22"/>
+                                    <TextBlock Text="{Binding Uid, RelativeSource={RelativeSource AncestorType=Button}}" FontSize="15" Foreground="{StaticResource AeroTextMuted}" TextWrapping="Wrap" Margin="0,8,0,0" LineHeight="22"/>
                                 </StackPanel>
 
                                 <TextBlock Grid.Column="2" Text="" FontFamily="Segoe MDL2 Assets" FontSize="18" Foreground="{StaticResource AeroAccent}" VerticalAlignment="Center" Opacity="0.6"/>
@@ -166,25 +172,25 @@
                 <Button Style="{StaticResource CardButtonStyle}"
                         Content="👥" 
                         Tag="Funcionários"
-                        ToolTip="Gerencie os funcionários, dados pessoais, contratos e informações profissionais." 
+                        Uid="Gerencie os funcionários, dados pessoais, contratos e informações profissionais." 
                         Click="BtnFuncionarios_Click"/>
 
                 <Button Style="{StaticResource CardButtonStyle}" 
                         Content="💼" 
                         Tag="Cargos" 
-                        ToolTip="Cadastre e gerencie os cargos da empresa, salários e atribuições." 
+                        Uid="Cadastre e gerencie os cargos da empresa, salários e atribuições." 
                         Click="BtnCargos_Click"/>
 
                 <Button Style="{StaticResource CardButtonStyle}"
                         Content="🏢" 
                         Tag="Clientes" 
-                        ToolTip="Gerencie os clientes, contatos, endereços e informações comerciais."
+                        Uid="Gerencie os clientes, contatos, endereços e informações comerciais."
                         Click="BtnClientes_Click"/>
 
                 <Button Style="{StaticResource CardButtonStyle}" 
                         Content="💰" 
                         Tag="Custos" 
-                        ToolTip="Gerencie os custos diretos e indiretos utilizados nos orçamentos."
+                        Uid="Gerencie os custos diretos e indiretos utilizados nos orçamentos."
                         Click="BtnCustos_Click"/>
             </UniformGrid>
         </ScrollViewer>

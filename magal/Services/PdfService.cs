@@ -45,7 +45,7 @@ namespace magal.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Margin(0.8f, Unit.Centimetre);
+                    page.Margin(0.6f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
 
@@ -66,7 +66,7 @@ namespace magal.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4.Landscape());
-                    page.Margin(1.5f, Unit.Centimetre);
+                    page.Margin(0.6f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
 
@@ -87,7 +87,7 @@ namespace magal.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4.Landscape());
-                    page.Margin(1.5f, Unit.Centimetre);
+                    page.Margin(0.6f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
 
@@ -108,7 +108,7 @@ namespace magal.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4.Landscape());
-                    page.Margin(1.5f, Unit.Centimetre);
+                    page.Margin(0.6f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
 
@@ -129,7 +129,7 @@ namespace magal.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4.Landscape());
-                    page.Margin(1.5f, Unit.Centimetre);
+                    page.Margin(0.6f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
 
@@ -150,7 +150,7 @@ namespace magal.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4.Landscape());
-                    page.Margin(1.5f, Unit.Centimetre);
+                    page.Margin(0.6f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
 
@@ -200,8 +200,6 @@ namespace magal.Services
                 });
 
                 row.ConstantItem(15);
-
-                // PROJETO (Ao Centro)
                 row.RelativeItem().Column(c =>
                 {
                     c.Item().Text("PROJETO").FontSize(7).FontColor("#999999").Bold();
@@ -212,8 +210,6 @@ namespace magal.Services
                 });
 
                 row.ConstantItem(15);
-
-                // DATAS (À Direita)
                 row.ConstantItem(120).Column(c =>
                 {
                     c.Item().Text("DATA DE EMISSÃO").FontSize(7).FontColor("#999999").Bold();

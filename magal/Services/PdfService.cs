@@ -218,7 +218,7 @@ namespace magal.Services
                 {
                     cols.RelativeColumn(3);
                     cols.RelativeColumn(2);
-                    cols.RelativeColumn(1.5f); // Ajustado para evitar quebra no "HORAS"
+                    cols.RelativeColumn(2); // Aumentado de 1.5f para 2 para acomodar a palavra "horas" sem quebras
                     cols.RelativeColumn(2);
                     cols.RelativeColumn(2);
                 });
@@ -236,7 +236,10 @@ namespace magal.Services
                 {
                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(item.descricao).FontSize(9);
                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).Text(item.Funcionario?.nome ?? "N/D").FontSize(9);
-                    table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignCenter().Text($"{item.horas_estimadas:0.#}h").FontSize(9);
+
+                    // Alterado de 'h' para 'horas' (com validação de singular/plural caso precise)
+                    string sufixoHoras = item.horas_estimadas == 1 ? " hora" : " horas";
+                    table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignCenter().Text($"{item.horas_estimadas:0.#}{sufixoHoras}").FontSize(9);
 
                     decimal vHora = item.Funcionario?.Cargo?.custo_medio_hora ?? 0;
                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignRight().Text(vHora.ToString("C2", _ptBR)).FontSize(9);
@@ -287,7 +290,6 @@ namespace magal.Services
                     header.Cell().Background("#1E3A5F").Padding(8).Text("FORMA DE PAGAMENTO").FontColor(Colors.White).Bold().FontSize(9);
                 });
 
-                // Corrigido: Apenas .Text() e .FontSize(9) para herdar o visual exato das tabelas de cima
                 tCondicoes.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
                     .Text(projeto.Orcamento?.prazo_entrega ?? "A combinar").FontSize(9);
 
@@ -308,7 +310,6 @@ namespace magal.Services
                         header.Cell().Background("#1E3A5F").Padding(8).Text("NOTAS E OBSERVAÇÕES COMPLEMENTARES").FontColor(Colors.White).Bold().FontSize(9);
                     });
 
-                    // Corrigido: Removidas as customizações manuais de cor/peso para igualar com o padrão das células acima
                     tObs.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
                         .Text(projeto.Orcamento.observacoes).FontSize(9);
                 });

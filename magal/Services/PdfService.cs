@@ -287,11 +287,12 @@ namespace magal.Services
                     header.Cell().Background("#1E3A5F").Padding(8).Text("FORMA DE PAGAMENTO").FontColor(Colors.White).Bold().FontSize(9);
                 });
 
+                // Corrigido: Apenas .Text() e .FontSize(9) para herdar o visual exato das tabelas de cima
                 tCondicoes.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
-                    .Text(projeto.Orcamento?.prazo_entrega ?? "A combinar").FontSize(9).FontColor("#2D3748");
+                    .Text(projeto.Orcamento?.prazo_entrega ?? "A combinar").FontSize(9);
 
                 tCondicoes.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
-                    .Text(projeto.Orcamento?.forma_pagamento ?? "A combinar").FontSize(9).FontColor("#2D3748");
+                    .Text(projeto.Orcamento?.forma_pagamento ?? "A combinar").FontSize(9);
             });
 
             // 4. OBSERVAÇÕES DA PROPOSTA
@@ -307,8 +308,9 @@ namespace magal.Services
                         header.Cell().Background("#1E3A5F").Padding(8).Text("NOTAS E OBSERVAÇÕES COMPLEMENTARES").FontColor(Colors.White).Bold().FontSize(9);
                     });
 
+                    // Corrigido: Removidas as customizações manuais de cor/peso para igualar com o padrão das células acima
                     tObs.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
-                        .Text(projeto.Orcamento.observacoes).FontSize(9).FontColor("#4A5568");
+                        .Text(projeto.Orcamento.observacoes).FontSize(9);
                 });
             }
 

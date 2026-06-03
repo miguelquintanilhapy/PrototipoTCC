@@ -23,11 +23,11 @@ namespace magal.Data.Repositories
                         {
                             // INSERIR NOVO PROJETO
                             using (var cmd = new MySqlCommand(@"
-                        INSERT INTO projeto
-                        (nome, id_cliente, id_usuario, data_criacao, tipo, status)
-                        VALUES
-                        (@nome, @idCliente, @idUsuario, @data, @tipo, @status);
-                    ", conn, transaction))
+                                INSERT INTO projeto
+                                (nome, id_cliente, id_usuario, data_criacao, tipo, status)
+                                VALUES
+                                (@nome, @idCliente, @idUsuario, @data, @tipo, @status);
+                            ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@nome", projeto.nome);
                                 cmd.Parameters.AddWithValue("@idCliente", projeto.id_cliente);
@@ -46,10 +46,10 @@ namespace magal.Data.Repositories
                         {
                             // ATUALIZAR PROJETO
                             using (var cmd = new MySqlCommand(@"
-                        UPDATE projeto
-                        SET nome = @nome, id_cliente = @idCliente, status = @status, tipo = @tipo
-                        WHERE id_projeto = @idProj
-                    ", conn, transaction))
+                                UPDATE projeto
+                                SET nome = @nome, id_cliente = @idCliente, status = @status, tipo = @tipo
+                                WHERE id_projeto = @idProj
+                            ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@nome", projeto.nome);
                                 cmd.Parameters.AddWithValue("@idCliente", projeto.id_cliente);
@@ -60,18 +60,18 @@ namespace magal.Data.Repositories
                                 cmd.ExecuteNonQuery();
                             }
 
-                            // LIMPAR TAREFAS E CUSTOS ANTIGOS (Isso não afeta a FK do orçamento)
+                            // LIMPAR TAREFAS E CUSTOS ANTIGOS
                             new MySqlCommand($"DELETE FROM tarefa WHERE id_projeto = {projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
                             new MySqlCommand($"DELETE FROM custo WHERE id_projeto = {projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
                         }
 
-                        // INSERIR OU ATUALIZAR ORÇAMENTO (Usando REPLACE INTO para evitar o erro de Foreign Key)
+                        // INSERIR OU ATUALIZAR ORÇAMENTO (Adicionado as 3 novas colunas aqui)
                         using (var cmd = new MySqlCommand(@"
-                    REPLACE INTO orcamento
-                    (id_projeto, custo_base, percentual_impostos, margem_percentual, valor_margem, valor_impostos, valor_final, validade_dias)
-                    VALUES
-                    (@idProj, @custo, @percImp, @margPerc, @vMarg, @vImp, @final, @validade);
-                ", conn, transaction))
+                            REPLACE INTO orcamento
+                            (id_projeto, custo_base, percentual_impostos, margem_percentual, valor_margem, valor_impostos, valor_final, validade_dias, forma_pagamento, prazo_entrega, observacoes)
+                            VALUES
+                            (@idProj, @custo, @percImp, @margPerc, @vMarg, @vImp, @final, @validade, @formaPagamento, @prazoEntrega, @obs);
+                        ", conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
                             cmd.Parameters.AddWithValue("@custo", projeto.Orcamento.custo_base);
@@ -82,6 +82,11 @@ namespace magal.Data.Repositories
                             cmd.Parameters.AddWithValue("@final", projeto.Orcamento.valor_final);
                             cmd.Parameters.AddWithValue("@validade", projeto.Orcamento.validade_dias);
 
+                            // Parâmetros novos com tratamento para nulo
+                            cmd.Parameters.AddWithValue("@formaPagamento", projeto.Orcamento.forma_pagamento ?? string.Empty);
+                            cmd.Parameters.AddWithValue("@prazoEntrega", projeto.Orcamento.prazo_entrega ?? string.Empty);
+                            cmd.Parameters.AddWithValue("@obs", projeto.Orcamento.observacoes ?? string.Empty);
+
                             cmd.ExecuteNonQuery();
                         }
 
@@ -89,11 +94,11 @@ namespace magal.Data.Repositories
                         foreach (var tarefa in projeto.Tarefas)
                         {
                             using (var cmd = new MySqlCommand(@"
-                        INSERT INTO tarefa
-                        (id_projeto, descricao, id_funcionario, horas_estimadas, status)
-                        VALUES
-                        (@idProj, @desc, @idFunc, @horas, @status);
-                    ", conn, transaction))
+                                INSERT INTO tarefa
+                                (id_projeto, descricao, id_funcionario, horas_estimadas, status)
+                                VALUES
+                                (@idProj, @desc, @idFunc, @horas, @status);
+                            ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
                                 cmd.Parameters.AddWithValue("@desc", tarefa.descricao);
@@ -105,15 +110,15 @@ namespace magal.Data.Repositories
                             }
                         }
 
-                        // INSERIR CUSTOS (Adicionado o campo id_catalogo_custo para sanar o erro 2)
+                        // INSERIR CUSTOS
                         foreach (var custo in custosExtras)
                         {
                             using (var cmd = new MySqlCommand(@"
-                        INSERT INTO custo
-                        (id_projeto, nome, categoria, tipo, valor, unidade, id_catalogo_custo)
-                        VALUES
-                        (@idProj, @nome, @cat, @tipo, @valor, @unidade, @idCatalogo);
-                    ", conn, transaction))
+                                INSERT INTO custo
+                                (id_projeto, nome, categoria, tipo, valor, unidade, id_catalogo_custo)
+                                VALUES
+                                (@idProj, @nome, @cat, @tipo, @valor, @unidade, @idCatalogo);
+                            ", conn, transaction))
                             {
                                 cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
                                 cmd.Parameters.AddWithValue("@nome", custo.nome);
@@ -121,7 +126,6 @@ namespace magal.Data.Repositories
                                 cmd.Parameters.AddWithValue("@tipo", custo.tipo ?? "Direto");
                                 cmd.Parameters.AddWithValue("@valor", custo.valor);
                                 cmd.Parameters.AddWithValue("@unidade", custo.unidade ?? "Unitário");
-
                                 cmd.Parameters.AddWithValue("@idCatalogo", 1);
 
                                 cmd.ExecuteNonQuery();
@@ -147,6 +151,7 @@ namespace magal.Data.Repositories
             {
                 conn.Open();
 
+                // Adicionado as 3 colunas novas no SELECT
                 string sqlProj = @"
                     SELECT
                         p.*,
@@ -156,7 +161,10 @@ namespace magal.Data.Repositories
                         o.valor_margem,
                         o.valor_impostos,
                         o.valor_final,
-                        o.validade_dias
+                        o.validade_dias,
+                        o.forma_pagamento,
+                        o.prazo_entrega,
+                        o.observacoes
                     FROM projeto p
                     LEFT JOIN orcamento o
                         ON p.id_projeto = o.id_projeto
@@ -181,33 +189,18 @@ namespace magal.Data.Repositories
 
                             projeto.Orcamento = new Orcamento
                             {
-                                custo_base = reader["custo_base"] != DBNull.Value
-                                    ? Convert.ToDecimal(reader["custo_base"])
-                                    : 0,
+                                custo_base = reader["custo_base"] != DBNull.Value ? Convert.ToDecimal(reader["custo_base"]) : 0,
+                                percentual_impostos = reader["percentual_impostos"] != DBNull.Value ? Convert.ToDecimal(reader["percentual_impostos"]) : 0,
+                                margem_percentual = reader["margem_percentual"] != DBNull.Value ? Convert.ToDecimal(reader["margem_percentual"]) : 0,
+                                valor_margem = reader["valor_margem"] != DBNull.Value ? Convert.ToDecimal(reader["valor_margem"]) : 0,
+                                valor_impostos = reader["valor_impostos"] != DBNull.Value ? Convert.ToDecimal(reader["valor_impostos"]) : 0,
+                                valor_final = reader["valor_final"] != DBNull.Value ? Convert.ToDecimal(reader["valor_final"]) : 0,
+                                validade_dias = reader["validade_dias"] != DBNull.Value ? Convert.ToInt32(reader["validade_dias"]) : 15,
 
-                                percentual_impostos = reader["percentual_impostos"] != DBNull.Value
-                                    ? Convert.ToDecimal(reader["percentual_impostos"])
-                                    : 0,
-
-                                margem_percentual = reader["margem_percentual"] != DBNull.Value
-                                    ? Convert.ToDecimal(reader["margem_percentual"])
-                                    : 0,
-
-                                valor_margem = reader["valor_margem"] != DBNull.Value
-                                    ? Convert.ToDecimal(reader["valor_margem"])
-                                    : 0,
-
-                                valor_impostos = reader["valor_impostos"] != DBNull.Value
-                                    ? Convert.ToDecimal(reader["valor_impostos"])
-                                    : 0,
-
-                                valor_final = reader["valor_final"] != DBNull.Value
-                                    ? Convert.ToDecimal(reader["valor_final"])
-                                    : 0,
-
-                                validade_dias = reader["validade_dias"] != DBNull.Value
-                                    ? Convert.ToInt32(reader["validade_dias"])
-                                    : 15
+                                // Mapeamento dos novos campos de texto com verificação de nulo
+                                forma_pagamento = reader["forma_pagamento"] != DBNull.Value ? reader["forma_pagamento"].ToString() : string.Empty,
+                                prazo_entrega = reader["prazo_entrega"] != DBNull.Value ? reader["prazo_entrega"].ToString() : string.Empty,
+                                observacoes = reader["observacoes"] != DBNull.Value ? reader["observacoes"].ToString() : string.Empty
                             };
                         }
                     }
@@ -284,6 +277,7 @@ namespace magal.Data.Repositories
             {
                 conn.Open();
 
+                // Adicionado as 3 colunas novas no SELECT da listagem geral
                 string sql = @"
                     SELECT
                         p.*,
@@ -294,7 +288,10 @@ namespace magal.Data.Repositories
                         o.valor_margem,
                         o.valor_impostos,
                         o.valor_final,
-                        o.validade_dias
+                        o.validade_dias,
+                        o.forma_pagamento,
+                        o.prazo_entrega,
+                        o.observacoes
                     FROM projeto p
                     INNER JOIN cliente c
                         ON p.id_cliente = c.id_cliente
@@ -334,19 +331,15 @@ namespace magal.Data.Repositories
                                     custo_base = Convert.ToDecimal(reader["custo_base"]),
                                     margem_percentual = Convert.ToDecimal(reader["margem_percentual"]),
                                     percentual_impostos = Convert.ToDecimal(reader["percentual_impostos"]),
-                                    valor_margem = reader["valor_margem"] != DBNull.Value
-                                        ? Convert.ToDecimal(reader["valor_margem"])
-                                        : 0,
-
-                                    valor_impostos = reader["valor_impostos"] != DBNull.Value
-                                        ? Convert.ToDecimal(reader["valor_impostos"])
-                                        : 0,
-
+                                    valor_margem = reader["valor_margem"] != DBNull.Value ? Convert.ToDecimal(reader["valor_margem"]) : 0,
+                                    valor_impostos = reader["valor_impostos"] != DBNull.Value ? Convert.ToDecimal(reader["valor_impostos"]) : 0,
                                     valor_final = Convert.ToDecimal(reader["valor_final"]),
+                                    validade_dias = reader["validade_dias"] != DBNull.Value ? Convert.ToInt32(reader["validade_dias"]) : 15,
 
-                                    validade_dias = reader["validade_dias"] != DBNull.Value
-                                        ? Convert.ToInt32(reader["validade_dias"])
-                                        : 15
+                                    // Mapeamento dos novos campos na listagem geral
+                                    forma_pagamento = reader["forma_pagamento"] != DBNull.Value ? reader["forma_pagamento"].ToString() : string.Empty,
+                                    prazo_entrega = reader["prazo_entrega"] != DBNull.Value ? reader["prazo_entrega"].ToString() : string.Empty,
+                                    observacoes = reader["observacoes"] != DBNull.Value ? reader["observacoes"].ToString() : string.Empty
                                 };
                             }
                             else
@@ -355,7 +348,10 @@ namespace magal.Data.Repositories
                                 {
                                     valor_final = 0,
                                     valor_margem = 0,
-                                    validade_dias = 15
+                                    validade_dias = 15,
+                                    forma_pagamento = string.Empty,
+                                    prazo_entrega = string.Empty,
+                                    observacoes = string.Empty
                                 };
                             }
 
@@ -382,7 +378,6 @@ namespace magal.Data.Repositories
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@id", idProjeto);
-
                     cmd.ExecuteNonQuery();
                 }
             }

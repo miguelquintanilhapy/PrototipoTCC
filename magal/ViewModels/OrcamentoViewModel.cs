@@ -174,7 +174,10 @@ namespace magal.ViewModels
                     {
                         margem_percentual = projetoDoBanco.Orcamento.margem_percentual,
                         percentual_impostos = projetoDoBanco.Orcamento.percentual_impostos,
-                        validade_dias = projetoDoBanco.Orcamento.validade_dias
+                        validade_dias = projetoDoBanco.Orcamento.validade_dias,
+                        forma_pagamento = projetoDoBanco.Orcamento.forma_pagamento,
+                        prazo_entrega = projetoDoBanco.Orcamento.prazo_entrega,
+                        observacoes = projetoDoBanco.Orcamento.observacoes
                     },
                     Tarefas = new ObservableCollection<Tarefa>(projetoDoBanco.Tarefas.ToList())
                 };
@@ -237,7 +240,10 @@ namespace magal.ViewModels
                                   ProjetoAtual.tipo != _projetoOriginal.tipo ||
                                   ProjetoAtual.Orcamento.margem_percentual != _projetoOriginal.Orcamento.margem_percentual ||
                                   ProjetoAtual.Orcamento.percentual_impostos != _projetoOriginal.Orcamento.percentual_impostos ||
-                                  ProjetoAtual.Orcamento.validade_dias != _projetoOriginal.Orcamento.validade_dias;
+                                  ProjetoAtual.Orcamento.validade_dias != _projetoOriginal.Orcamento.validade_dias ||
+                                  ProjetoAtual.Orcamento.forma_pagamento != _projetoOriginal.Orcamento.forma_pagamento ||
+                                  ProjetoAtual.Orcamento.prazo_entrega != _projetoOriginal.Orcamento.prazo_entrega ||
+                                  ProjetoAtual.Orcamento.observacoes != _projetoOriginal.Orcamento.observacoes;
 
             if (basicoAlterado) return true;
 
@@ -325,7 +331,15 @@ namespace magal.ViewModels
             _isUpdating = true;
             var p = new Projeto
             {
-                Orcamento = new Orcamento { margem_percentual = 20, percentual_impostos = 15, validade_dias = 15 },
+                Orcamento = new Orcamento
+                {
+                    margem_percentual = 20,
+                    percentual_impostos = 15,
+                    validade_dias = 15,
+                    forma_pagamento = "PIX", 
+                    prazo_entrega = "",
+                    observacoes = ""
+                },
                 Tarefas = new ObservableCollection<Tarefa>(),
                 id_usuario = 1,
                 nome = "",
@@ -476,7 +490,17 @@ namespace magal.ViewModels
 
             try
             {
-                var listaCustosBase = CustosExtras.Select(c => (Custo)c).ToList();
+                var listaCustosBase = CustosExtras.Select(item => new Custo
+                {
+                    id_custo = item.id_custo,
+                    id_projeto = item.id_projeto,
+                    id_catalogo_custo = item.id_catalogo_custo,
+                    nome = item.nome,
+                    valor = item.valor,
+                    categoria = item.categoria,
+                    tipo = item.tipo,
+                    unidade = item.unidade
+                }).ToList();
 
                 ProjetoAtual.Orcamento.CalcularTotal(
                     ProjetoAtual.Tarefas.ToList(),
@@ -501,7 +525,18 @@ namespace magal.ViewModels
                 }
 
                 var repo = new ProjetoRepository();
-                var listaCustosBase = CustosExtras.Select(c => (Custo)c).ToList();
+
+                var listaCustosBase = CustosExtras.Select(item => new Custo
+                {
+                    id_custo = item.id_custo,
+                    id_projeto = item.id_projeto,
+                    id_catalogo_custo = item.id_catalogo_custo,
+                    nome = item.nome,
+                    valor = item.valor,
+                    categoria = item.categoria,
+                    tipo = item.tipo,
+                    unidade = item.unidade
+                }).ToList();
 
                 repo.SalvarProjetoCompleto(ProjetoAtual, listaCustosBase);
 
@@ -513,7 +548,6 @@ namespace magal.ViewModels
                 return false;
             }
         }
-
         private bool GerarRelatorioPdf()
         {
             var sfd = new SaveFileDialog { Filter = "PDF|*.pdf", FileName = $"Proposta_{ProjetoAtual.nome}" };
@@ -522,7 +556,18 @@ namespace magal.ViewModels
             {
                 try
                 {
-                    var listaCustosBase = CustosExtras.Select(c => (Custo)c).ToList();
+                    var listaCustosBase = CustosExtras.Select(item => new Custo
+                    {
+                        id_custo = item.id_custo,
+                        id_projeto = item.id_projeto,
+                        id_catalogo_custo = item.id_catalogo_custo,
+                        nome = item.nome,
+                        valor = item.valor,
+                        categoria = item.categoria,
+                        tipo = item.tipo,
+                        unidade = item.unidade
+                    }).ToList();
+
                     new PdfService().GerarPropostaTecnica(ProjetoAtual, listaCustosBase, sfd.FileName);
                     return true;
                 }
@@ -587,13 +632,14 @@ namespace magal.ViewModels
                 if (_itemSelecionado != value)
                 {
                     _itemSelecionado = value;
-                    OnRowPropertyChanged();
                     if (_itemSelecionado != null)
                     {
                         this.id_catalogo_custo = _itemSelecionado.id_catalogo_custo;
                         this.nome = _itemSelecionado.nome;
-                        this.valor = _itemSelecionado.valor;
+                        base.valor = _itemSelecionado.valor;
                     }
+                    OnRowPropertyChanged();
+                    OnRowPropertyChanged(nameof(valor)); 
                 }
             }
         }
@@ -655,7 +701,14 @@ namespace magal.ViewModels
 
     public static class BindableExtensions
     {
-        public static IDisposable DisablePropertyChange(this object obj) => null;
+        public static IDisposable DisablePropertyChange(this object obj)
+        {
+            return new DummyDisposable();
+        }
+        private class DummyDisposable : IDisposable
+        {
+            public void Dispose() { /* Não faz nada, apenas evita o NullReference */ }
+        }
     }
 
     #endregion

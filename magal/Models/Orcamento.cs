@@ -34,6 +34,31 @@ namespace magal.Models
             set { _validade_dias = value; OnPropertyChanged(); }
         }
 
+        // =========================================================================
+        // NOVOS CAMPOS PARA PROFISSIONALIZAÇÃO DO PDF (ALINHADOS COM O BANCO)
+        // =========================================================================
+        private string _forma_pagamento;
+        public string forma_pagamento
+        {
+            get => _forma_pagamento;
+            set { _forma_pagamento = value; OnPropertyChanged(); }
+        }
+
+        private string _prazo_entrega;
+        public string prazo_entrega
+        {
+            get => _prazo_entrega;
+            set { _prazo_entrega = value; OnPropertyChanged(); }
+        }
+
+        private string _observacoes;
+        public string observacoes
+        {
+            get => _observacoes;
+            set { _observacoes = value; OnPropertyChanged(); }
+        }
+        // =========================================================================
+
         private decimal _percentual_impostos;
         public decimal percentual_impostos
         {
@@ -82,7 +107,6 @@ namespace magal.Models
                 decimal calculado = custo_base + valor_margem + valor_impostos;
                 return (calculado > 0) ? calculado : (_valor_final_manual ?? 0);
             }
-
             set
             {
                 _valor_final_manual = value;
@@ -111,9 +135,5 @@ namespace magal.Models
             // dispara o setter de custo_base, que limpa os manuais e recalcula tudo
             custo_base = totalMaoDeObra + totalCustosExtras;
         }
-
-
-
-
     }
 }

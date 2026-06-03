@@ -16,7 +16,7 @@ namespace magal.Views
 
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Verifica se os campos não estão em branco (Incluindo a confirmação de senha)
+            // Verifica se os campos não estão em branco 
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
                 string.IsNullOrWhiteSpace(TxtEmail.Text) ||
                 string.IsNullOrWhiteSpace(TxtSenha.Password) ||
@@ -26,14 +26,14 @@ namespace magal.Views
                 return;
             }
 
-            // 2. Validação do formato do e-mail via Regex
+            // Validação do formato do e-mail via Regex
             if (!ValidarEmail(TxtEmail.Text))
             {
                 MessageBox.Show("Por favor, insira um e-mail válido (exemplo@dominio.com).", "E-mail Inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // 3. Verifica se as senhas são iguais
+            // Verifica se as senhas são iguais
             if (TxtSenha.Password != TxtConfirmarSenha.Password)
             {
                 MessageBox.Show("As senhas digitadas não coincidem. Por favor, verifique.", "Senhas Diferentes", MessageBoxButton.OK, MessageBoxImage.Warning);

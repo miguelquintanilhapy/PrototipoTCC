@@ -210,12 +210,17 @@ namespace magal.Services
 
         private void ConstruirConteudoPrincipal(ColumnDescriptor col, Projeto projeto, List<Custo> custosExtras)
         {
+            // 1. COMPOSIÇÃO DE MÃO DE OBRA E TAREFAS
             col.Item().Text("1. COMPOSIÇÃO DE MÃO DE OBRA E TAREFAS").FontSize(9).Bold().FontColor("#555555");
             col.Item().PaddingTop(6).PaddingBottom(15).Table(table =>
             {
                 table.ColumnsDefinition(cols =>
                 {
-                    cols.RelativeColumn(3); cols.RelativeColumn(2); cols.RelativeColumn(1); cols.RelativeColumn(2); cols.RelativeColumn(2);
+                    cols.RelativeColumn(3);
+                    cols.RelativeColumn(2);
+                    cols.RelativeColumn(1.5f); // Ajustado para evitar quebra no "HORAS"
+                    cols.RelativeColumn(2);
+                    cols.RelativeColumn(2);
                 });
 
                 table.Header(header =>
@@ -239,10 +244,11 @@ namespace magal.Services
                 }
             });
 
+            // 2. EQUIPAMENTOS, LICENÇAS E CUSTOS ADICIONAIS
             if (custosExtras != null && custosExtras.Any())
             {
                 col.Item().Text("2. EQUIPAMENTOS, LICENÇAS E CUSTOS ADICIONAIS").FontSize(9).Bold().FontColor("#555555");
-                col.Item().PaddingTop(6).Table(table =>
+                col.Item().PaddingTop(6).PaddingBottom(15).Table(table =>
                 {
                     table.ColumnsDefinition(cols =>
                     {
@@ -251,9 +257,9 @@ namespace magal.Services
 
                     table.Header(header =>
                     {
-                        header.Cell().Background("#4A5568").Padding(8).Text("DESCRIÇÃO DO ITEM").FontColor(Colors.White).Bold().FontSize(9);
-                        header.Cell().Background("#4A5568").Padding(8).Text("CATEGORIA").FontColor(Colors.White).Bold().FontSize(9);
-                        header.Cell().Background("#4A5568").Padding(8).AlignRight().Text("VALOR").FontColor(Colors.White).Bold().FontSize(9);
+                        header.Cell().Background("#1E3A5F").Padding(8).Text("DESCRIÇÃO DO ITEM").FontColor(Colors.White).Bold().FontSize(9);
+                        header.Cell().Background("#1E3A5F").Padding(8).Text("CATEGORIA").FontColor(Colors.White).Bold().FontSize(9);
+                        header.Cell().Background("#1E3A5F").Padding(8).AlignRight().Text("VALOR").FontColor(Colors.White).Bold().FontSize(9);
                     });
 
                     foreach (var custo in custosExtras)
@@ -265,9 +271,52 @@ namespace magal.Services
                 });
             }
 
-            col.Item().PaddingTop(30).Row(row =>
+            // 3. CONDIÇÕES COMERCIAIS
+            col.Item().Text("3. CONDIÇÕES COMERCIAIS").FontSize(9).Bold().FontColor("#555555");
+            col.Item().PaddingTop(6).PaddingBottom(15).Table(tCondicoes =>
+            {
+                tCondicoes.ColumnsDefinition(c =>
+                {
+                    c.RelativeColumn();
+                    c.RelativeColumn();
+                });
+
+                tCondicoes.Header(header =>
+                {
+                    header.Cell().Background("#1E3A5F").Padding(8).Text("PRAZO DE ENTREGA").FontColor(Colors.White).Bold().FontSize(9);
+                    header.Cell().Background("#1E3A5F").Padding(8).Text("FORMA DE PAGAMENTO").FontColor(Colors.White).Bold().FontSize(9);
+                });
+
+                tCondicoes.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
+                    .Text(projeto.Orcamento?.prazo_entrega ?? "A combinar").FontSize(9).FontColor("#2D3748");
+
+                tCondicoes.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
+                    .Text(projeto.Orcamento?.forma_pagamento ?? "A combinar").FontSize(9).FontColor("#2D3748");
+            });
+
+            // 4. OBSERVAÇÕES DA PROPOSTA
+            if (!string.IsNullOrWhiteSpace(projeto.Orcamento?.observacoes))
+            {
+                col.Item().Text("4. OBSERVAÇÕES DA PROPOSTA").FontSize(9).Bold().FontColor("#555555");
+                col.Item().PaddingTop(6).PaddingBottom(15).Table(tObs =>
+                {
+                    tObs.ColumnsDefinition(c => c.RelativeColumn());
+
+                    tObs.Header(header =>
+                    {
+                        header.Cell().Background("#1E3A5F").Padding(8).Text("NOTAS E OBSERVAÇÕES COMPLEMENTARES").FontColor(Colors.White).Bold().FontSize(9);
+                    });
+
+                    tObs.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8)
+                        .Text(projeto.Orcamento.observacoes).FontSize(9).FontColor("#4A5568");
+                });
+            }
+
+            // 5. RESUMO FINANCEIRO FINAL
+            col.Item().PaddingTop(5).Row(row =>
             {
                 row.RelativeItem();
+
                 row.ConstantItem(300).Column(resumo =>
                 {
                     resumo.Item().Text("RESUMO FINANCEIRO FINAL").FontSize(9).Bold().FontColor("#555555");
@@ -510,10 +559,6 @@ namespace magal.Services
             });
         }
 
-        /// <summary>
-        /// REFEITO: Monta a tabela do relatório gerencial de custos usando CatalogoCusto 
-        /// e removendo a coluna "Tipo" que não existe na nova tabela.
-        /// </summary>
         private void ConstruirTabelaRelatorioCustos(ColumnDescriptor col, List<CatalogoCusto> custos)
         {
             col.Item().Table(table =>
@@ -548,7 +593,6 @@ namespace magal.Services
                 }
             });
 
-            // Somatório dos custos filtrados para o rodapé da tabela
             decimal somaCustos = custos.Sum(c => c.valor);
 
             col.Item().PaddingTop(12).AlignRight().Width(250).Table(t =>

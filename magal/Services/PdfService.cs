@@ -45,7 +45,7 @@ namespace magal.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Margin(2, Unit.Centimetre);
+                    page.Margin(0.8f, Unit.Centimetre);
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
 
@@ -167,35 +167,54 @@ namespace magal.Services
 
         private void ConstruirCabecalho(ColumnDescriptor col, Projeto projeto)
         {
+            // 1. TOPO DO CABEÇALHO (Faixa Azul Escura - Aero embaixo do título)
             col.Item().Background("#1E3A5F").Padding(16).Row(row =>
             {
                 row.RelativeItem().Column(c =>
                 {
                     c.Item().Text("PROPOSTA TÉCNICA COMERCIAL").FontSize(20).Bold().FontColor(Colors.White);
-                    c.Item().Text("AERO CONCEPTS — ENGENHARIA AERONÁUTICA").FontSize(9).FontColor("#A8C4E0");
+                    c.Item().Text("AERO CONCEPTS — ENGENHARIA AERONÁUTICA").FontSize(9).Bold().FontColor("#A8C4E0");
+                    c.Item().PaddingTop(6);
+                    c.Item().Text("CNPJ: 00.000.000/0001-00  |  Av. Brg. Faria Lima, 1234 - São José dos Campos/SP").FontSize(7).FontColor("#A8C4E0");
+                    c.Item().Text("comercial@aeroconcepts.com.br  |  (12) 3456-7890").FontSize(7).FontColor("#A8C4E0");
                 });
+
                 row.ConstantItem(100).AlignRight().AlignMiddle()
                     .Text($"#{DateTime.Now:yyyyMMdd}")
                     .FontSize(9).FontColor("#A8C4E0");
             });
 
+            // 2. CORPO DO CABEÇALHO (Faixa Clara - Cliente à esquerda, Projeto ao centro, Datas à direita)
             col.Item().BorderBottom(1).BorderColor("#E0E0E0").PaddingVertical(10).Row(row =>
             {
-                row.RelativeItem().Column(c =>
+                // CLIENTE (À esquerda no alinhamento horizontal)
+                row.RelativeItem(1.5f).Column(c =>
                 {
                     c.Item().Text("CLIENTE").FontSize(7).FontColor("#999999").Bold();
                     c.Item().Text(projeto.Cliente?.nome ?? "Consumidor Final").FontSize(12).Bold().FontColor("#1E3A5F");
+
+                    // Dados complementares do Cliente
+                    c.Item().PaddingTop(2);
+                    c.Item().Text("CNPJ/CPF: 02.247.165/0001-05").FontSize(8).FontColor("#555555");
+                    c.Item().Text("Contato: diretoria@funcate.org.br").FontSize(8).FontColor("#555555");
                 });
 
-                row.ConstantItem(20);
+                row.ConstantItem(15);
 
+                // PROJETO (Ao Centro)
                 row.RelativeItem().Column(c =>
                 {
                     c.Item().Text("PROJETO").FontSize(7).FontColor("#999999").Bold();
                     c.Item().Text(projeto.nome).FontSize(12).Bold().FontColor("#1E3A5F");
+
+                    c.Item().PaddingTop(2);
+                    c.Item().Text($"Cód. Projeto: PRJ-{projeto.id_projeto}").FontSize(8).FontColor("#555555");
                 });
 
-                row.ConstantItem(150).Column(c =>
+                row.ConstantItem(15);
+
+                // DATAS (À Direita)
+                row.ConstantItem(120).Column(c =>
                 {
                     c.Item().Text("DATA DE EMISSÃO").FontSize(7).FontColor("#999999").Bold();
                     c.Item().Text(projeto.Orcamento?.data_criacao.ToString("dd/MM/yyyy") ?? DateTime.Now.ToString("dd/MM/yyyy")).FontSize(11).Bold().FontColor("#1E3A5F");
@@ -218,7 +237,7 @@ namespace magal.Services
                 {
                     cols.RelativeColumn(3);
                     cols.RelativeColumn(2);
-                    cols.RelativeColumn(2); 
+                    cols.RelativeColumn(2);
                     cols.RelativeColumn(2);
                     cols.RelativeColumn(2);
                 });
@@ -314,8 +333,8 @@ namespace magal.Services
                 });
             }
 
-            // 5. RESUMO FINANCEIRO FINAL
-            col.Item().PaddingTop(5).Row(row =>
+            // 5. RESUMO FINANCEIRO FINAL (Ajustado padding para dar mais respiro)
+            col.Item().PaddingTop(15).Row(row =>
             {
                 row.RelativeItem();
 
@@ -361,8 +380,30 @@ namespace magal.Services
                     });
                 });
             });
-        }
 
+            // 6. BLOCO DE ASSINATURAS (Nova adição recomendada)
+            col.Item().PaddingTop(40).Row(row =>
+            {
+                // Assinatura da Empresa Emitente
+                row.RelativeItem().Column(assinaturaEmpresa =>
+                {
+                    assinaturaEmpresa.Item().BorderBottom(1).BorderColor("#A0AEC0").PaddingBottom(2);
+                    assinaturaEmpresa.Item().PaddingTop(4).Text("Aero Concepts — Engenharia Aeronáutica").FontSize(9).Bold().FontColor("#2D3748");
+                    assinaturaEmpresa.Item().Text("Responsável Técnico / Comercial").FontSize(8).FontColor("#718096");
+                });
+
+                // Espaço entre as duas assinaturas
+                row.ConstantItem(40);
+
+                // Assinatura do Cliente (Aceite)
+                row.RelativeItem().Column(assinaturaCliente =>
+                {
+                    assinaturaCliente.Item().BorderBottom(1).BorderColor("#A0AEC0").PaddingBottom(2);
+                    assinaturaCliente.Item().PaddingTop(4).Text($"De acordo: {projeto.Cliente?.nome ?? "Funcate"}").FontSize(9).Bold().FontColor("#2D3748");
+                    assinaturaCliente.Item().Text("Assinatura do Cliente / Data").FontSize(8).FontColor("#718096");
+                });
+            });
+        }
         private void ConstruirCabecalhoRelatorio(ColumnDescriptor col, string tipoRelatorio, int totalRegistros)
         {
             col.Item().Background("#1E3A5F").Padding(14).Row(row =>

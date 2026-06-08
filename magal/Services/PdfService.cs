@@ -193,10 +193,20 @@ namespace magal.Services
                     c.Item().Text("CLIENTE").FontSize(7).FontColor("#999999").Bold();
                     c.Item().Text(projeto.Cliente?.nome ?? "Consumidor Final").FontSize(12).Bold().FontColor("#1E3A5F");
 
-                    // Dados complementares do Cliente
+                    // Dados dinâmicos do Cliente vindos do seu banco/dialog
                     c.Item().PaddingTop(2);
-                    c.Item().Text("CNPJ/CPF: 02.247.165/0001-05").FontSize(8).FontColor("#555555");
-                    c.Item().Text("Contato: diretoria@funcate.org.br").FontSize(8).FontColor("#555555");
+
+                    string docCliente = projeto.Cliente?.cpf_cnpj ?? "Não Informado";
+                    c.Item().Text($"CNPJ/CPF: {docCliente}").FontSize(8).FontColor("#555555");
+
+                    string contatoCliente = projeto.Cliente?.contato ?? "Não Informado";
+                    c.Item().Text($"Contato: {contatoCliente}").FontSize(8).FontColor("#555555");
+
+                    // Se quiser aproveitar que agora tem a cidade e o estado cadastrados:
+                    if (projeto.Cliente != null && !string.IsNullOrEmpty(projeto.Cliente.cidade))
+                    {
+                        c.Item().Text($"Localidade: {projeto.Cliente.cidade}/{projeto.Cliente.estado}").FontSize(8).FontColor("#555555");
+                    }
                 });
 
                 row.ConstantItem(15);

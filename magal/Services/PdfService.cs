@@ -173,10 +173,13 @@ namespace magal.Services
                 row.RelativeItem().Column(c =>
                 {
                     c.Item().Text("PROPOSTA TÉCNICA COMERCIAL").FontSize(20).Bold().FontColor(Colors.White);
-                    c.Item().Text("AERO CONCEPTS — ENGENHARIA AERONÁUTICA").FontSize(9).Bold().FontColor("#A8C4E0");
+                    c.Item().Text(" AERO CONCEPTS - AEROESPACIAL, INDUSTRIAL E DEFESA LTDA").FontSize(9).Bold().FontColor("#A8C4E0");
+
+                    // Dados Aero Concepts
                     c.Item().PaddingTop(6);
-                    c.Item().Text("CNPJ: 00.000.000/0001-00  |  Av. Brg. Faria Lima, 1234 - São José dos Campos/SP").FontSize(7).FontColor("#A8C4E0");
-                    c.Item().Text("comercial@aeroconcepts.com.br  |  (12) 3456-7890").FontSize(7).FontColor("#A8C4E0");
+                    c.Item().Text("CNPJ: 23.995.416/0002-73  |  Insc. Estadual: 125.380.094.115").FontSize(7).FontColor("#A8C4E0");
+                    c.Item().Text("Filial SJC: São José dos Campos - SP  |  CEP: 12247-016").FontSize(7).FontColor("#A8C4E0");
+                    c.Item().Text("Contato: contato@aeroconcepts.com.br  | +55 12 3905-4003").FontSize(7).FontColor("#A8C4E0");
                 });
 
                 row.ConstantItem(100).AlignRight().AlignMiddle()
@@ -187,13 +190,12 @@ namespace magal.Services
             // 2. CORPO DO CABEÇALHO (Faixa Clara - Cliente à esquerda, Projeto ao centro, Datas à direita)
             col.Item().BorderBottom(1).BorderColor("#E0E0E0").PaddingVertical(10).Row(row =>
             {
-                // CLIENTE (À esquerda no alinhamento horizontal)
                 row.RelativeItem(1.5f).Column(c =>
                 {
                     c.Item().Text("CLIENTE").FontSize(7).FontColor("#999999").Bold();
                     c.Item().Text(projeto.Cliente?.nome ?? "Consumidor Final").FontSize(12).Bold().FontColor("#1E3A5F");
 
-                    // Dados dinâmicos do Cliente vindos do seu banco/dialog
+                    // Dados dinâmicos do Cliente vindos do banco
                     c.Item().PaddingTop(2);
 
                     string docCliente = projeto.Cliente?.cpf_cnpj ?? "Não Informado";
@@ -202,7 +204,6 @@ namespace magal.Services
                     string contatoCliente = projeto.Cliente?.contato ?? "Não Informado";
                     c.Item().Text($"Contato: {contatoCliente}").FontSize(8).FontColor("#555555");
 
-                    // Se quiser aproveitar que agora tem a cidade e o estado cadastrados:
                     if (projeto.Cliente != null && !string.IsNullOrEmpty(projeto.Cliente.cidade))
                     {
                         c.Item().Text($"Localidade: {projeto.Cliente.cidade}/{projeto.Cliente.estado}").FontSize(8).FontColor("#555555");
@@ -220,6 +221,11 @@ namespace magal.Services
                 });
 
                 row.ConstantItem(15);
+
+                // ADICIONADO: Esse item relativo vazio vai empurrar tudo o que vem depois para a extrema direita
+                row.RelativeItem();
+
+                // Sua coluna de datas (agora colada na borda direita)
                 row.ConstantItem(120).Column(c =>
                 {
                     c.Item().Text("DATA DE EMISSÃO").FontSize(7).FontColor("#999999").Bold();
@@ -387,7 +393,7 @@ namespace magal.Services
                 });
             });
 
-            // 6. BLOCO DE ASSINATURAS (Nova adição recomendada)
+            // 6. BLOCO DE ASSINATURAS 
             col.Item().PaddingTop(40).Row(row =>
             {
                 // Assinatura da Empresa Emitente
@@ -398,10 +404,9 @@ namespace magal.Services
                     assinaturaEmpresa.Item().Text("Responsável Técnico / Comercial").FontSize(8).FontColor("#718096");
                 });
 
-                // Espaço entre as duas assinaturas
                 row.ConstantItem(40);
 
-                // Assinatura do Cliente (Aceite)
+                // Assinatura do Cliente 
                 row.RelativeItem().Column(assinaturaCliente =>
                 {
                     assinaturaCliente.Item().BorderBottom(1).BorderColor("#A0AEC0").PaddingBottom(2);
@@ -655,7 +660,7 @@ namespace magal.Services
 
         private void ConstruirRodape(RowDescriptor row)
         {
-            row.RelativeItem().Text("Aero Concepts — Tecnologia em Engenharia Aeronáutica").FontSize(8).FontColor("#AAAAAA");
+            row.RelativeItem().Text(" AERO CONCEPTS - AEROESPACIAL, INDUSTRIAL E DEFESA LTDA").FontSize(8).FontColor("#AAAAAA");
             row.ConstantItem(80).AlignRight().Text(x =>
             {
                 x.Span("Página ").FontSize(8);

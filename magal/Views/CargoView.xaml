@@ -123,18 +123,30 @@
 
         <StackPanel Grid.Row="1" Margin="0,0,0,15">
             <TextBlock Text="FILTRE POR NOME" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
-            <Grid>
-                <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
-                         Height="42" VerticalContentAlignment="Center" Padding="12,0,40,0"
-                         FontSize="14" Background="White" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
-                    <TextBox.Resources>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="CornerRadius" Value="8"/>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
-                <TextBlock Text="🔍" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="{StaticResource AeroTextHint}" IsHitTestVisible="False"/>
-            </Grid>
+
+            <Border BorderThickness="1" Height="42" Background="White" CornerRadius="8">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <Grid>
+                    <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalContentAlignment="Center" 
+                     Padding="12,0,40,0"
+                     FontSize="14" 
+                     Background="Transparent" 
+                     BorderThickness="0"/>
+
+                    <TextBlock Text="🔍" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="{StaticResource AeroTextHint}" IsHitTestVisible="False"/>
+                </Grid>
+            </Border>
         </StackPanel>
 
         <Border Grid.Row="2" Background="White" CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}" Padding="1">

@@ -116,7 +116,7 @@
         <StackPanel Grid.Row="2" Margin="0,0,0,15">
             <TextBlock Text="FILTRE POR ( PROJETO, CLIENTE, TIPO OU STATUS )" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
 
-            <Border BorderThickness="1" Height="42" Background="White">
+            <Border BorderThickness="1.5" Height="42" Background="White">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>

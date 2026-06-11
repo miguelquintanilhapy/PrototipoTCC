@@ -329,7 +329,7 @@
                         <ItemsControl ItemsSource="{Binding ProjetoAtual.Tarefas}" Margin="20,14,20,4">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource TaskCard}" Margin="0,0,0,10">
+                                    <Border Style="{StaticResource TaskCard}" Margin="0,0,0,10" BorderThickness="0">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="80"/>
@@ -447,7 +447,7 @@
                                 <ItemsControl ItemsSource="{Binding CustosExtras}" Margin="20,14,20,14">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Style="{StaticResource CostCard}" Margin="0,0,0,10">
+                                            <Border Style="{StaticResource CostCard}" Margin="0,0,0,10" BorderThickness="0">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -594,16 +594,16 @@
                                 <TextBlock Text="PRAZO DE ENTREGA" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
 
                                 <DatePicker SelectedDate="{Binding ProjetoAtual.Orcamento.prazo_entrega, UpdateSourceTrigger=PropertyChanged}" 
-            FontSize="14" 
-            FontWeight="SemiBold" 
-            Foreground="{StaticResource AeroTextDark}" 
-            Background="Transparent" 
-            BorderThickness="1.5" 
-            Padding="8,0" 
-            Height="40" 
-            Cursor="Hand" 
-            VerticalContentAlignment="Center" 
-            Language="pt-BR">
+                                    FontSize="14" 
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource AeroTextDark}" 
+                                    Background="Transparent" 
+                                    BorderThickness="1.5" 
+                                    Padding="8,0" 
+                                    Height="40" 
+                                    Cursor="Hand" 
+                                    VerticalContentAlignment="Center" 
+                                    Language="pt-BR">
                                     <DatePicker.Resources>
                                         <Style TargetType="{x:Type DatePickerTextBox}">
                                             <Setter Property="Template">

@@ -241,11 +241,10 @@ namespace magal.Services
             {
                 table.ColumnsDefinition(cols =>
                 {
-                    cols.RelativeColumn(3);
-                    cols.RelativeColumn(2);
-                    cols.RelativeColumn(2);
-                    cols.RelativeColumn(2);
-                    cols.RelativeColumn(2);
+                    cols.RelativeColumn(4.5f);
+                    cols.RelativeColumn(2.5f); 
+                    cols.RelativeColumn(1);   
+                    cols.RelativeColumn(2);   
                 });
 
                 table.Header(header =>
@@ -253,7 +252,6 @@ namespace magal.Services
                     header.Cell().Background("#1E3A5F").Padding(8).Text("TAREFAS/DESCRIÇÃO").FontColor(Colors.White).Bold().FontSize(9);
                     header.Cell().Background("#1E3A5F").Padding(8).Text("RESPONSÁVEL").FontColor(Colors.White).Bold().FontSize(9);
                     header.Cell().Background("#1E3A5F").Padding(8).AlignCenter().Text("HORAS").FontColor(Colors.White).Bold().FontSize(9);
-                    header.Cell().Background("#1E3A5F").Padding(8).AlignRight().Text("VALOR/HORA").FontColor(Colors.White).Bold().FontSize(9);
                     header.Cell().Background("#1E3A5F").Padding(8).AlignRight().Text("TOTAL").FontColor(Colors.White).Bold().FontSize(9);
                 });
 
@@ -265,8 +263,6 @@ namespace magal.Services
                     string sufixoHoras = item.horas_estimadas == 1 ? " hora" : " horas";
                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignCenter().Text($"{item.horas_estimadas:0.#}{sufixoHoras}").FontSize(9);
 
-                    decimal vHora = item.Funcionario?.Cargo?.custo_medio_hora ?? 0;
-                    table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignRight().Text(vHora.ToString("C2", _ptBR)).FontSize(9);
                     table.Cell().BorderBottom(1).BorderColor("#E8EDF2").Padding(8).AlignRight().Text(item.custo_real.ToString("C2", _ptBR)).FontSize(9).Bold();
                 }
             });
@@ -279,7 +275,7 @@ namespace magal.Services
                 {
                     table.ColumnsDefinition(cols =>
                     {
-                        cols.RelativeColumn(4); cols.RelativeColumn(2); cols.RelativeColumn(2);
+                        cols.RelativeColumn(5.5f); cols.RelativeColumn(1.5f); cols.RelativeColumn(2);
                     });
 
                     table.Header(header =>
@@ -434,7 +430,7 @@ namespace magal.Services
                 row.RelativeItem().Column(c =>
                 {
                     c.Item().Text($"RELATÓRIO GERENCIAL DE {tipoRelatorio.ToUpper()}").FontSize(18).Bold().FontColor(Colors.White);
-                    c.Item().Text("AERO CONCEPTS — SISTEMA INTERNO DE HISTÓRICO").FontSize(10).FontColor("#A8C4E0");
+                    c.Item().Text("AERO CONCEPTS — AEROESPACIAL, INDUSTRIAL E DEFESA LTDA").FontSize(10).FontColor("#A8C4E0");
                 });
 
                 row.ConstantItem(220).AlignRight().AlignMiddle().Column(c =>

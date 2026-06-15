@@ -556,7 +556,7 @@
                                VerticalAlignment="Center"/>
                                 </Border>
 
-                                <TextBlock Text="CONDIÇÕES DO ORÇAMENTO" FontSize="12"
+                                <TextBlock Text="CONDIÇÕES DE PAGAMENTO" FontSize="12"
                            FontWeight="Bold" Foreground="{StaticResource AzulAero}"
                            VerticalAlignment="Center"/>
                             </StackPanel>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks; 
 using MySql.Data.MySqlClient;
 using magal.Models;
 using magal.Data;
@@ -9,21 +10,21 @@ namespace magal.Data.Repositories
     public class CatalogoCustoRepository
     {
         // Busca apenas as categorias únicas para o primeiro ComboBox
-        public List<string> ListarCategoriasUnicas()
+        public async Task<List<string>> ListarCategoriasUnicas()
         {
             var lista = new List<string>();
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string sql = "SELECT DISTINCT categoria FROM catalogo_custo WHERE categoria IS NOT NULL AND categoria != '' ORDER BY categoria ASC";
-                    
+
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 lista.Add(reader.GetString(0));
                             }
@@ -39,22 +40,22 @@ namespace magal.Data.Repositories
         }
 
         // Busca os itens específicos da categoria escolhida para o segundo ComboBox
-        public List<CatalogoCusto> ListarItensPorCategoria(string categoria)
+        public async Task<List<CatalogoCusto>> ListarItensPorCategoria(string categoria)
         {
             var lista = new List<CatalogoCusto>();
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string sql = "SELECT id_catalogo_custo, nome, categoria, valor FROM catalogo_custo WHERE categoria = @categoria ORDER BY nome ASC";
-                    
+
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@categoria", categoria);
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 lista.Add(new CatalogoCusto
                                 {
@@ -75,20 +76,20 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        public List<CatalogoCusto> ListarTodos()
+        public async Task<List<CatalogoCusto>> ListarTodos()
         {
             var lista = new List<CatalogoCusto>();
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string sql = "SELECT id_catalogo_custo, nome, categoria, valor FROM catalogo_custo ORDER BY id_catalogo_custo DESC";
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 lista.Add(new CatalogoCusto
                                 {
@@ -106,33 +107,33 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        public void Inserir(CatalogoCusto custo)
+        public async Task Inserir(CatalogoCusto custo)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string sql = "INSERT INTO catalogo_custo (nome, categoria, valor) VALUES (@nome, @categoria, @valor)";
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@nome", custo.nome);
                         cmd.Parameters.AddWithValue("@categoria", custo.categoria ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@valor", custo.valor);
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
             catch (Exception ex) { throw new Exception("Erro ao inserir no catálogo: " + ex.Message); }
         }
 
-        public void Atualizar(CatalogoCusto custo)
+        public async Task Atualizar(CatalogoCusto custo)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string sql = "UPDATE catalogo_custo SET nome = @nome, categoria = @categoria, valor = @valor WHERE id_catalogo_custo = @id";
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
@@ -140,25 +141,25 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@nome", custo.nome);
                         cmd.Parameters.AddWithValue("@categoria", custo.categoria ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@valor", custo.valor);
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
             catch (Exception ex) { throw new Exception("Erro ao atualizar catálogo: " + ex.Message); }
         }
 
-        public void Excluir(int idCatalogoCusto)
+        public async Task Excluir(int idCatalogoCusto)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
                     string sql = "DELETE FROM catalogo_custo WHERE id_catalogo_custo = @id";
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", idCatalogoCusto);
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }

@@ -129,15 +129,15 @@ namespace magal.ViewModels
         /// <summary>
         /// Busca a lista atualizada de funcionários do banco de dados e limpa os filtros da tela.
         /// </summary>
-        public void CarregarFuncionarios()
+        public async void CarregarFuncionarios()
         {
             try
             {
                 FiltroTexto = string.Empty;
 
-                var lista = _repository.ListarTodos();
+                var lista = await _repository.ListarTodos();
                 Funcionarios.Clear();
-                foreach (var f in lista)
+                foreach (var f in  lista)
                 {
                     Funcionarios.Add(f);
                 }

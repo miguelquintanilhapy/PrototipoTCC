@@ -128,13 +128,13 @@ namespace magal.ViewModels
         /// <summary>
         /// Busca a lista atualizada de cargos do banco de dados e limpa os filtros da tela.
         /// </summary>
-        public void CarregarCargos()
+        public async void CarregarCargos()
         {
             try
             {
                 FiltroTexto = string.Empty;
-                var lista = _repository.ListarTodos();
 
+                var lista = await _repository.ListarTodos();
                 Cargos.Clear();
                 foreach (var c in lista)
                 {

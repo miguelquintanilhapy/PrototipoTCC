@@ -89,20 +89,20 @@ namespace magal.ViewModels
         /// <summary>
         /// Consulta os repositórios para obter a contagem atualizada de cada entidade e atualiza as propriedades visíveis na tela.
         /// </summary>
-        public void CarregarIndicadores()
+        public async void CarregarIndicadores()
         {
             try
             {
-                var funcionarios = _funcionarioRepo.ListarTodos();
+                var funcionarios = await _funcionarioRepo.ListarTodos();
                 TotalFuncionarios = (funcionarios?.Count ?? 0).ToString("D2");
 
-                var clientes = _clienteRepo.ListarTodos();
+                var clientes = await _clienteRepo.ListarTodos();
                 TotalClientes = (clientes?.Count ?? 0).ToString("D2");
 
-                var cargos = _cargoRepo.ListarTodos();
+                var cargos = await _cargoRepo.ListarTodos();
                 TotalCargos = (cargos?.Count ?? 0).ToString("D2");
 
-                var custos = _catalogoCustoRepo.ListarTodos();
+                var custos =  await _catalogoCustoRepo.ListarTodos();
                 TotalCustos = (custos?.Count ?? 0).ToString("D2");
             }
             catch (Exception ex)

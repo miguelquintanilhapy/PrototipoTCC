@@ -132,13 +132,13 @@ namespace magal.ViewModels
         /// <summary>
         /// Busca a lista atualizada de itens do catálogo do banco de dados e limpa os filtros da tela.
         /// </summary>
-        public void CarregarCustos()
+        public async Task CarregarCustos()
         {
             try
             {
                 FiltroTexto = string.Empty;
 
-                var lista = _repository.ListarTodos();
+                var lista = await _repository.ListarTodos();
 
                 Custos.Clear();
                 foreach (var c in lista)

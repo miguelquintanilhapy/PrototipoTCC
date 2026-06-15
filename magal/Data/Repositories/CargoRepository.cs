@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks; // Mantido para o async funcionar
 using MySql.Data.MySqlClient;
 using magal.Models;
 using magal.Data;
@@ -8,7 +9,8 @@ namespace magal.Data.Repositories
 {
     public class CargoRepository
     {
-        public List<Cargo> ListarTodos()
+        // Nome mantido como "ListarTodos", mas agora é async Task
+        public async Task<List<Cargo>> ListarTodos()
         {
             var lista = new List<Cargo>();
 
@@ -16,15 +18,15 @@ namespace magal.Data.Repositories
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = "SELECT id_cargo, nome, custo_medio_hora FROM cargo";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 lista.Add(new Cargo
                                 {
@@ -39,19 +41,20 @@ namespace magal.Data.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception("Erro no CargoRepository: " + ex.Message);
+                throw new Exception("Erro no CargoRepository (Listar): " + ex.Message);
             }
 
             return lista;
         }
 
-        public void Inserir(Cargo cargo)
+        // Nome mantido como "Inserir", mas agora é async Task
+        public async Task Inserir(Cargo cargo)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = @"
                         INSERT INTO cargo (
@@ -69,7 +72,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -79,13 +82,14 @@ namespace magal.Data.Repositories
             }
         }
 
-        public void Atualizar(Cargo cargo)
+        // Nome mantido como "Atualizar", mas agora é async Task
+        public async Task Atualizar(Cargo cargo)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = @"
                         UPDATE cargo
@@ -100,7 +104,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@nome", cargo.nome);
                         cmd.Parameters.AddWithValue("@custo", cargo.custo_medio_hora);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -110,13 +114,14 @@ namespace magal.Data.Repositories
             }
         }
 
-        public void Excluir(int idCargo)
+        // Nome mantido como "Excluir", mas agora é async Task
+        public async Task Excluir(int idCargo)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = "DELETE FROM cargo WHERE id_cargo = @id";
 
@@ -124,7 +129,7 @@ namespace magal.Data.Repositories
                     {
                         cmd.Parameters.AddWithValue("@id", idCargo);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }

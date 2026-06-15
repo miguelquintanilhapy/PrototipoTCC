@@ -30,11 +30,10 @@ namespace magal.Views
             PreencherCampos();
         }
 
-        private void CarregarCargos()
+        private async void CarregarCargos()
         {
             var repo = new CargoRepository();
-
-            ComboCargo.ItemsSource = repo.ListarTodos();
+            ComboCargo.ItemsSource = await repo.ListarTodos();
         }
 
         private void PreencherCampos()

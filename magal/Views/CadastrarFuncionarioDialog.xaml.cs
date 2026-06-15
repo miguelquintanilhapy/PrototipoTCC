@@ -23,10 +23,10 @@ namespace magal.Views
             CarregarCargos();
         }
 
-        private void CarregarCargos()
+        private async void CarregarCargos()
         {
             var repo = new CargoRepository();
-            ComboCargo.ItemsSource = repo.ListarTodos();
+            ComboCargo.ItemsSource = await repo.ListarTodos();
         }
 
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)

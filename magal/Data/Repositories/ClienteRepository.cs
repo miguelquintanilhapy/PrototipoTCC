@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks; 
 using MySql.Data.MySqlClient;
 using magal.Models;
 using magal.Data;
@@ -8,7 +9,7 @@ namespace magal.Data.Repositories
 {
     public class ClienteRepository
     {
-        public List<Cliente> ListarTodos()
+        public async Task<List<Cliente>> ListarTodos()
         {
             var lista = new List<Cliente>();
 
@@ -16,7 +17,7 @@ namespace magal.Data.Repositories
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = @"SELECT id_cliente, 
                                           nome, 
@@ -29,9 +30,9 @@ namespace magal.Data.Repositories
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 lista.Add(new Cliente
                                 {
@@ -68,13 +69,13 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        public void Inserir(Cliente cliente)
+        public async Task Inserir(Cliente cliente)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = @"
                         INSERT INTO cliente (
@@ -104,7 +105,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@estado", cliente.estado ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@contato", cliente.contato ?? (object)DBNull.Value);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -114,13 +115,13 @@ namespace magal.Data.Repositories
             }
         }
 
-        public void Atualizar(Cliente cliente)
+        public async Task Atualizar(Cliente cliente)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = @"
                         UPDATE cliente
@@ -143,7 +144,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@estado", cliente.estado ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@contato", cliente.contato ?? (object)DBNull.Value);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -153,13 +154,13 @@ namespace magal.Data.Repositories
             }
         }
 
-        public void Excluir(int idCliente)
+        public async Task Excluir(int idCliente)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = "DELETE FROM cliente WHERE id_cliente = @id";
 
@@ -167,7 +168,7 @@ namespace magal.Data.Repositories
                     {
                         cmd.Parameters.AddWithValue("@id", idCliente);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }

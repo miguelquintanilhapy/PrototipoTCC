@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks; // Adicionado para suportar Task
 using magal.Models;
 using MySql.Data.MySqlClient;
 
@@ -6,13 +8,14 @@ namespace magal.Data.Repositories
 {
     public class FuncionarioRepository
     {
-        public List<Funcionario> ListarTodos()
+        public async Task<List<Funcionario>> ListarTodos()
         {
             var lista = new List<Funcionario>();
 
             try
             {
-                using (var conn = DbConnectionFactory.CreateConnection())
+                // Adicionado o cast para (MySqlConnection) para liberar os métodos Async
+                using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
                     string query = @"
                         SELECT 
@@ -36,11 +39,14 @@ namespace magal.Data.Repositories
                     {
                         cmd.CommandText = query;
 
-                        conn.Open();
+                        // Adicionado o await no OpenAsync
+                        await conn.OpenAsync();
 
-                        using (var reader = cmd.ExecuteReader())
+                        // Adicionado o await no ExecuteReaderAsync
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            // Adicionado o await no ReadAsync
+                            while (await reader.ReadAsync())
                             {
                                 var func = new Funcionario
                                 {
@@ -55,7 +61,7 @@ namespace magal.Data.Repositories
 
                                     nivel = reader.GetString(
                                         reader.GetOrdinal("nivel")),
-                                                                       
+
                                     tipo_vinculo = reader.GetString(
                                         reader.GetOrdinal("tipo_vinculo")),
 
@@ -91,12 +97,12 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        public void Inserir(Funcionario funcionario)
+        public async Task Inserir(Funcionario funcionario)
         {
             using (var conn =
                    (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
                 string sql = @"
                     INSERT INTO funcionario
@@ -133,17 +139,17 @@ namespace magal.Data.Repositories
                     cmd.Parameters.AddWithValue(
                         "@status", funcionario.status);
 
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
 
-        public void Atualizar(Funcionario funcionario)
+        public async Task Atualizar(Funcionario funcionario)
         {
             using (var conn =
                    (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
                 string sql = @"
                     UPDATE funcionario
@@ -176,17 +182,17 @@ namespace magal.Data.Repositories
                         "@id_funcionario",
                         funcionario.id_funcionario);
 
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
 
-        public void Excluir(int id_funcionario)
+        public async Task Excluir(int id_funcionario)
         {
             using (var conn =
                    (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
                 string sql =
                     "DELETE FROM funcionario WHERE id_funcionario = @id";
@@ -195,7 +201,7 @@ namespace magal.Data.Repositories
                 {
                     cmd.Parameters.AddWithValue("@id", id_funcionario);
 
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }

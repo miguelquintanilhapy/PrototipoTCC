@@ -379,14 +379,19 @@ namespace magal.ViewModels
             }
         }
 
-        private void CarregarDadosIniciais()
+        private async void CarregarDadosIniciais()
         {
             try
             {
-                var listaClientes = new ClienteRepository().ListarTodos();
-                var listaFuncionarios = new FuncionarioRepository().ListarTodos();
+                // 1. Adicionado o await (lembre-se que ListarTodos agora retorna uma Task)
+                var listaClientes = await new ClienteRepository().ListarTodos();
 
-                _todosOsCustosCadastrados = new CatalogoCustoRepository().ListarTodos() ?? new List<CatalogoCusto>();
+                // Esse já estava certo!
+                var listaFuncionarios = await new FuncionarioRepository().ListarTodos();
+
+                // 2. Adicionado o await e os parênteses para o operador ?? funcionar corretamente
+                _todosOsCustosCadastrados = ( await new CatalogoCustoRepository().ListarTodos()) ?? new List<CatalogoCusto>();
+
                 Clientes.Clear();
                 foreach (var c in listaClientes) Clientes.Add(c);
 

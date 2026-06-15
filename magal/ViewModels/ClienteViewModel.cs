@@ -83,25 +83,24 @@ namespace magal.ViewModels
 
         #region Métodos Públicos
 
-        public void CarregarClientes()
+        // Mude para async Task
+        public async Task CarregarClientes()
         {
             try
             {
                 FiltroTexto = string.Empty;
+                var lista = await _repository.ListarTodos();
 
-                var lista = _repository.ListarTodos();
                 Clientes.Clear();
                 foreach (var c in lista)
                 {
                     Clientes.Add(c);
                 }
-
                 ClientesView?.Refresh();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro ao carregar clientes: {ex.Message}", "Aero Concepts",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Erro: {ex.Message}");
             }
         }
 

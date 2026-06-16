@@ -6,9 +6,12 @@
              mc:Ignorable="d" 
              Language="pt-BR"
              d:DesignHeight="900" d:DesignWidth="1200"
-             Background="#F0F4FA">
+             Background="#F0F4FA"
+             Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
         <SolidColorBrush x:Key="AzulAero"        Color="#131C49"/>
         <SolidColorBrush x:Key="AeroAccent"      Color="#3B82F6"/>
         <SolidColorBrush x:Key="AeroDanger"      Color="#EF4444"/>
@@ -141,16 +144,17 @@
 
                 <Grid>
                     <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
-                     VerticalContentAlignment="Center" 
-                     Padding="12,0,40,0"
-                     FontSize="14" 
-                     Background="Transparent" 
-                     BorderThickness="0"/>
+                             VerticalContentAlignment="Center" 
+                             Padding="12,0,40,0"
+                             FontSize="14" 
+                             Background="Transparent" 
+                             BorderThickness="0"/>
 
                     <TextBlock Text="🔍" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="{StaticResource AeroTextHint}" IsHitTestVisible="False"/>
                 </Grid>
             </Border>
         </StackPanel>
+
         <Border Grid.Row="2" Background="White" CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}" Padding="1">
             <Grid>
                 <Grid.RowDefinitions>
@@ -207,17 +211,8 @@
                     </DataGrid.Resources>
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" 
-                                            Binding="{Binding id_funcionario}" 
-                                            Width="80" 
-                                            FontSize="14" 
-                                            FontWeight="SemiBold" />
-
-                        <DataGridTextColumn Header="NOME COMPLETO" 
-                                            Binding="{Binding nome}" 
-                                            Width="*" 
-                                            FontSize="15" 
-                                            FontWeight="SemiBold">
+                        <DataGridTextColumn Header="ID" Binding="{Binding id_funcionario}" Width="80" FontSize="14" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="NOME COMPLETO" Binding="{Binding nome}" Width="*" FontSize="15" FontWeight="SemiBold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
@@ -226,17 +221,8 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="NÍVEL" 
-                                            Binding="{Binding nivel}" 
-                                            Width="120" 
-                                            FontSize="14" 
-                                            FontWeight="SemiBold" />
-
-                        <DataGridTextColumn Header="CUSTO/HORA" 
-                                            Binding="{Binding custo_hora, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" 
-                                            Width="160" 
-                                            FontSize="16" FontWeight="Bold">
+                        <DataGridTextColumn Header="NÍVEL" Binding="{Binding nivel}" Width="120" FontSize="14" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="CUSTO/HORA" Binding="{Binding custo_hora, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" Width="160" FontSize="16" FontWeight="Bold">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Right"/>
@@ -246,17 +232,8 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="VÍNCULO" 
-                                            Binding="{Binding tipo_vinculo}" 
-                                            Width="150" 
-                                            FontSize="14" FontWeight="SemiBold" />
-
-                        <DataGridTextColumn Header="STATUS" 
-                                            Binding="{Binding status}" 
-                                            Width="130" 
-                                            FontSize="14" FontWeight="SemiBold" />
-
+                        <DataGridTextColumn Header="VÍNCULO" Binding="{Binding tipo_vinculo}" Width="150" FontSize="14" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="STATUS" Binding="{Binding status}" Width="130" FontSize="14" FontWeight="SemiBold" />
                         <DataGridTemplateColumn Header="AÇÕES" Width="170">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -264,15 +241,12 @@
                                         <Button Content="Editar" 
                                                 Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
-                                                FontSize="13"
-                                                Foreground="{StaticResource AeroAccent}"
+                                                FontSize="13" Foreground="{StaticResource AeroAccent}"
                                                 Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
-
                                         <Button Content="Excluir" 
                                                 Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
-                                                FontSize="13"
-                                                Foreground="{StaticResource AeroDanger}"
+                                                FontSize="13" Foreground="{StaticResource AeroDanger}"
                                                 Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -287,5 +261,15 @@
                 </Border>
             </Grid>
         </Border>
+
+        <Grid Grid.Row="0" Grid.RowSpan="3" 
+              x:Name="LoadingOverlay"
+              Background="#CCFFFFFF" 
+              Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="6" Foreground="{StaticResource AzulAero}" Background="#E2E8F0" BorderThickness="0"/>
+                <TextBlock Text="Carregando funcionários..." Margin="0,12,0,0" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource AzulAero}" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

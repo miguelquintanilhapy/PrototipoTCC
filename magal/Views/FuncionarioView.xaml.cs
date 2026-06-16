@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq; 
-using System.Text;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using magal.Data.Repositories;
+using magal.ViewModels;
 
 namespace magal.Views
 {
     public partial class FuncionarioView : UserControl
     {
+        private readonly FuncionarioViewModel _viewModel;
+
         public FuncionarioView()
         {
             InitializeComponent();
-            this.DataContext = new magal.ViewModels.FuncionarioViewModel();
+            _viewModel = new FuncionarioViewModel();
+            this.DataContext = _viewModel;
+        }
+
+        /// <summary>
+        /// Dispara o carregamento assíncrono dos funcionários assim que a tela é carregada.
+        /// </summary>
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            await _viewModel.CarregarFuncionarios();
         }
 
         /// <summary>

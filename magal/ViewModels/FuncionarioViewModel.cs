@@ -7,16 +7,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
 namespace magal.ViewModels
 {
-    /// <summary>
-    /// ViewModel responsável por gerenciar a tela de funcionários,
-    /// controlando filtros de busca, listagem e ações de criação, edição e exclusão.
-    /// </summary>
     public class FuncionarioViewModel : BaseModel
     {
         #region Atributos e Campos Privados
@@ -25,14 +22,21 @@ namespace magal.ViewModels
         private readonly PdfService _pdfService;
         private Funcionario _funcionarioSelecionado;
         private string _filtroTexto;
+        private bool _isLoading = true;
 
         #endregion
 
         #region Propriedades e Filtros
 
         /// <summary>
-        /// Obtém ou define o texto de busca utilizado para filtrar os funcionários na tela em tempo real.
+        /// Sinaliza se a listagem de funcionários está buscando dados do banco.
         /// </summary>
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set { _isLoading = value; OnPropertyChanged(); }
+        }
+
         public string FiltroTexto
         {
             get => _filtroTexto;
@@ -44,9 +48,6 @@ namespace magal.ViewModels
             }
         }
 
-        /// <summary>
-        /// Obtém ou define o funcionário atualmente selecionado na listagem (DataGrid).
-        /// </summary>
         public Funcionario FuncionarioSelecionado
         {
             get => _funcionarioSelecionado;
@@ -57,69 +58,38 @@ namespace magal.ViewModels
 
         #region Coleções e Visões de Dados
 
-        /// <summary>
-        /// Lista observável de funcionários carregados do banco de dados.
-        /// </summary>
         public ObservableCollection<Funcionario> Funcionarios { get; } = new ObservableCollection<Funcionario>();
-
-        /// <summary>
-        /// Visão customizada da coleção de funcionários que permite a aplicação de filtros em tempo real sem perder a lista original.
-        /// </summary>
         public ICollectionView FuncionariosView { get; private set; }
 
         #endregion
 
         #region Comandos disparados pela View
 
-        /// <summary>
-        /// Comando para deletar um funcionário do banco de dados e da listagem.
-        /// </summary>
         public RelayCommand ExcluirCommand { get; }
-
-        /// <summary>
-        /// Comando para recarregar a lista de funcionários a partir do banco de dados.
-        /// </summary>
+        public RelayCommand AtuaisCommand => AtualizarCommand; // Alias de segurança se necessário
         public RelayCommand AtualizarCommand { get; }
-
-        /// <summary>
-        /// Comando para abrir a caixa de diálogo de cadastro de um novo funcionário.
-        /// </summary>
         public RelayCommand CriarCommand { get; }
-
-        /// <summary>
-        /// Comando para abrir a caixa de diálogo de edição do funcionário selecionado.
-        /// </summary>
         public RelayCommand EditarCommand { get; }
-
-        /// <summary>
-        /// Comando para exportar a listagem atual de funcionários em formato PDF.
-        /// </summary>
         public RelayCommand ExportarPdfCommand { get; }
 
         #endregion
 
         #region Construtores
 
-        /// <summary>
-        /// Inicializa uma nova instância da classe <see cref="FuncionarioViewModel"/>, configurando os repositórios, comandos e filtros.
-        /// </summary>
         public FuncionarioViewModel()
         {
             _repository = new FuncionarioRepository();
             _pdfService = new PdfService();
 
-            // Configuração do mecanismo de filtragem do WPF
             FuncionariosView = CollectionViewSource.GetDefaultView(Funcionarios);
             FuncionariosView.Filter = FiltroDeFuncionarios;
 
-            // Inicialização dos comandos mapeados para os botões da tela
             ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as Funcionario));
-            AtualizarCommand = new RelayCommand(_ => CarregarFuncionarios());
+            // Sincroniza o botão Atualizar com a Task assíncrona de carregamento
+            AtualizarCommand = new RelayCommand(async _ => await CarregarFuncionarios());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Funcionario));
             ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
-
-            CarregarFuncionarios();
         }
 
         #endregion
@@ -127,27 +97,33 @@ namespace magal.ViewModels
         #region Métodos Públicos
 
         /// <summary>
-        /// Busca a lista atualizada de funcionários do banco de dados e limpa os filtros da tela.
+        /// Busca a lista atualizada de funcionários assincronamente gerenciando o estado de Loading.
         /// </summary>
-        public async void CarregarFuncionarios()
+        public async Task CarregarFuncionarios()
         {
             try
             {
+                IsLoading = true;
                 FiltroTexto = string.Empty;
 
                 var lista = await _repository.ListarTodos();
                 Funcionarios.Clear();
-                foreach (var f in  lista)
+                foreach (var f in lista)
                 {
                     Funcionarios.Add(f);
                 }
 
                 FuncionariosView?.Refresh();
+                await Task.Delay(100); // Estabiliza a renderização visual do DataGrid
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao carregar funcionários: {ex.Message}", "Aero Concepts",
                     MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -155,9 +131,6 @@ namespace magal.ViewModels
 
         #region Métodos Auxiliares / Privados
 
-        /// <summary>
-        /// Avalia se um funcionário deve ser exibido no DataGrid com base no texto inserido no campo de busca.
-        /// </summary>
         private bool FiltroDeFuncionarios(object obj)
         {
             if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
@@ -170,10 +143,7 @@ namespace magal.ViewModels
                    (func.status?.ToLower().Contains(busca) ?? false);
         }
 
-        /// <summary>
-        /// Solicita a confirmação do usuário e executa a exclusão do funcionário no banco de dados e na memória.
-        /// </summary>
-        private void ExecutarExclusao(Funcionario funcionario)
+        private async void ExecutarExclusao(Funcionario funcionario)
         {
             if (funcionario == null) return;
 
@@ -184,8 +154,6 @@ namespace magal.ViewModels
                 {
                     _repository.Excluir(funcionario.id_funcionario);
                     Funcionarios.Remove(funcionario);
-
-                    // Força a atualização da contagem no rodapé após remover do ObservableCollection
                     FuncionariosView?.Refresh();
                 }
                 catch (Exception ex)
@@ -196,32 +164,23 @@ namespace magal.ViewModels
             }
         }
 
-        /// <summary>
-        /// Abre a janela de cadastro de funcionários e recarrega a lista caso o registro seja concluído.
-        /// </summary>
-        private void ExecutarCriar()
+        private async void ExecutarCriar()
         {
             var dialog = new magal.Views.CadastrarFuncionarioDialog();
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
-                CarregarFuncionarios();
+                await CarregarFuncionarios();
         }
 
-        /// <summary>
-        /// Abre a janela de edição preenchida com os dados do funcionário selecionado e atualiza a lista se houver salvamento.
-        /// </summary>
-        private void ExecutarEdicao(Funcionario funcionario)
+        private async void ExecutarEdicao(Funcionario funcionario)
         {
             if (funcionario == null) return;
             var dialog = new magal.Views.EditarFuncionarioDialog(funcionario);
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
-                CarregarFuncionarios();
+                await CarregarFuncionarios();
         }
 
-        /// <summary>
-        /// Abre a caixa de diálogo para salvar o arquivo e dispara a geração do PDF com os dados filtrados na tela.
-        /// </summary>
         private void ExecutarExportacaoPdf()
         {
             var funcionariosFiltrados = FuncionariosView.Cast<Funcionario>().ToList();

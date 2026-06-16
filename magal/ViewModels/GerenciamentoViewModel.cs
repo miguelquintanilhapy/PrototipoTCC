@@ -69,8 +69,6 @@ namespace magal.ViewModels
             _clienteRepo = new ClienteRepository();
             _cargoRepo = new CargoRepository();
             _catalogoCustoRepo = new CatalogoCustoRepository();
-
-            // O carregamento agora é gerenciado pelo ciclo de vida da View (Loaded)
         }
 
         #endregion

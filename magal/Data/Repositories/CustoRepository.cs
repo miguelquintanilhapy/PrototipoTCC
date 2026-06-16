@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using magal.Models;
 using magal.Data;
@@ -8,7 +9,7 @@ namespace magal.Data.Repositories
 {
     public class CustoRepository
     {
-        public List<Custo> ListarPorProjeto(int idProjeto)
+        public async Task<List<Custo>> ListarPorProjeto(int idProjeto)
         {
             var lista = new List<Custo>();
 
@@ -16,7 +17,7 @@ namespace magal.Data.Repositories
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = @"
                         SELECT 
@@ -37,9 +38,9 @@ namespace magal.Data.Repositories
                     {
                         cmd.Parameters.AddWithValue("@idProjeto", idProjeto);
 
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 lista.Add(new Custo
                                 {
@@ -65,13 +66,13 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        public void InserirCustoNoProjeto(int idProjeto, int idCatalogoCusto, string tipo, string unidade)
+        public async Task InserirCustoNoProjeto(int idProjeto, int idCatalogoCusto, string tipo, string unidade)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = @"
                         INSERT INTO custo (id_projeto, id_catalogo_custo, tipo, unidade)
@@ -84,7 +85,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@tipo", tipo ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@unidade", unidade ?? (object)DBNull.Value);
 
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -94,20 +95,21 @@ namespace magal.Data.Repositories
             }
         }
 
-        public void ExcluirCustoDoProjeto(int idCusto)
+        public async Task ExcluirCustoDoProjeto(int idCusto)
         {
             try
             {
                 using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     string sql = "DELETE FROM custo WHERE id_custo = @id";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", idCusto);
-                        cmd.ExecuteNonQuery();
+
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
             }

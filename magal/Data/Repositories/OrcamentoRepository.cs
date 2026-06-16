@@ -3,19 +3,21 @@ using MySql.Data.MySqlClient;
 using magal.Data;
 using magal.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks; // Adicionado para suportar Task
 
 namespace magal.Data.Repositories
 {
     public class OrcamentoRepository
     {
         /// <summary>
-        /// Salva ou atualiza os dados financeiros e termos comerciais de um orçamento.
+        /// Salva ou atualiza os dados financeiros e termos comerciais de um orçamento de forma assíncrona.
         /// </summary>
-        public void SalvarOrcamento(Orcamento orcamento, int idProjeto)
+        public async Task SalvarOrcamento(Orcamento orcamento, int idProjeto)
         {
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                // Adicionado await no OpenAsync
+                await conn.OpenAsync();
 
                 // Usando REPLACE INTO igual à estratégia do seu repositório original
                 string sql = @"
@@ -34,30 +36,29 @@ namespace magal.Data.Repositories
                     cmd.Parameters.AddWithValue("@idProj", idProjeto);
                     cmd.Parameters.AddWithValue("@custo", orcamento.custo_base);
                     cmd.Parameters.AddWithValue("@percImp", orcamento.percentual_impostos);
-                    cmd.Parameters.AddWithValue("@margPerc", orcamento.margem_percentual);
+                    cmd.Parameters.AddWithValue("@margPerc", orcamento.margem_percentual); 
                     cmd.Parameters.AddWithValue("@vMarg", orcamento.valor_margem);
                     cmd.Parameters.AddWithValue("@vImp", orcamento.valor_impostos);
                     cmd.Parameters.AddWithValue("@final", orcamento.valor_final);
                     cmd.Parameters.AddWithValue("@validade", orcamento.validade_dias);
 
-                    // Tratamento para nulos nos novos campos de profissionalização
                     cmd.Parameters.AddWithValue("@formaPagto", (object)orcamento.forma_pagamento ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@prazoEntr", (object)orcamento.prazo_entrega ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@obs", (object)orcamento.observacoes ?? DBNull.Value);
 
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
 
         /// <summary>
-        /// Busca o orçamento atrelado a um determinado projeto.
+        /// Busca o orçamento atrelado a um determinado projeto de forma assíncrona.
         /// </summary>
-        public Orcamento BuscarPorProjeto(int idProjeto)
+        public async Task<Orcamento> BuscarPorProjeto(int idProjeto)
         {
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
                 string sql = @"
                     SELECT id_orcamento, id_projeto, custo_base, percentual_impostos, 
@@ -71,9 +72,9 @@ namespace magal.Data.Repositories
                 {
                     cmd.Parameters.AddWithValue("@idProj", idProjeto);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        if (reader.Read())
+                        if (await reader.ReadAsync())
                         {
                             return new Orcamento
                             {
@@ -98,7 +99,7 @@ namespace magal.Data.Repositories
                 }
             }
 
-            return null; // Caso o projeto ainda não possua uma proposta salva
+            return null; 
         }
     }
 }

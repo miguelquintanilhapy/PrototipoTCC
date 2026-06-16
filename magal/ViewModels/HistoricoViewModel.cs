@@ -157,14 +157,14 @@ namespace magal.ViewModels
         /// <summary>
         /// Busca a lista atualizada de projetos do banco de dados e limpa os filtros da tela.
         /// </summary>
-        public void CarregarHistorico()
+        public async Task CarregarHistorico()
         {
             try
             {
                 _filtroTexto = string.Empty;
                 OnPropertyChanged(nameof(FiltroTexto));
 
-                var lista = _repository.BuscarTodosPorUsuario(1);
+                var lista = await _repository.BuscarTodosPorUsuario(1);
                 Projetos.Clear();
 
                 foreach (var p in lista)
@@ -306,13 +306,13 @@ namespace magal.ViewModels
         /// <summary>
         /// Carrega a estrutura de dados profunda do projeto selecionado e aciona a navegação da janela principal para a tela de edição.
         /// </summary>
-        private void ExecutarEdicao(Projeto projeto)
+        private async void ExecutarEdicao(Projeto projeto)
         {
             if (projeto == null) return;
 
             try
             {
-                var projetoCompleto = _repository.CarregarProjetoCompleto(projeto.id_projeto);
+                var projetoCompleto = await _repository.CarregarProjetoCompleto(projeto.id_projeto);
 
                 if (projetoCompleto != null)
                 {

@@ -4,18 +4,19 @@ using magal.Data;
 using magal.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks; // Adicionado para suportar Task
 
 namespace magal.Data.Repositories
 {
     public class ProjetoRepository
     {
-        public void SalvarProjetoCompleto(Projeto projeto, List<Custo> custosExtras)
+        public async Task SalvarProjetoCompleto(Projeto projeto, List<Custo> custosExtras)
         {
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
-                using (var transaction = conn.BeginTransaction())
+                using (var transaction = await conn.BeginTransactionAsync())
                 {
                     try
                     {
@@ -36,10 +37,10 @@ namespace magal.Data.Repositories
                                 cmd.Parameters.AddWithValue("@tipo", projeto.tipo ?? "Serviço");
                                 cmd.Parameters.AddWithValue("@status", projeto.status ?? "Rascunho");
 
-                                cmd.ExecuteNonQuery();
+                                await cmd.ExecuteNonQueryAsync();
 
                                 cmd.CommandText = "SELECT LAST_INSERT_ID();";
-                                projeto.id_projeto = Convert.ToInt32(cmd.ExecuteScalar());
+                                projeto.id_projeto = Convert.ToInt32(await cmd.ExecuteScalarAsync());
                             }
                         }
                         else
@@ -57,15 +58,22 @@ namespace magal.Data.Repositories
                                 cmd.Parameters.AddWithValue("@tipo", projeto.tipo);
                                 cmd.Parameters.AddWithValue("@idProj", projeto.id_projeto);
 
-                                cmd.ExecuteNonQuery();
+                                await cmd.ExecuteNonQueryAsync();
                             }
 
-                            // LIMPAR TAREFAS E CUSTOS ANTIGOS
-                            new MySqlCommand($"DELETE FROM tarefa WHERE id_projeto = {projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
-                            new MySqlCommand($"DELETE FROM custo WHERE id_projeto = {projeto.id_projeto}", conn, transaction).ExecuteNonQuery();
+                            // LIMPAR TAREFAS E CUSTOS ANTIGOS (Convertidos para Execuções Assíncronas)
+                            using (var cmdDelTarefa = new MySqlCommand($"DELETE FROM tarefa WHERE id_projeto = {projeto.id_projeto}", conn, transaction))
+                            {
+                                await cmdDelTarefa.ExecuteNonQueryAsync();
+                            }
+
+                            using (var cmdDelCusto = new MySqlCommand($"DELETE FROM custo WHERE id_projeto = {projeto.id_projeto}", conn, transaction))
+                            {
+                                await cmdDelCusto.ExecuteNonQueryAsync();
+                            }
                         }
 
-                        // INSERIR OU ATUALIZAR ORÇAMENTO (Adicionado as 3 novas colunas aqui)
+                        // INSERIR OU ATUALIZAR ORÇAMENTO
                         using (var cmd = new MySqlCommand(@"
                             REPLACE INTO orcamento
                             (id_projeto, custo_base, percentual_impostos, margem_percentual, valor_margem, valor_impostos, valor_final, validade_dias, forma_pagamento, prazo_entrega, observacoes)
@@ -82,12 +90,11 @@ namespace magal.Data.Repositories
                             cmd.Parameters.AddWithValue("@final", projeto.Orcamento.valor_final);
                             cmd.Parameters.AddWithValue("@validade", projeto.Orcamento.validade_dias);
 
-                            // Parâmetros novos com tratamento para nulo
                             cmd.Parameters.AddWithValue("@formaPagamento", projeto.Orcamento.forma_pagamento ?? string.Empty);
                             cmd.Parameters.AddWithValue("@prazoEntrega", projeto.Orcamento.prazo_entrega.HasValue ? (object)projeto.Orcamento.prazo_entrega.Value : DBNull.Value);
                             cmd.Parameters.AddWithValue("@obs", projeto.Orcamento.observacoes ?? string.Empty);
 
-                            cmd.ExecuteNonQuery();
+                            await cmd.ExecuteNonQueryAsync();
                         }
 
                         // INSERIR TAREFAS
@@ -106,7 +113,7 @@ namespace magal.Data.Repositories
                                 cmd.Parameters.AddWithValue("@horas", Convert.ToDecimal(tarefa.horas_estimadas));
                                 cmd.Parameters.AddWithValue("@status", tarefa.status ?? "Pendente");
 
-                                cmd.ExecuteNonQuery();
+                                await cmd.ExecuteNonQueryAsync();
                             }
                         }
 
@@ -128,30 +135,29 @@ namespace magal.Data.Repositories
                                 cmd.Parameters.AddWithValue("@unidade", custo.unidade ?? "Unitário");
                                 cmd.Parameters.AddWithValue("@idCatalogo", 1);
 
-                                cmd.ExecuteNonQuery();
+                                await cmd.ExecuteNonQueryAsync();
                             }
                         }
 
-                        transaction.Commit();
+                        await transaction.CommitAsync();
                     }
                     catch (Exception ex)
                     {
-                        transaction.Rollback();
+                        await transaction.RollbackAsync();
                         throw new Exception("Erro ao processar transação no MySQL: " + ex.Message);
                     }
                 }
             }
         }
 
-        public Projeto CarregarProjetoCompleto(int idProjeto)
+        public async Task<Projeto> CarregarProjetoCompleto(int idProjeto)
         {
             var projeto = new Projeto();
 
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
-                // Adicionado as 3 colunas novas no SELECT
                 string sqlProj = @"
                     SELECT
                         p.*,
@@ -175,9 +181,9 @@ namespace magal.Data.Repositories
                 {
                     cmd.Parameters.AddWithValue("@id", idProjeto);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        if (reader.Read())
+                        if (await reader.ReadAsync())
                         {
                             projeto.id_projeto = idProjeto;
                             projeto.nome = reader["nome"].ToString();
@@ -197,7 +203,6 @@ namespace magal.Data.Repositories
                                 valor_final = reader["valor_final"] != DBNull.Value ? Convert.ToDecimal(reader["valor_final"]) : 0,
                                 validade_dias = reader["validade_dias"] != DBNull.Value ? Convert.ToInt32(reader["validade_dias"]) : 15,
 
-                                // Mapeamento dos novos campos de texto com verificação de nulo
                                 forma_pagamento = reader["forma_pagamento"] != DBNull.Value ? reader["forma_pagamento"].ToString() : string.Empty,
                                 prazo_entrega = reader["prazo_entrega"] != DBNull.Value ? (DateTime?)Convert.ToDateTime(reader["prazo_entrega"]) : null,
                                 observacoes = reader["observacoes"] != DBNull.Value ? reader["observacoes"].ToString() : string.Empty
@@ -219,9 +224,9 @@ namespace magal.Data.Repositories
                 {
                     cmd.Parameters.AddWithValue("@id", idProjeto);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             projeto.Tarefas.Add(new Tarefa
                             {
@@ -248,9 +253,9 @@ namespace magal.Data.Repositories
                 {
                     cmd.Parameters.AddWithValue("@id", idProjeto);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             projeto.Custos.Add(new Custo
                             {
@@ -269,15 +274,14 @@ namespace magal.Data.Repositories
             return projeto;
         }
 
-        public List<Projeto> BuscarTodosPorUsuario(int idUsuario)
+        public async Task<List<Projeto>> BuscarTodosPorUsuario(int idUsuario)
         {
             var lista = new List<Projeto>();
 
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
-                // Adicionado as 3 colunas novas no SELECT da listagem geral
                 string sql = @"
                     SELECT
                         p.*,
@@ -305,9 +309,11 @@ namespace magal.Data.Repositories
                 {
                     cmd.Parameters.AddWithValue("@idUser", idUsuario);
 
-                    using (var reader = cmd.ExecuteReader())
+                    // Adicionado await no ExecuteReaderAsync
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        while (reader.Read())
+                        // Adicionado await no ReadAsync
+                        while (await reader.ReadAsync())
                         {
                             var projeto = new Projeto
                             {
@@ -336,7 +342,6 @@ namespace magal.Data.Repositories
                                     valor_final = Convert.ToDecimal(reader["valor_final"]),
                                     validade_dias = reader["validade_dias"] != DBNull.Value ? Convert.ToInt32(reader["validade_dias"]) : 15,
 
-                                    // Mapeamento dos novos campos na listagem geral
                                     forma_pagamento = reader["forma_pagamento"] != DBNull.Value ? reader["forma_pagamento"].ToString() : string.Empty,
                                     prazo_entrega = reader["prazo_entrega"] != DBNull.Value ? (DateTime?)Convert.ToDateTime(reader["prazo_entrega"]) : null,
                                     observacoes = reader["observacoes"] != DBNull.Value ? reader["observacoes"].ToString() : string.Empty
@@ -364,11 +369,11 @@ namespace magal.Data.Repositories
             return lista;
         }
 
-        public void ExcluirProjeto(int idProjeto)
+        public async Task ExcluirProjeto(int idProjeto)
         {
             using (var conn = (MySqlConnection)DbConnectionFactory.CreateConnection())
             {
-                conn.Open();
+                await conn.OpenAsync();
 
                 string sql = @"
                     DELETE FROM projeto
@@ -378,7 +383,7 @@ namespace magal.Data.Repositories
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@id", idProjeto);
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }

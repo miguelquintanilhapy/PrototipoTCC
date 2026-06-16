@@ -135,11 +135,11 @@ namespace magal.ViewModels
 
         #region Métodos de Carregamento
 
-        public void CarregarDados()
+        public async void CarregarDados()
         {
             try
             {
-                var projetos = _repository.BuscarTodosPorUsuario(1) ?? new List<Projeto>();
+                var projetos = await _repository.BuscarTodosPorUsuario(1) ?? new List<Projeto>();
                 DateTime dataLimite = DateTime.MinValue;
 
                 switch (PeriodoSelecionado)

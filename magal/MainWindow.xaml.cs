@@ -116,10 +116,10 @@ namespace magal
             AtualizarBotaoAtivo(BtnGerenciamento); // <-- ADICIONE AQUI
         }
 
-        public void IrParaEdicao(Projeto projetoSimplificado)
+        public async void IrParaEdicao(Projeto projetoSimplificado)
         {
             var repo = new ProjetoRepository();
-            Projeto projetoCompleto = repo.CarregarProjetoCompleto(projetoSimplificado.id_projeto);
+            Projeto projetoCompleto = await repo.CarregarProjetoCompleto(projetoSimplificado.id_projeto);
 
             var viewModel = new OrcamentoViewModel();
             viewModel.CarregarProjetoParaEdicao(projetoCompleto);

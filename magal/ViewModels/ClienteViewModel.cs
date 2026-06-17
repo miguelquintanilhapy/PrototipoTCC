@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Threading.Tasks;
 using magal.Models;
 using magal.Data.Repositories;
 using magal.Services;
@@ -19,6 +20,7 @@ namespace magal.ViewModels
         private readonly PdfService _pdfService;
         private Cliente _clienteSelecionado;
         private string _filtroTexto;
+        private bool _isLoading;
 
         #endregion
 
@@ -39,6 +41,12 @@ namespace magal.ViewModels
         {
             get => _clienteSelecionado;
             set { _clienteSelecionado = value; OnPropertyChanged(); }
+        }
+
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set { _isLoading = value; OnPropertyChanged(); }
         }
 
         #endregion
@@ -71,24 +79,31 @@ namespace magal.ViewModels
             ClientesView.Filter = FiltroDeClientes;
 
             ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as Cliente));
-            AtualizarCommand = new RelayCommand(_ => CarregarClientes());
+            AtualizarCommand = new RelayCommand(async _ => await CarregarClientes());
             CriarCommand = new RelayCommand(_ => ExecutarCriar());
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Cliente));
             ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
 
-            CarregarClientes();
+            // Executa a carga inicial de dados de maneira assíncrona sem travar o construtor
+            _ = CarregarClientes();
         }
 
         #endregion
 
         #region Métodos Públicos
 
-        // Mude para async Task
+        /// <summary>
+        /// Carrega a listagem de clientes de forma assíncrona gerenciando o estado do loader de interface.
+        /// </summary>
         public async Task CarregarClientes()
         {
+            if (IsLoading) return;
+
             try
             {
+                IsLoading = true;
                 FiltroTexto = string.Empty;
+
                 var lista = await _repository.ListarTodos();
 
                 Clientes.Clear();
@@ -100,7 +115,11 @@ namespace magal.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erro: {ex.Message}");
+                MessageBox.Show($"Erro ao carregar clientes: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -146,7 +165,7 @@ namespace magal.ViewModels
             var dialog = new magal.Views.CadastrarClienteDialog();
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
-                CarregarClientes();
+                _ = CarregarClientes();
         }
 
         private void ExecutarEdicao(Cliente cliente)
@@ -155,7 +174,7 @@ namespace magal.ViewModels
             var dialog = new magal.Views.EditarClienteDialog(cliente);
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
-                CarregarClientes();
+                _ = CarregarClientes();
         }
 
         private void ExecutarExportacaoPdf()

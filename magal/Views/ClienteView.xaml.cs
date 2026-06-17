@@ -22,7 +22,7 @@ namespace magal.Views
             var mainWindow = Window.GetWindow(this) as magal.MainWindow;
             if (mainWindow != null)
             {
-               mainWindow.AbrirGerenciamento(); 
+                mainWindow.AbrirGerenciamento();
             }
         }
     }

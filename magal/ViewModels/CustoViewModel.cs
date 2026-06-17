@@ -4,18 +4,15 @@ using System.Linq;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using magal.Models;
 using magal.Data.Repositories;
 using magal.Services;
 using Microsoft.Win32;
-using System.Collections.Generic;
 
 namespace magal.ViewModels
 {
-    /// <summary>
-    /// ViewModel responsável por gerenciar a tela de catálogo de custos,
-    /// controlando filtros de busca, listagem e ações de lançamento, edição e exclusão.
-    /// </summary>
     public class CustoViewModel : BaseModel
     {
         #region Atributos e Campos Privados
@@ -24,14 +21,31 @@ namespace magal.ViewModels
         private readonly PdfService _pdfService;
         private CatalogoCusto _custoSelecionado;
         private string _filtroTexto;
+        private bool _isLoading;
 
         #endregion
 
         #region Propriedades e Filtros
 
-        /// <summary>
-        /// Obtém ou define o texto de busca utilizado para filtrar os custos por nome ou categoria em tempo real.
-        /// </summary>
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                if (_isLoading != value)
+                {
+                    _isLoading = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(IsNotLoading));
+
+                    // Força o WPF a reavaliar automaticamente o CanExecute de todos os botões vinculados
+                    System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+                }
+            }
+        }
+
+        public bool IsNotLoading => !IsLoading;
+
         public string FiltroTexto
         {
             get => _filtroTexto;
@@ -43,9 +57,6 @@ namespace magal.ViewModels
             }
         }
 
-        /// <summary>
-        /// Obtém ou define o custo do catálogo atualmente selecionado na listagem (DataGrid).
-        /// </summary>
         public CatalogoCusto CustoSelecionado
         {
             get => _custoSelecionado;
@@ -56,57 +67,24 @@ namespace magal.ViewModels
 
         #region Coleções e Visões de Dados
 
-        /// <summary>
-        /// Lista observável de itens do catálogo de custos carregados do banco de dados.
-        /// </summary>
         public ObservableCollection<CatalogoCusto> Custos { get; } = new ObservableCollection<CatalogoCusto>();
-
-        /// <summary>
-        /// Visão customizada da coleção que permite a aplicação de filtros em tempo real sem perder a lista original.
-        /// </summary>
         public ICollectionView CustosView { get; private set; }
 
         #endregion
 
         #region Comandos disparados pela View
 
-        /// <summary>
-        /// Comando para deletar um custo do banco de dados e da listagem.
-        /// </summary>
         public RelayCommand ExcluirCommand { get; }
-
-        /// <summary>
-        /// Comando para recarregar a lista de custos a partir do banco de dados.
-        /// </summary>
         public RelayCommand AtualizarCommand { get; }
-
-        /// <summary>
-        /// Comando para abrir a caixa de diálogo de lançamento de um novo custo no catálogo.
-        /// </summary>
         public RelayCommand CriarCommand { get; }
-
-        /// <summary>
-        /// Comando para abrir a caixa de diálogo de edição do custo selecionado.
-        /// </summary>
         public RelayCommand EditarCommand { get; }
-
-        /// <summary>
-        /// Comando para exportar a listagem atual de custos em formato PDF.
-        /// </summary>
         public RelayCommand ExportarPdfCommand { get; }
-
-        /// <summary>
-        /// Comando para voltar ao painel principal do sistema.
-        /// </summary>
         public RelayCommand VoltarCommand { get; }
 
         #endregion
 
-        #region Construtores
+        #region Construtor
 
-        /// <summary>
-        /// Inicializa uma nova instância da classe <see cref="CustoViewModel"/>, configurando os repositórios, comandos e filtros.
-        /// </summary>
         public CustoViewModel()
         {
             _repository = new CatalogoCustoRepository();
@@ -115,30 +93,32 @@ namespace magal.ViewModels
             CustosView = CollectionViewSource.GetDefaultView(Custos);
             CustosView.Filter = FiltroDeCustos;
 
-            // Inicialização dos Comandos mapeados para os botões da tela
-            ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as CatalogoCusto));
-            AtualizarCommand = new RelayCommand(_ => CarregarCustos());
-            CriarCommand = new RelayCommand(_ => ExecutarCriar());
-            EditarCommand = new RelayCommand(p => ExecutarEdicao(p as CatalogoCusto));
-            ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
+            // Inicialização dos Comandos avaliando a trava de carregamento do sistema
+            ExcluirCommand = new RelayCommand(async p => await ExecutarExclusao(p as CatalogoCusto), _ => IsNotLoading);
+            AtualizarCommand = new RelayCommand(async _ => await CarregarCustos(), _ => IsNotLoading);
+            CriarCommand = new RelayCommand(_ => ExecutarCriar(), _ => IsNotLoading);
+            EditarCommand = new RelayCommand(_ => ExecutarEdicao(CustoSelecionado), _ => IsNotLoading);
+            ExportarPdfCommand = new RelayCommand(async _ => await ExecutarExportacaoPdf(), _ => IsNotLoading);
+            VoltarCommand = new RelayCommand(_ => ExecutarVoltar());
 
-            CarregarCustos();
+            // Inicializa a tela trazendo a listagem
+            _ = CarregarCustos();
         }
 
         #endregion
 
-        #region Métodos Públicos
+        #region Métodos de Ação
 
-        /// <summary>
-        /// Busca a lista atualizada de itens do catálogo do banco de dados e limpa os filtros da tela.
-        /// </summary>
         public async Task CarregarCustos()
         {
+            if (IsLoading) return;
+
             try
             {
+                IsLoading = true;
                 FiltroTexto = string.Empty;
 
-                var lista = await _repository.ListarTodos();
+                var lista = await Task.Run(() => _repository.ListarTodos());
 
                 Custos.Clear();
                 foreach (var c in lista)
@@ -153,77 +133,63 @@ namespace magal.ViewModels
                 MessageBox.Show($"Erro ao carregar catálogo de custos: {ex.Message}", "Aero Concepts",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
-        #endregion
-
-        #region Métodos Auxiliares / Privados
-
-        /// <summary>
-        /// Avalia se um custo deve ser exibido no DataGrid com base no texto inserido no campo de busca (Nome ou Categoria).
-        /// </summary>
-        private bool FiltroDeCustos(object obj)
+        private async Task ExecutarExclusao(CatalogoCusto custo)
         {
-            if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
-            if (obj is not CatalogoCusto custo) return false;
-
-            var busca = FiltroTexto.ToLower().Trim();
-
-            return (custo.nome?.ToLower().Contains(busca) ?? false) ||
-                   (custo.categoria?.ToLower().Contains(busca) ?? false);
-        }
-
-        /// <summary>
-        /// Solicita a confirmação do usuário e executa a exclusão do custo no banco de dados e na memória.
-        /// </summary>
-        private void ExecutarExclusao(CatalogoCusto custo)
-        {
-            if (custo == null) return;
+            if (custo == null || IsLoading) return;
 
             var msg = $"Tem certeza que deseja excluir o custo '{custo.nome}' no valor de {custo.valor:C} do catálogo?";
             if (MessageBox.Show(msg, "Confirmar Exclusão", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 try
                 {
-                    _repository.Excluir(custo.id_catalogo_custo);
+                    IsLoading = true;
+                    await Task.Run(() => _repository.Excluir(custo.id_catalogo_custo));
                     Custos.Remove(custo);
+                    CustosView?.Refresh();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Erro ao excluir custo: {ex.Message}", "Erro",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+                finally
+                {
+                    IsLoading = false;
+                }
             }
         }
 
-        /// <summary>
-        /// Abre a janela modal de lançamento de custos e recarrega a lista caso o registro seja concluído.
-        /// </summary>
         private void ExecutarCriar()
         {
             var dialog = new magal.Views.CadastrarCustoDialog();
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
-                CarregarCustos();
+            {
+                _ = CarregarCustos();
+            }
         }
 
-        /// <summary>
-        /// Abre a janela modal de edição preenchida com os dados do custo selecionado e atualiza a lista se houver salvamento.
-        /// </summary>
         private void ExecutarEdicao(CatalogoCusto custo)
         {
             if (custo == null) return;
             var dialog = new magal.Views.EditarCustoDialog(custo);
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
-                CarregarCustos();
+            {
+                _ = CarregarCustos();
+            }
         }
 
-        /// <summary>
-        /// Abre a caixa de diálogo para salvar o arquivo e dispara a geração do PDF com os custos filtrados na tela.
-        /// </summary>
-        private void ExecutarExportacaoPdf()
+        private async Task ExecutarExportacaoPdf()
         {
+            if (IsLoading) return;
+
             var custosFiltrados = CustosView.Cast<CatalogoCusto>().ToList();
 
             if (!custosFiltrados.Any())
@@ -247,7 +213,10 @@ namespace magal.ViewModels
             {
                 try
                 {
-                    _pdfService.GerarRelatorioTabelaCustos(custosFiltrados, saveFileDialog.FileName);
+                    IsLoading = true;
+                    string caminhoSalvar = saveFileDialog.FileName;
+
+                    await Task.Run(() => _pdfService.GerarRelatorioTabelaCustos(custosFiltrados, caminhoSalvar));
 
                     MessageBox.Show("Relatório do catálogo de custos gerado com sucesso!", "Sucesso",
                         MessageBoxButton.OK, MessageBoxImage.Information);
@@ -257,7 +226,28 @@ namespace magal.ViewModels
                     MessageBox.Show($"Erro ao exportar PDF: {ex.Message}", "Erro",
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+                finally
+                {
+                    IsLoading = false;
+                }
             }
+        }
+
+        private void ExecutarVoltar()
+        {
+            var mainWindow = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
+            mainWindow?.AbrirGerenciamento();
+        }
+
+        private bool FiltroDeCustos(object obj)
+        {
+            if (string.IsNullOrWhiteSpace(FiltroTexto)) return true;
+            if (obj is not CatalogoCusto custo) return false;
+
+            var busca = FiltroTexto.ToLower().Trim();
+
+            return (custo.nome?.ToLower().Contains(busca) ?? false) ||
+                   (custo.categoria?.ToLower().Contains(busca) ?? false);
         }
 
         #endregion

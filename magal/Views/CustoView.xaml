@@ -9,6 +9,8 @@
              Background="#F0F4FA">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
         <SolidColorBrush x:Key="AzulAero"        Color="#131C49"/>
         <SolidColorBrush x:Key="AeroAccent"      Color="#3B82F6"/>
         <SolidColorBrush x:Key="AeroDanger"      Color="#EF4444"/>
@@ -23,35 +25,21 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
-
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-
-                        <Border x:Name="Border"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="20">
-
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="20">
                             <ContentPresenter x:Name="ContentIcon"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"
-                                      TextBlock.Foreground="#64748B"/>
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextBlock.Foreground="#64748B"/>
                         </Border>
-
                         <ControlTemplate.Triggers>
-
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border"
-                                Property="Background"
-                                Value="#E2EBF5"/>
-
-                                <Setter TargetName="ContentIcon"
-                                Property="TextBlock.Foreground"
-                                Value="#131C49"/>
+                                <Setter TargetName="Border" Property="Background" Value="#E2EBF5"/>
+                                <Setter TargetName="ContentIcon" Property="TextBlock.Foreground" Value="#131C49"/>
                             </Trigger>
-
                         </ControlTemplate.Triggers>
-
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -74,6 +62,9 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="#1E3A8A"/>
                             </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Background" Value="#94A3B8"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -81,195 +72,199 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="32,28">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid Margin="32,28" IsEnabled="{Binding IsNotLoading}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Height="80" Margin="0,0,0,10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Button Style="{StaticResource BackBtnStyle}"
-                        Content="" 
-                        FontFamily="Segoe MDL2 Assets" 
-                        FontSize="16"
-                        Margin="0,0,15,0"
-                        Click="BtnVoltar_Click"/>
+            <Grid Grid.Row="0" Height="80" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button Style="{StaticResource BackBtnStyle}"
+                            Content="" 
+                            FontFamily="Segoe MDL2 Assets" 
+                            FontSize="16"
+                            Margin="0,0,15,0"
+                            Command="{Binding VoltarCommand}"/>
 
-                <TextBlock Text="Gestão de Custos" 
-                           FontSize="28" FontWeight="Bold"
-                           Foreground="{StaticResource AzulAero}"
-                           VerticalAlignment="Center"/>
-            </StackPanel>
+                    <TextBlock Text="Gestão de Custos" 
+                               FontSize="28" FontWeight="Bold"
+                               Foreground="{StaticResource AzulAero}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="+ NOVO CUSTO" 
-                        Style="{StaticResource PrimaryBtn}"
-                        Margin="0,0,10,0"
-                        Command="{Binding CriarCommand}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Content="+ NOVO CUSTO" 
+                            Style="{StaticResource PrimaryBtn}"
+                            Margin="0,0,10,0"
+                            Command="{Binding CriarCommand}"/>
 
-                <Button Command="{Binding AtualizarCommand}" Style="{StaticResource PrimaryBtn}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#xE72C;" 
-                                   FontFamily="Segoe MDL2 Assets" 
-                                   FontSize="12" 
-                                   VerticalAlignment="Center" 
-                                   Margin="0,0,8,0"/>
-                        <TextBlock Text="ATUALIZAR LISTA" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
+                    <Button Command="{Binding AtualizarCommand}" Style="{StaticResource PrimaryBtn}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE72C;" 
+                                       FontFamily="Segoe MDL2 Assets" 
+                                       FontSize="12" 
+                                       VerticalAlignment="Center" 
+                                       Margin="0,0,8,0"/>
+                            <TextBlock Text="ATUALIZAR LISTA" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                <Button Command="{Binding ExportarPdfCommand}" Style="{StaticResource PrimaryBtn}" Margin="10,0,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#xE72D;" 
-                                   FontFamily="Segoe MDL2 Assets" 
-                                   FontSize="12" 
-                                   VerticalAlignment="Center" 
-                                   Margin="0,0,8,0"/>
-                        <TextBlock Text="EXPORTAR RELATÓRIO" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
+                    <Button Command="{Binding ExportarPdfCommand}" Style="{StaticResource PrimaryBtn}" Margin="10,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE72D;" 
+                                       FontFamily="Segoe MDL2 Assets" 
+                                       FontSize="12" 
+                                       VerticalAlignment="Center" 
+                                       Margin="0,0,8,0"/>
+                            <TextBlock Text="EXPORTAR RELATÓRIO" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
 
-        <StackPanel Grid.Row="1" Margin="0,0,0,15">
-            <TextBlock Text="FILTRE POR NOME, CATEGORIA OU TIPO" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
-
-            <Border BorderThickness="1.5" Height="42" Background="White" CornerRadius="8">
-                <Border.Style>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-
-                <Grid>
-                    <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
-                     VerticalContentAlignment="Center" 
-                     Padding="12,0,40,0"
-                     FontSize="14" 
-                     Background="Transparent" 
-                     BorderThickness="0"/>
-
-                    <TextBlock Text="🔍" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="{StaticResource AeroTextHint}" IsHitTestVisible="False"/>
-                </Grid>
-            </Border>
-        </StackPanel>
-
-        <Border Grid.Row="2" Background="White" CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}" Padding="1">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <DataGrid ItemsSource="{Binding CustosView}" 
-                          AutoGenerateColumns="False" IsReadOnly="True"
-                          Background="Transparent" BorderThickness="0"
-                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
-                          HeadersVisibility="Column"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          CanUserResizeColumns="False"
-                          CanUserReorderColumns="False"
-                          RowHeight="60" SelectionMode="Single"
-                          FontSize="14">
-
-                    <DataGrid.Resources>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background" Value="#F8FAFC"/>
-                            <Setter Property="Foreground" Value="{StaticResource AeroTextMuted}"/>
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="FontSize" Value="13"/>
-                            <Setter Property="Padding" Value="15,12"/>
-                            <Setter Property="Height" Value="46"/>
-                            <Setter Property="Cursor" Value="Hand"/>
-                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <StackPanel Grid.Row="1" Margin="0,0,0,15">
+                <TextBlock Text="FILTRE POR NOME, CATEGORIA OU TIPO" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AzulAero}" Margin="0,0,0,4"/>
+                <Border BorderThickness="1.5" Height="42" Background="White" CornerRadius="8">
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
                             <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
-                        </Style>
-
-                        <Style TargetType="DataGridCell">
-                            <Setter Property="Padding" Value="15,0"/>
-                            <Setter Property="Cursor" Value="Hand"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="DataGridCell">
-                                        <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
-                                            <ContentPresenter VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
                             <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="#EFF6FF"/>
-                                    <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
-                                </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#F1F5F9"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
-                    </DataGrid.Resources>
-
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding id_catalogo_custo}" Width="80" FontSize="14" FontWeight="SemiBold" />
-
-                        <DataGridTextColumn Header="NOME DO CUSTO" Binding="{Binding nome}" Width="*" FontSize="15" FontWeight="SemiBold">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="Margin" Value="10,0"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="CATEGORIA" Binding="{Binding categoria}" Width="180" FontSize="14" FontWeight="SemiBold" />
-
-                        <DataGridTextColumn Header="VALOR" Binding="{Binding valor, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" Width="160" FontSize="16" FontWeight="Bold">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Right"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="Foreground" Value="{StaticResource VerdeAero}"/>
-                                    <Setter Property="Padding" Value="0,0,30,0"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTemplateColumn Header="AÇÕES" Width="170">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="Editar" 
-                                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                FontSize="13" Foreground="{StaticResource AeroAccent}"
-                                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
-
-                                        <Button Content="Excluir" 
-                                                Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                FontSize="13" Foreground="{StaticResource AeroDanger}"
-                                                Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-
-                <Border Grid.Row="1" Background="#F8FAFC" BorderThickness="0,1,0,0" BorderBrush="#F1F5F9" CornerRadius="0,0,16,16" Padding="20,12">
-                    <TextBlock Text="{Binding CustosView.Count, StringFormat='{}{0} custos encontrados'}"
-                               FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
+                    </Border.Style>
+                    <Grid>
+                        <TextBox Text="{Binding FiltroTexto, UpdateSourceTrigger=PropertyChanged}"
+                                 VerticalContentAlignment="Center" 
+                                 Padding="12,0,40,0"
+                                 FontSize="14" 
+                                 Background="Transparent" 
+                                 BorderThickness="0"/>
+                        <TextBlock Text="🔍" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0" Foreground="{StaticResource AeroTextHint}" IsHitTestVisible="False"/>
+                    </Grid>
                 </Border>
-            </Grid>
-        </Border>
+            </StackPanel>
+
+            <Border Grid.Row="2" Background="White" CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource AeroBorder}" Padding="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid ItemsSource="{Binding CustosView}" 
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              Background="Transparent" BorderThickness="0"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F5F9"
+                              HeadersVisibility="Column"
+                              CanUserAddRows="False" CanUserDeleteRows="False"
+                              CanUserResizeColumns="False" CanUserReorderColumns="False"
+                              RowHeight="60" SelectionMode="Single"
+                              SelectedItem="{Binding CustoSelecionado}"
+                              FontSize="14">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F8FAFC"/>
+                                <Setter Property="Foreground" Value="{StaticResource AeroTextMuted}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="Padding" Value="15,12"/>
+                                <Setter Property="Height" Value="46"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+                            </Style>
+
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="15,0"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#EFF6FF"/>
+                                        <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#F1F5F9"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding id_catalogo_custo}" Width="80" FontSize="14" FontWeight="SemiBold" />
+                            <DataGridTextColumn Header="NOME DO CUSTO" Binding="{Binding nome}" Width="*" FontSize="15" FontWeight="SemiBold">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Margin" Value="10,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="CATEGORIA" Binding="{Binding categoria}" Width="180" FontSize="14" FontWeight="SemiBold" />
+                            <DataGridTextColumn Header="VALOR" Binding="{Binding valor, StringFormat='{}{0:C}', ConverterCulture=pt-BR}" Width="160" FontSize="16" FontWeight="Bold">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Foreground" Value="{StaticResource VerdeAero}"/>
+                                        <Setter Property="Padding" Value="0,0,30,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <DataGridTemplateColumn Header="AÇÕES" Width="170">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="Editar" 
+                                                    Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    FontSize="13" Foreground="{StaticResource AeroAccent}"
+                                                    Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold" Margin="0,0,15,0"/>
+
+                                            <Button Content="Excluir" 
+                                                    Command="{Binding DataContext.ExcluirCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    FontSize="13" Foreground="{StaticResource AeroDanger}"
+                                                    Background="Transparent" BorderThickness="0" Cursor="Hand" FontWeight="Bold"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Border Grid.Row="1" Background="#F8FAFC" BorderThickness="0,1,0,0" BorderBrush="#F1F5F9" CornerRadius="0,0,16,16" Padding="20,12">
+                        <TextBlock Text="{Binding CustosView.Count, StringFormat='{}{0} custos encontrados'}"
+                                   FontSize="12" Foreground="{StaticResource AeroTextHint}" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="0" Grid.RowSpan="3" 
+              x:Name="LoadingOverlay"
+              Background="#CCFFFFFF" 
+              Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="6" Foreground="{StaticResource AzulAero}" Background="#E2E8F0" BorderThickness="0"/>
+                <TextBlock Text="Carregando..." Margin="0,12,0,0" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource AzulAero}" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

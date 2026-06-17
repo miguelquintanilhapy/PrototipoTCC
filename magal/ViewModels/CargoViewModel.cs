@@ -24,10 +24,24 @@ namespace magal.ViewModels
         private readonly PdfService _pdfService;
         private Cargo _cargoSelecionado;
         private string _filtroTexto;
+        private bool _isLoading;
 
         #endregion
 
         #region Propriedades e Filtros
+
+        /// <summary>
+        /// Obtém ou define o estado de carregamento da tela.
+        /// </summary>
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Obtém ou define o texto de busca utilizado para filtrar os cargos na tela em tempo real.
@@ -132,6 +146,7 @@ namespace magal.ViewModels
         {
             try
             {
+                IsLoading = true;
                 FiltroTexto = string.Empty;
 
                 var lista = await _repository.ListarTodos();
@@ -147,6 +162,10 @@ namespace magal.ViewModels
             {
                 MessageBox.Show($"Erro ao carregar cargos: {ex.Message}", "Aero Concepts",
                     MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 

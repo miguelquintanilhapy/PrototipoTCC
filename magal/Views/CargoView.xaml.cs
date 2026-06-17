@@ -1,32 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq; // Adicionado para permitir localização da MainWindow na aplicação
-using System.Text;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using magal.ViewModels;
 
 namespace magal.Views
 {
+    /// <summary>
+    /// Lógica de interação para CargoView.xaml
+    /// </summary>
     public partial class CargoView : UserControl
     {
+        #region Construtores
+
+        /// <summary>
+        /// Inicializa uma nova instância da classe <see cref="CargoView"/>.
+        /// Configura os componentes visuais e vincula a ViewModel ao DataContext.
+        /// </summary>
         public CargoView()
         {
             InitializeComponent();
+
             // Instancia e vincula a ViewModel ao contexto de dados da View
             this.DataContext = new CargoViewModel();
         }
 
+        #endregion
+
+        #region Eventos Disparados pela View
+
         /// <summary>
-        /// Lógica replicada do botão voltar. 
-        /// Localiza a MainWindow ativa e comanda o retorno à tela anterior.
+        /// Localiza a MainWindow ativa na aplicação e solicita o retorno 
+        /// para a tela de menu/gerenciamento principal.
         /// </summary>
         private void BtnVoltar_Click(object sender, RoutedEventArgs e)
         {
@@ -37,5 +42,7 @@ namespace magal.Views
                 mainWindow.AbrirGerenciamento();
             }
         }
+
+        #endregion
     }
 }

@@ -458,20 +458,23 @@
 
                                                     <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="0,0,15,0">
                                                         <TextBlock Text="ITEM DE CUSTO" 
-                                                                   FontSize="12" 
-                                                                   FontWeight="Bold" 
-                                                                   Foreground="{StaticResource AeroTextDark}" 
-                                                                   Margin="0,0,0,4"/>
+               FontSize="12" 
+               FontWeight="Bold" 
+               Foreground="{StaticResource AeroTextDark}" 
+               Margin="0,0,0,4"/>
                                                         <ComboBox ItemsSource="{Binding ItensFiltrados}"
-                                                                  SelectedItem="{Binding ItemSelecionado, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                  DisplayMemberPath="nome" FontSize="14" 
-                                                                  Height="40" 
-                                                                  FontWeight="SemiBold" 
-                                                                  VerticalContentAlignment="Center"
-                                                                  Cursor="Hand" 
-                                                                  BorderThickness="0.4" 
-                                                                  BorderBrush="{StaticResource AeroBorder}"
-                                                                  Background="#F8FAFC"/>
+          SelectedValue="{Binding id_catalogo_custo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+          SelectedValuePath="id_catalogo_custo"
+          DisplayMemberPath="nome"
+          FontSize="14" 
+          Height="40" 
+          FontWeight="SemiBold" 
+         Validation.ErrorTemplate="{x:Null}"
+          VerticalContentAlignment="Center"
+          Cursor="Hand" 
+          BorderThickness="0.4" 
+          BorderBrush="{StaticResource AeroBorder}"
+          Background="#F8FAFC"/>
                                                     </StackPanel>
 
                                                     <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="10,0">

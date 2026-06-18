@@ -21,5 +21,20 @@ namespace magal.Models
                 }
             }
         }
+
+        // CRUCIAL para o SelectedItem do ComboBox funcionar no WPF:
+        public override bool Equals(object obj)
+        {
+            if (obj is CatalogoCusto outro)
+            {
+                return this.id_catalogo_custo == outro.id_catalogo_custo;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return id_catalogo_custo.GetHashCode();
+        }
     }
 }

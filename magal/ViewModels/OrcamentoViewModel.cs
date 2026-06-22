@@ -164,10 +164,8 @@ namespace magal.ViewModels
             _isUpdating = true;
             try
             {
-                // 1. LIGA IMEDIATAMENTE A TELA DE CARREGAMENTO
                 IsLoading = true;
 
-                // 2. SE AS LISTAS DO BANCO AINDA NÃO ESTIVEREM PRONTAS, AGUARDA
                 if (!_dadosIniciaisCarregados.Task.IsCompleted)
                 {
                     await _dadosIniciaisCarregados.Task;
@@ -215,6 +213,21 @@ namespace magal.ViewModels
                         };
                         this.CustosExtras.Add(itemViewModel);
                     }
+
+                    await System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke(
+                        System.Windows.Threading.DispatcherPriority.Loaded,
+                        new Action(() =>
+                        {
+                            for (int i = 0; i < projetoDoBanco.Custos.Count; i++)
+                            {
+                                if (i < this.CustosExtras.Count)
+                                {
+                                    this.CustosExtras[i].id_catalogo_custo = 0;
+                                    this.CustosExtras[i].id_catalogo_custo = projetoDoBanco.Custos.ElementAt(i).id_catalogo_custo;
+                                }
+                            }
+                        })
+                    );
                 }
 
                 foreach (var t in this.ProjetoAtual.Tarefas)
@@ -226,6 +239,7 @@ namespace magal.ViewModels
                     };
                 }
             }
+            // ... restante do método CarregarProjetoParaEdicao igual ...
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao carregar edição: " + ex.Message, "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -234,14 +248,32 @@ namespace magal.ViewModels
             {
                 _isUpdating = false;
                 AtualizarFinanceiro();
-
                 OnPropertyChanged(nameof(ProjetoAtual));
 
-                // Aguarda um pequeno tempo para o WPF renderizar o layout pesado das tabelas
-                await System.Threading.Tasks.Task.Delay(300);
-
-                // Desliga o overlay com segurança
+                // 1. Primeiro desliga o carregamento para a View de custos aparecer de fato na tela
                 IsLoading = false;
+
+                // 2. Aguarda um curtíssimo delay para o WPF criar os ComboBoxes físicos na interface
+                await System.Threading.Tasks.Task.Delay(50);
+
+                // 3. Força a atualização reinjetando a referência do objeto para o ComboBox acordar
+                if (this.CustosExtras != null)
+                {
+                    foreach (var linhaCusto in this.CustosExtras)
+                    {
+                        // Busca o objeto correto dentro da lista de itens filtrados daquela linha
+                        var itemReal = linhaCusto.ItensFiltrados?.FirstOrDefault(x => x.id_catalogo_custo == linhaCusto.id_catalogo_custo);
+
+                        if (itemReal != null)
+                        {
+                            // Reseta temporariamente a referência da ViewModel e a reaplica
+                            // Isso força o acionamento do PropertyChanged com a tela 100% aberta
+                            var backup = itemReal;
+                            linhaCusto.ItemSelecionado = null;
+                            linhaCusto.ItemSelecionado = backup;
+                        }
+                    }
+                }
             }
         }
         #endregion
@@ -709,7 +741,6 @@ namespace magal.ViewModels
             }
         }
 
-      
         public new int id_catalogo_custo
         {
             get => base.id_catalogo_custo;
@@ -718,18 +749,20 @@ namespace magal.ViewModels
                 if (base.id_catalogo_custo != value)
                 {
                     base.id_catalogo_custo = value;
-                    OnRowPropertyChanged();
+                    OnRowPropertyChanged(nameof(id_catalogo_custo));
 
-                    // Busca o item no catálogo usando o novo ID selecionado no ComboBox
-                    var itemNoCatalogo = _listaMestraCustos?.FirstOrDefault(x => x.id_catalogo_custo == value);
-                    if (itemNoCatalogo != null)
+                    if (!_isSuppressingFilter)
                     {
-                        this.nome = itemNoCatalogo.nome;
-                        this.valor = itemNoCatalogo.valor; // Isso vai disparar o PropertyChanged do valor e atualizar o total geral!
-
-                        // Mantém o ItemSelecionado sincronizado por garantia
-                        _itemSelecionado = itemNoCatalogo;
-                        OnRowPropertyChanged(nameof(ItemSelecionado));
+                        var itemNoCatalogo = ItensFiltrados?.FirstOrDefault(x => x.id_catalogo_custo == value);
+                        if (itemNoCatalogo != null && _itemSelecionado != itemNoCatalogo)
+                        {
+                            this.nome = itemNoCatalogo.nome;
+                            this.valor = itemNoCatalogo.valor;
+                            _itemSelecionado = itemNoCatalogo;
+                            OnRowPropertyChanged(nameof(nome));
+                            OnRowPropertyChanged(nameof(valor));
+                            OnRowPropertyChanged(nameof(ItemSelecionado));
+                        }
                     }
                 }
             }
@@ -746,33 +779,6 @@ namespace magal.ViewModels
                     OnRowPropertyChanged();
                 }
             }
-        }
-
-        public CustoItemViewModel(List<CatalogoCusto> listaMestra)
-        {
-            _listaMestraCustos = listaMestra ?? new List<CatalogoCusto>();
-            FiltrarItensPorCategoria();
-        }
-
-        public CustoItemViewModel(Custo custoExistente, List<CatalogoCusto> listaMestra)
-        {
-            _listaMestraCustos = listaMestra ?? new List<CatalogoCusto>();
-            _isSuppressingFilter = true;
-
-            this.id_custo = custoExistente.id_custo;
-            this.id_projeto = custoExistente.id_projeto;
-            this.id_catalogo_custo = custoExistente.id_catalogo_custo;
-            this.nome = custoExistente.nome;
-            this.valor = custoExistente.valor;
-            this.categoria = custoExistente.categoria;
-            this.tipo = custoExistente.tipo;
-            this.unidade = custoExistente.unidade;
-
-            _isSuppressingFilter = false;
-            FiltrarItensPorCategoria();
-
-            _itemSelecionado = _itensFiltrados.FirstOrDefault(x => x.id_catalogo_custo == this.id_catalogo_custo)
-                              ?? _itensFiltrados.FirstOrDefault(x => string.Equals(x.nome, this.nome, StringComparison.OrdinalIgnoreCase));
         }
 
         public ObservableCollection<CatalogoCusto> ItensFiltrados
@@ -793,15 +799,57 @@ namespace magal.ViewModels
                 if (_itemSelecionado != value)
                 {
                     _itemSelecionado = value;
+
                     if (_itemSelecionado != null)
                     {
+                        // Altera a propriedade new (pública) para que o binding do SelectedValue acompanhe
                         this.id_catalogo_custo = _itemSelecionado.id_catalogo_custo;
                         this.nome = _itemSelecionado.nome;
-                        this.valor = _itemSelecionado.valor; // Altera a propriedade 'new valor' para notificar o TextBox
+                        this.valor = _itemSelecionado.valor;
                     }
+                    else
+                    {
+                        this.id_catalogo_custo = 0;
+                    }
+
                     OnRowPropertyChanged();
+                    OnRowPropertyChanged(nameof(id_catalogo_custo));
+                    OnRowPropertyChanged(nameof(nome));
+                    OnRowPropertyChanged(nameof(valor));
                 }
             }
+        }
+
+        // Construtor para item Novo
+        public CustoItemViewModel(List<CatalogoCusto> listaMestra)
+        {
+            _listaMestraCustos = listaMestra ?? new List<CatalogoCusto>();
+            FiltrarItensPorCategoria();
+        }
+
+        // Construtor para Edição (Carregamento do Banco)
+        public CustoItemViewModel(Custo custoExistente, List<CatalogoCusto> listaMestra)
+        {
+            _listaMestraCustos = listaMestra ?? new List<CatalogoCusto>();
+
+            _isSuppressingFilter = true;
+            this.id_custo = custoExistente.id_custo;
+            this.id_projeto = custoExistente.id_projeto;
+            this.nome = custoExistente.nome?.Trim();
+            this.valor = custoExistente.valor;
+            this.categoria = custoExistente.categoria?.Trim(); 
+            this.tipo = custoExistente.tipo;
+            this.unidade = custoExistente.unidade;
+            base.id_catalogo_custo = custoExistente.id_catalogo_custo;
+
+            _isSuppressingFilter = false;
+            FiltrarItensPorCategoria();
+
+            _itemSelecionado = _itensFiltrados.FirstOrDefault(x => x.id_catalogo_custo == base.id_catalogo_custo)
+                              ?? _itensFiltrados.FirstOrDefault(x => string.Equals(x.nome?.Trim(), this.nome, StringComparison.OrdinalIgnoreCase));
+
+            OnRowPropertyChanged(nameof(id_catalogo_custo));
+            OnRowPropertyChanged(nameof(ItemSelecionado));
         }
 
         private void FiltrarItensPorCategoria()
@@ -809,41 +857,39 @@ namespace magal.ViewModels
             if (ItensFiltrados == null) ItensFiltrados = new ObservableCollection<CatalogoCusto>();
 
             string categoriaBusca = this.categoria?.Trim() ?? string.Empty;
-
             List<CatalogoCusto> filtrados;
 
-            // Se não houver categoria selecionada ainda, mostra todos do catálogo
             if (string.IsNullOrEmpty(categoriaBusca))
             {
                 filtrados = _listaMestraCustos ?? new List<CatalogoCusto>();
             }
             else
             {
-                // Filtra buscando igualdade exata ou por aproximação de texto (ex: Equipamentos)
                 filtrados = _listaMestraCustos?
                     .Where(c => string.Equals(c.categoria?.Trim(), categoriaBusca, StringComparison.OrdinalIgnoreCase) ||
-                               (c.categoria != null && c.categoria.IndexOf(categoriaBusca, StringComparison.OrdinalIgnoreCase) >= 0))
+                               (c.categoria != null && c.categoria.Trim().IndexOf(categoriaBusca, StringComparison.OrdinalIgnoreCase) >= 0))
                     .ToList() ?? new List<CatalogoCusto>();
 
-                // Se o filtro resultou em zero itens, usa a lista mestra como contingência para não travar em branco
                 if (filtrados.Count == 0)
                 {
                     filtrados = _listaMestraCustos ?? new List<CatalogoCusto>();
                 }
             }
 
-            // Só atualiza a coleção se houver mudança real de itens (evita loops infinitos de interface)
-            if (!ItensFiltrados.SequenceEqual(filtrados))
+            // O SEGREDO: Se a lista atual já for identica à filtrada, NÃO damos Clear().
+            // Isso evita que o WPF desmaque o ComboBox do nada.
+            var idsAtuais = ItensFiltrados.Select(x => x.id_catalogo_custo).ToList();
+            var idsNovos = filtrados.Select(x => x.id_catalogo_custo).ToList();
+
+            if (!idsAtuais.SequenceEqual(idsNovos))
             {
                 ItensFiltrados.Clear();
                 foreach (var item in filtrados)
                 {
                     ItensFiltrados.Add(item);
                 }
+                OnRowPropertyChanged(nameof(ItensFiltrados));
             }
-
-            // Notifica o WPF que a lista foi atualizada para renderizar as opções corretas
-            OnRowPropertyChanged(nameof(ItensFiltrados));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

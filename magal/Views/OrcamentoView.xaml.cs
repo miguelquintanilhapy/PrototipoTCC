@@ -14,7 +14,6 @@ namespace magal.Views
 
         #region Construtores
 
-        // Construtor para Novo Orçamento
         public OrcamentoView()
         {
             InitializeComponent();
@@ -22,17 +21,13 @@ namespace magal.Views
             var vm = new OrcamentoViewModel();
             this.DataContext = vm;
 
-            // Registra o evento para escutar o Loading
             vm.PropertyChanged += ViewModel_PropertyChanged;
         }
 
-        // Construtor para Edição (Vindo do Histórico)
-        // Construtor para Edição (Vindo do Histórico)
         public OrcamentoView(Projeto projetoParaEditar)
         {
             InitializeComponent();
 
-            // 1. Já deixa a propriedade visual em Visible por segurança
             if (LoadingOverlay != null)
             {
                 LoadingOverlay.Visibility = Visibility.Visible;
@@ -41,16 +36,10 @@ namespace magal.Views
             var vm = new OrcamentoViewModel();
             this.DataContext = vm;
 
-            // 2. Registra o evento para escutar as mudanças do IsLoading
             vm.PropertyChanged += ViewModel_PropertyChanged;
-
-            // 3. Força a ViewModel a saber que a tela começou carregando
             vm.IsLoading = true;
-
-            // 4. Espera a tela estar TOTALMENTE carregada e visível na MainWindow antes de processar
             this.Loaded += (s, e) =>
             {
-                // Executa em segundo plano para não congelar a interface enquanto monta as listas
                 Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new System.Action(() =>
                 {
                     vm.CarregarProjetoParaEdicao(projetoParaEditar);

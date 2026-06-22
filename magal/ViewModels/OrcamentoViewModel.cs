@@ -19,7 +19,7 @@ namespace magal.ViewModels
     /// </summary>
     public class OrcamentoViewModel : BaseModel
     {
-        #region Atributos e Campos Privados
+        #region Atributos e Campos Privados;.
 
         private Projeto _projetoAtual;
         private bool _processando = false;
@@ -131,6 +131,7 @@ namespace magal.ViewModels
 
         #region Construtores
 
+        private TaskCompletionSource<bool> _dadosIniciaisCarregados = new TaskCompletionSource<bool>();
 
 
         /// <summary>
@@ -156,13 +157,22 @@ namespace magal.ViewModels
         /// <summary>
         /// Transpõe e injeta uma instância de projeto vinda do banco de dados para a tela de edição, gerando backups de descarte.
         /// </summary>
-        public void CarregarProjetoParaEdicao(Projeto projetoDoBanco)
+        public async void CarregarProjetoParaEdicao(Projeto projetoDoBanco)
         {
             if (projetoDoBanco == null) return;
 
             _isUpdating = true;
             try
             {
+                // 1. LIGA IMEDIATAMENTE A TELA DE CARREGAMENTO
+                IsLoading = true;
+
+                // 2. SE AS LISTAS DO BANCO AINDA NÃO ESTIVEREM PRONTAS, AGUARDA
+                if (!_dadosIniciaisCarregados.Task.IsCompleted)
+                {
+                    await _dadosIniciaisCarregados.Task;
+                }
+
                 this.ProjetoAtual = projetoDoBanco;
 
                 _projetoOriginal = new Projeto
@@ -199,7 +209,6 @@ namespace magal.ViewModels
                 {
                     foreach (var c in projetoDoBanco.Custos)
                     {
-                        // Encapsula o custo do banco no wrapper passando a lista do catálogo
                         var itemViewModel = new CustoItemViewModel(c, _todosOsCustosCadastrados);
                         itemViewModel.PropertyChanged += (s, e) => {
                             if (e.PropertyName == nameof(CustoItemViewModel.valor)) AtualizarFinanceiro();
@@ -221,13 +230,20 @@ namespace magal.ViewModels
             {
                 MessageBox.Show("Erro ao carregar edição: " + ex.Message, "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            using (this.DisablePropertyChange())
+            finally
             {
                 _isUpdating = false;
                 AtualizarFinanceiro();
+
+                OnPropertyChanged(nameof(ProjetoAtual));
+
+                // Aguarda um pequeno tempo para o WPF renderizar o layout pesado das tabelas
+                await System.Threading.Tasks.Task.Delay(300);
+
+                // Desliga o overlay com segurança
+                IsLoading = false;
             }
         }
-
         #endregion
 
         #region Métodos Auxiliares / Privados
@@ -294,6 +310,17 @@ namespace magal.ViewModels
                 return;
             }
 
+            // ====================================================================
+            // INTERCEPTAÇÃO: ABRE O NOVO MODAL DE CONDIÇÕES DE PAGAMENTO
+            // ====================================================================
+            var activeWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+            var dialog = new magal.Views.FinalizarPropostaDialog(this.ProjetoAtual.Orcamento);
+            dialog.Owner = activeWindow;
+
+            // Se o usuário fechar o modal ou não confirmar, cancela a gravação
+            if (dialog.ShowDialog() != true) return;
+
+            // Se confirmou no modal, segue para a confirmação de gravação física
             var confirm = MessageBox.Show("Deseja salvar as alterações deste projeto?", "Confirmar Salvamento", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (confirm != MessageBoxResult.Yes) return;
 
@@ -385,10 +412,12 @@ namespace magal.ViewModels
         {
             try
             {
+                // Força o loading a ligar assim que a tela nasce
+                IsLoading = true;
+
                 var listaClientes = await new ClienteRepository().ListarTodos();
                 var listaFuncionarios = await new FuncionarioRepository().ListarTodos();
 
-                // 1. Busca os dados do banco
                 _todosOsCustosCadastrados = (await new CatalogoCustoRepository().ListarTodos()) ?? new List<CatalogoCusto>();
 
                 Clientes.Clear();
@@ -397,26 +426,35 @@ namespace magal.ViewModels
                 Funcionarios.Clear();
                 foreach (var f in listaFuncionarios) Funcionarios.Add(f);
 
-                if (ProjetoAtual != null && _projetoOriginal == null)
+                if (ProjetoAtual != null)
                 {
-                    if (ProjetoAtual.Cliente == null && Clientes.Count > 0)
+                    if (ProjetoAtual.id_cliente > 0)
+                    {
+                        ProjetoAtual.Cliente = Clientes.FirstOrDefault(c => c.id_cliente == ProjetoAtual.id_cliente);
+                    }
+                    else if (_projetoOriginal == null && Clientes.Count > 0)
                     {
                         ProjetoAtual.Cliente = Clientes[0];
                         ProjetoAtual.id_cliente = Clientes[0].id_cliente;
                     }
+
+                    if (ProjetoAtual.Tarefas != null)
+                    {
+                        foreach (var t in ProjetoAtual.Tarefas)
+                        {
+                            if (t.id_funcionario > 0)
+                            {
+                                t.Funcionario = Funcionarios.FirstOrDefault(f => f.id_funcionario == t.id_funcionario);
+                            }
+                        }
+                    }
                 }
 
-                // ====================================================================
-                // O PULO DO GATO PARA TIRAR O DELAY:
-                // Passa pelas linhas que o "NovoProjeto" criou e força o carregamento imediato
-                // ====================================================================
                 if (CustosExtras != null && CustosExtras.Count > 0)
                 {
                     foreach (var linhaCusto in CustosExtras)
                     {
-                        // Força a linha a atualizar o catálogo interno que ela estava usando
-                        // usando reflexão ou invocando o método privado via um truque simples:
-                        linhaCusto.categoria = linhaCusto.categoria; // Força o 'set' a rodar o filtro novamente com os dados novos do banco
+                        linhaCusto.categoria = linhaCusto.categoria;
                     }
                 }
 
@@ -424,33 +462,56 @@ namespace magal.ViewModels
                 {
                     NovoProjeto();
                 }
+                else
+                {
+                    OnPropertyChanged(nameof(ProjetoAtual));
+                    AtualizarFinanceiro();
+                }
+
+                // Avisa que acabou o carregamento base do sistema
+                _dadosIniciaisCarregados.TrySetResult(true);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao carregar dados iniciais: " + ex.Message, "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _dadosIniciaisCarregados.TrySetResult(false);
+            }
+            finally
+            {
+                // Se for um projeto novo (_projetoOriginal é nulo), pode desligar o loading.
+                // Se for edição, deixa que o CarregarProjetoParaEdicao cuide do desligamento no final dele.
+                if (_projetoOriginal == null)
+                {
+                    IsLoading = false;
+                }
             }
         }
 
         private void AdicionarTarefa()
         {
-            var primeiroFunc = Funcionarios.FirstOrDefault();
             var novaTarefa = new Tarefa
             {
                 descricao = "",
                 horas_estimadas = 0,
-                Funcionario = primeiroFunc,
-                id_funcionario = primeiroFunc?.id_funcionario ?? 0
+                Funcionario = null,          
+                id_funcionario = 0
             };
 
             novaTarefa.PropertyChanged += (s, e) => {
-                if (e.PropertyName == nameof(Tarefa.Funcionario) || e.PropertyName == nameof(Tarefa.horas_estimadas))
+                if (e.PropertyName == nameof(Tarefa.Funcionario))
+                {
+                    novaTarefa.id_funcionario = novaTarefa.Funcionario?.id_funcionario ?? 0;
                     AtualizarFinanceiro();
+                }
+                else if (e.PropertyName == nameof(Tarefa.horas_estimadas))
+                {
+                    AtualizarFinanceiro();
+                }
             };
 
             ProjetoAtual.Tarefas.Add(novaTarefa);
             AtualizarFinanceiro();
         }
-
         private void DeletarTarefa(Tarefa tarefa)
         {
             if (tarefa != null && ProjetoAtual.Tarefas.Contains(tarefa))
@@ -605,6 +666,17 @@ namespace magal.ViewModels
         }
 
         #endregion
+
+        public bool IsLoading
+        {
+            get => _processando;
+            set
+            {
+                _processando = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(BotaoAtivo)); // Mantém o botão sincronizado também
+            }
+        }
     }
 
     #region Wrapper/ViewModel auxiliar para as Linhas de Custos Extras
@@ -637,6 +709,7 @@ namespace magal.ViewModels
             }
         }
 
+      
         public new int id_catalogo_custo
         {
             get => base.id_catalogo_custo;

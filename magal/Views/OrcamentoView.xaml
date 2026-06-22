@@ -47,7 +47,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
+        
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <Style x:Key="SecondaryBtn" TargetType="Button">
             <Setter Property="Background"   Value="{StaticResource AeroTextMuted}"/>
@@ -394,15 +395,21 @@
                                                          VerticalContentAlignment="Center"/>    
                                                 </Border>
                                             </StackPanel>
-
                                             <StackPanel Grid.Column="2" VerticalAlignment="Bottom" Margin="10,0">
                                                 <TextBlock Text="RESPONSÁVEL" FontSize="12" FontWeight="Bold" 
-                   Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
+               Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
+
                                                 <ComboBox ItemsSource="{Binding DataContext.Funcionarios, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                  SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                  DisplayMemberPath="nome" FontSize="12" Height="40" FontWeight="semiBold" Cursor="Hand" 
-                  VerticalContentAlignment="Center" BorderThickness="0" 
-                  BorderBrush="{StaticResource AeroBorder}" Background="#F8FAFC"/>
+              SelectedItem="{Binding Funcionario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Null}}" 
+              DisplayMemberPath="nome" 
+              FontSize="12" 
+              Height="40" 
+              FontWeight="SemiBold" 
+              Cursor="Hand" 
+              VerticalContentAlignment="Center" 
+              BorderThickness="0" 
+              BorderBrush="{StaticResource AeroBorder}" 
+              Background="#F8FAFC"/>
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0,10,0">
@@ -547,119 +554,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Background="White" CornerRadius="16" Margin="0,8,0,16"
-        BorderThickness="1" BorderBrush="{StaticResource AeroBorder}">
-                    <StackPanel>
-                        <Grid Margin="20,16">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Border Background="{StaticResource AeroPrimary}" CornerRadius="6"
-                        Width="24" Height="24" Margin="0,0,10,0">
-                                    <TextBlock Text="3" Foreground="White" FontSize="11"
-                               FontWeight="Bold" HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
-                                </Border>
-
-                                <TextBlock Text="CONDIÇÕES DE PAGAMENTO" FontSize="12"
-                           FontWeight="Bold" Foreground="{StaticResource AzulAero}"
-                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <Border Height="1" Background="#F1F5F9"/>
-
-                        <Grid Margin="20,16,20,20">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,14">
-                                <TextBlock Text="FORMA DE PAGAMENTO" FontSize="12" FontWeight="Bold" 
-               Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
-                                <ComboBox SelectedValue="{Binding ProjetoAtual.Orcamento.forma_pagamento, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-              SelectedValuePath="Content"
-              FontSize="14" Height="40" FontWeight="SemiBold" Cursor="Hand" 
-              VerticalContentAlignment="Center" BorderThickness="0" 
-              BorderBrush="{StaticResource AeroBorder}" Background="#F8FAFC">
-                                    <ComboBoxItem Content="PIX"/>
-                                    <ComboBoxItem Content="Boleto Bancário"/>
-                                    <ComboBoxItem Content="Cartão de Crédito"/>
-                                    <ComboBoxItem Content="Transferência (TED/DOC)"/>
-                                    <ComboBoxItem Content="Dinheiro"/>
-                                </ComboBox>
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,0,14">
-                                <TextBlock Text="PRAZO DE ENTREGA" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
-
-                                <DatePicker SelectedDate="{Binding ProjetoAtual.Orcamento.prazo_entrega, UpdateSourceTrigger=PropertyChanged}" 
-                                    FontSize="14" 
-                                    FontWeight="SemiBold"
-                                    Foreground="{StaticResource AeroTextDark}" 
-                                    Background="Transparent" 
-                                    BorderThickness="1.5" 
-                                    Padding="8,0" 
-                                    Height="40" 
-                                    Cursor="Hand" 
-                                    VerticalContentAlignment="Center" 
-                                    Language="pt-BR">
-                                    <DatePicker.Resources>
-                                        <Style TargetType="{x:Type DatePickerTextBox}">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="{x:Type DatePickerTextBox}">
-                                                        <ScrollViewer x:Name="PART_ContentHost" 
-                                      Focusable="False" 
-                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" 
-                                      Padding="{TemplateBinding Padding}"/>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-
-                                        <Style TargetType="{x:Type DatePicker}">
-                                            <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </DatePicker.Resources>
-                                </DatePicker>
-                            </StackPanel>
-
-                            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,4,0,0">
-                                <TextBlock Text="OBSERVAÇÕES" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AeroTextDark}" Margin="0,0,0,4"/>
-
-                                <Border BorderThickness="1.5" Height="80" Background="Transparent">
-                                    <Border.Style>
-                                        <Style TargetType="{x:Type Border}">
-                                            <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-
-                                    <TextBox Text="{Binding ProjetoAtual.Orcamento.observacoes, UpdateSourceTrigger=PropertyChanged}"
-                 FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource AeroTextDark}"
-                 Background="Transparent" BorderThickness="0" Padding="8,6"
-                 VerticalContentAlignment="Top" AcceptsReturn="True" TextWrapping="Wrap" 
-                 VerticalScrollBarVisibility="Auto"/>
-                                </Border>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
+               
             </StackPanel>
         </ScrollViewer>
 
@@ -787,5 +682,29 @@
                         Width="240" Height="54" FontSize="14"/>
             </StackPanel>
         </Grid>
+        <Grid x:Name="LoadingOverlay"
+      Background="#CCFFFFFF" 
+      Visibility="Visible" 
+      Grid.Row="0"
+      Grid.RowSpan="99"
+      Grid.Column="0"
+      Grid.ColumnSpan="99"
+      Panel.ZIndex="99999">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" 
+                     Width="200" 
+                     Height="6" 
+                     Foreground="{StaticResource AzulAero}" 
+                     Background="#E2E8F0" 
+                     BorderThickness="0"/>
+                <TextBlock Text="Carregando..." 
+                   Margin="0,12,0,0" 
+                   FontSize="13" 
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource AzulAero}" 
+                   HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </UserControl>

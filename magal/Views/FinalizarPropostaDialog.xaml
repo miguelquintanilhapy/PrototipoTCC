@@ -1,0 +1,165 @@
+﻿<Window x:Class="magal.Views.FinalizarPropostaDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Finalizar Proposta"
+        Height="460"
+        Width="460"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F0F4FA">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="AzulAero" Color="#131C49"/>
+        <SolidColorBrush x:Key="AeroBorder" Color="#E2E8F0"/>
+        <SolidColorBrush x:Key="AeroTextDark" Color="#334155"/>
+
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="InputStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Bd"
+                                BorderBrush="{StaticResource AeroBorder}"
+                                BorderThickness="1.5"
+                                CornerRadius="4"
+                                Background="{TemplateBinding Background}">
+                            <ScrollViewer x:Name="PART_ContentHost" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ComboStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AzulAero}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="14,7">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd"
+                                        Property="Background"
+                                        Value="#1E3A8A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="32,28">
+        <TextBlock Text="Finalizar Proposta"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource AzulAero}"
+                   Margin="0,0,0,24"/>
+
+        <TextBlock Text="FORMA DE PAGAMENTO"
+                   Style="{StaticResource LabelStyle}"/>
+        <ComboBox x:Name="ComboFormaPagamento"
+                  Style="{StaticResource ComboStyle}"
+                  Margin="0,0,0,14"
+                  FontWeight="SemiBold">
+            <ComboBoxItem Content="PIX"/>
+            <ComboBoxItem Content="Boleto Bancário"/>
+            <ComboBoxItem Content="Cartão de Crédito"/>
+            <ComboBoxItem Content="Transferência (TED/DOC)"/>
+            <ComboBoxItem Content="Dinheiro"/>
+        </ComboBox>
+
+        <TextBlock Text="PRAZO DE ENTREGA"
+                   Style="{StaticResource LabelStyle}"/>
+        <DatePicker x:Name="DpPrazoEntrega" 
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource AeroTextDark}"
+                    Background="Transparent"
+                    BorderThickness="1.5"
+                    Padding="8,0"
+                    Height="40"
+                    Cursor="Hand"
+                    VerticalContentAlignment="Center"
+                    Language="pt-BR"
+                    Margin="0,0,0,14">
+            <DatePicker.Resources>
+                <Style TargetType="{x:Type DatePickerTextBox}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type DatePickerTextBox}">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Focusable="False"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Padding="{TemplateBinding Padding}"/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+
+                <Style TargetType="{x:Type DatePicker}">
+                    <Setter Property="BorderBrush" Value="{StaticResource AeroBorder}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DatePicker.Resources>
+        </DatePicker>
+
+        <TextBlock Text="OBSERVAÇÕES"
+                   Style="{StaticResource LabelStyle}"/>
+        <TextBox x:Name="TxtObservacoes"
+                 Style="{StaticResource InputStyle}"
+                 Height="80"
+                 Margin="0,0,0,24"
+                 AcceptsReturn="True" 
+                 TextWrapping="Wrap" 
+                 VerticalScrollBarVisibility="Auto"/>
+
+        <Button Content="SALVAR E FINALIZAR"
+                Style="{StaticResource PrimaryBtn}"
+                Click="BtnFinalizar_Click"/>
+    </StackPanel>
+</Window>

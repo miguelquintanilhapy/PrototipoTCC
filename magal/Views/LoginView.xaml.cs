@@ -77,7 +77,7 @@ namespace magal.Views
                 {
                     conn.Open();
 
-                    // 🔥 CORREÇÃO CRÍTICA: Adicionado 'senha' e 'nivel' no SELECT
+                    // Adicionado 'senha' e 'nivel' no SELECT
                     string sql = @"SELECT id_usuario, nome, email, senha, status, nivel 
                                    FROM usuario 
                                    WHERE email = @email AND senha = @pass AND status = 'Ativo'";
@@ -97,7 +97,7 @@ namespace magal.Views
                                     nome = reader["nome"].ToString(),
                                     email = reader["email"].ToString(),
 
-                                    // 🔥 ATUALIZAÇÃO: Mapeia os dados cruciais para a Sessão funcionar perfeitamente
+                                    // Mapeia os dados cruciais para a Sessão funcionar perfeitamente
                                     senha = reader["senha"].ToString(),
                                     status = reader["status"].ToString(),
                                     nivel = reader["nivel"] == DBNull.Value ? "Operador" : reader["nivel"].ToString()

@@ -66,7 +66,7 @@ namespace magal.ViewModels
         #region Comandos disparados pela View
 
         public RelayCommand ExcluirCommand { get; }
-        public RelayCommand AtuaisCommand => AtualizarCommand; // Alias de segurança se necessário
+        public RelayCommand AtuaisCommand => AtualizarCommand;
         public RelayCommand AtualizarCommand { get; }
         public RelayCommand CriarCommand { get; }
         public RelayCommand EditarCommand { get; }
@@ -109,18 +109,17 @@ namespace magal.ViewModels
                 var lista = await _repository.ListarTodos();
                 Funcionarios.Clear();
 
-                // 🛡️ Verifica se o usuário NÃO é um Administrador
+                // Verifica se o usuário NÃO é um Administrador
                 bool naoEAdmin = Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador";
 
                 foreach (var f in lista)
                 {
                     if (naoEAdmin)
                     {
-                        f.CustoHoraExibicao = "—"; // Exibe o traço para operadores
+                        f.CustoHoraExibicao = "—"; 
                     }
                     else
                     {
-                        // Formata o decimal para dinheiro nativamente (R$ XX,XX) para o Admin
                         f.CustoHoraExibicao = f.custo_hora.ToString("C", new System.Globalization.CultureInfo("pt-BR"));
                     }
 

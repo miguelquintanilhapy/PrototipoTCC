@@ -77,7 +77,10 @@ namespace magal.Views
                 {
                     conn.Open();
 
-                    string sql = "SELECT id_usuario, nome, email FROM usuario WHERE email = @email AND senha = @pass AND status = 'Ativo'";
+                    // 🔥 CORREÇÃO CRÍTICA: Adicionado 'senha' e 'nivel' no SELECT
+                    string sql = @"SELECT id_usuario, nome, email, senha, status, nivel 
+                                   FROM usuario 
+                                   WHERE email = @email AND senha = @pass AND status = 'Ativo'";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
@@ -92,7 +95,12 @@ namespace magal.Views
                                 {
                                     id_usuario = Convert.ToInt32(reader["id_usuario"]),
                                     nome = reader["nome"].ToString(),
-                                    email = reader["email"].ToString()
+                                    email = reader["email"].ToString(),
+
+                                    // 🔥 ATUALIZAÇÃO: Mapeia os dados cruciais para a Sessão funcionar perfeitamente
+                                    senha = reader["senha"].ToString(),
+                                    status = reader["status"].ToString(),
+                                    nivel = reader["nivel"] == DBNull.Value ? "Operador" : reader["nivel"].ToString()
                                 };
 
                                 magal.Sessao.UsuarioLogado = usuarioLogado;

@@ -157,15 +157,9 @@ namespace magal.ViewModels
             // Inicialização dos comandos mapeados para os botões da tela
             ExcluirCommand = new RelayCommand(p => ExecutarExclusao(p as Projeto));
             EditarCommand = new RelayCommand(p => ExecutarEdicao(p as Projeto));
-
-            // Alterado para chamar a Task de forma assíncrona com segurança
             AtualizarCommand = new RelayCommand(async _ => await CarregarHistorico());
             ExportarPdfCommand = new RelayCommand(_ => ExecutarExportacaoPdf());
-
-            // ATENÇÃO: NÃO chamamos o CarregarHistorico() aqui dentro do construtor da VM!
-            // Deixamos para a View chamá-lo logo após se inscrever no PropertyChanged.
-            // Isso evita a "corrida de linha de código" onde a busca começava antes da View estar pronta para ler.
-        }
+             }
 
         #endregion
 
@@ -178,13 +172,12 @@ namespace magal.ViewModels
         {
             try
             {
-                // Garante que o estado seja verdadeiro ao iniciar (útil para cliques subsequentes em Atualizar)
+                // Garante que o estado seja verdadeiro ao iniciar 
                 IsLoading = true;
 
                 _filtroTexto = string.Empty;
                 OnPropertyChanged(nameof(FiltroTexto));
 
-                // Executa a busca demorada no banco de dados
                 var lista = await _repository.BuscarTodosPorUsuario(1);
                 Projetos.Clear();
 
@@ -196,8 +189,6 @@ namespace magal.ViewModels
                     }
 
                     Projetos.Add(p);
-
-                    // Força o WPF a recalcular os gatilhos visuais da linha do DataGrid
                     p.OnPropertyChanged(nameof(p.DataExpiracao));
                     p.OnPropertyChanged(nameof(p.EstaVencido));
                 }
@@ -209,10 +200,9 @@ namespace magal.ViewModels
                 MessageBox.Show($"Erro ao carregar histórico: {ex.Message}", "Aviso de Sistema", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             finally
-            {
-                // O bloco finally garante que o loading caia mesmo se houver erro de rede
-                IsLoading = false;
-            }
+                {
+                    IsLoading = false;
+                }
         }
 
         #endregion
@@ -300,6 +290,18 @@ namespace magal.ViewModels
         {
             if (projeto == null) return;
 
+            // Verifica se a sessão existe e se o nível NÃO é Administrador
+            if (Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador")
+            {
+                MessageBox.Show(
+                    "Acesso Negado!\nApenas usuários com nível 'Administrador' possuem permissão para excluir projetos.",
+                    "Aero Concepts - Segurança",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return; // Interrompe a execução aqui, blindando a ação
+            }
+
             var result = MessageBox.Show(
                 $"Deseja realmente excluir o projeto '{projeto.nome}'?\nEsta ação não poderá ser desfeita.",
                 "Atenção - Confirmação",
@@ -348,7 +350,7 @@ namespace magal.ViewModels
             {
                 MessageBox.Show($"Erro ao carregar edição: {ex.Message}", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-           }
+        }
 
         #endregion
     }

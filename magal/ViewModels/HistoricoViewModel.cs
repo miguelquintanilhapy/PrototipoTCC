@@ -236,18 +236,28 @@ namespace magal.ViewModels
         {
             var projetosVisiveis = ProjetosView.Cast<Projeto>().ToList();
 
-            decimal somaFaturamento = projetosVisiveis
-                .Where(p => p.Orcamento != null)
-                .Sum(p => p.Orcamento.valor_final);
-
-            decimal somaLucro = projetosVisiveis
-                .Where(p => p.Orcamento != null)
-                .Sum(p => p.Orcamento.valor_margem);
-
             QuantidadeProjetos = projetosVisiveis.Count;
 
-            TotalFinanceiro = somaFaturamento.ToString("C2", _ptBR);
-            TotalLucro = somaLucro.ToString("C2", _ptBR);
+            //Dados financeiros (Faturamento e Lucro) são exclusivos do Administrador
+            if (Sessao.UsuarioLogado != null && Sessao.UsuarioLogado.nivel == "Administrador")
+            {
+                decimal somaFaturamento = projetosVisiveis
+                    .Where(p => p.Orcamento != null)
+                    .Sum(p => p.Orcamento.valor_final);
+
+                decimal somaLucro = projetosVisiveis
+                    .Where(p => p.Orcamento != null)
+                    .Sum(p => p.Orcamento.valor_margem);
+
+                TotalFinanceiro = somaFaturamento.ToString("C2", _ptBR);
+                TotalLucro = somaLucro.ToString("C2", _ptBR);
+            }
+            else
+            {
+                // Oculta e simplifica o visual para nível Operador ou menor
+                TotalFinanceiro = "—";
+                TotalLucro = "—";
+            }
         }
 
         /// <summary>

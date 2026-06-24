@@ -143,7 +143,19 @@ namespace magal.ViewModels
         {
             if (custo == null || IsLoading) return;
 
-            var msg = $"Tem certeza que deseja excluir o custo '{custo.nome}' no valor de {custo.valor:C} do catálogo?";
+            //Bloqueia a exclusão para quem não é Administrador
+            if (Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador")
+            {
+                MessageBox.Show(
+                    "Acesso Negado!\nApenas usuários com o nível 'Administrador' possuem permissão para excluir custos do catálogo.",
+                    "Aero Concepts - Segurança",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return; // Interrompe o fluxo e protege os dados
+            }
+
+            var msg = $"Tem certeza que deseja excluir o custo '{custo.nome}' no valor de {custo.valor:C} do catálogo?\nEsta ação não poderá ser desfeita.";
             if (MessageBox.Show(msg, "Confirmar Exclusão", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 try

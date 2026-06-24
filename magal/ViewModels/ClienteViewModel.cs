@@ -145,7 +145,19 @@ namespace magal.ViewModels
         {
             if (cliente == null) return;
 
-            var msg = $"Tem certeza que deseja excluir o cliente '{cliente.nome}'?";
+            //Bloqueia a exclusão para quem não é Administrador
+            if (Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador")
+            {
+                MessageBox.Show(
+                    "Acesso Negado!\nApenas usuários com o nível 'Administrador' possuem permissão para excluir clientes.",
+                    "Aero Concepts - Segurança",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return; // Interrompe o fluxo e protege o banco de dados
+            }
+
+            var msg = $"Tem certeza que deseja excluir o cliente '{cliente.nome}'?\nEsta ação não poderá ser desfeita.";
             if (MessageBox.Show(msg, "Confirmar Exclusão", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
                 try

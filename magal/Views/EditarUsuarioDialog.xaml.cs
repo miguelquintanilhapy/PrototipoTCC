@@ -33,6 +33,19 @@ namespace magal.Views
                     break;
                 }
             }
+
+            // NÍVEL DE ACESSO
+            if (ComboNivel != null && !string.IsNullOrEmpty(_usuario.nivel))
+            {
+                foreach (ComboBoxItem item in ComboNivel.Items)
+                {
+                    if (item.Content.ToString() == _usuario.nivel)
+                    {
+                        ComboNivel.SelectedItem = item;
+                        break;
+                    }
+                }
+            }
         }
 
         private void BtnSalvar_Click(object sender, RoutedEventArgs e)
@@ -41,7 +54,8 @@ namespace magal.Views
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
                 string.IsNullOrWhiteSpace(TxtEmail.Text) ||
                 string.IsNullOrWhiteSpace(TxtSenhaAtual.Password) ||
-                ComboStatus.SelectedItem == null)
+                ComboStatus.SelectedItem == null ||
+                ComboNivel.SelectedItem == null)
             {
                 MessageBox.Show(
                     "Preencha todos os campos obrigatórios.",
@@ -52,7 +66,7 @@ namespace magal.Views
                 return;
             }
 
-            // Validação de segurança: A senha digitada confere com a gravada no banco/objeto?
+            // Validação de segurança: A senha digitada confere com a gravada no banco
             if (TxtSenhaAtual.Password != _usuario.senha)
             {
                 MessageBox.Show(
@@ -71,6 +85,10 @@ namespace magal.Views
                 _usuario.email = TxtEmail.Text.Trim();
 
                 _usuario.status = ((ComboBoxItem)ComboStatus.SelectedItem)
+                    .Content
+                    .ToString();
+
+                _usuario.nivel = ((ComboBoxItem)ComboNivel.SelectedItem)
                     .Content
                     .ToString();
 

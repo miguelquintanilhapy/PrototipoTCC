@@ -23,7 +23,8 @@ namespace magal.Data.Repositories
                                           nome, 
                                           email, 
                                           senha, 
-                                          status 
+                                          status,
+                                          nivel
                                    FROM usuario 
                                    ORDER BY nome ASC";
 
@@ -47,7 +48,10 @@ namespace magal.Data.Repositories
                                             ? "" : reader.GetString(reader.GetOrdinal("senha")),
 
                                     status = reader.IsDBNull(reader.GetOrdinal("status"))
-                                             ? "Ativo" : reader.GetString(reader.GetOrdinal("status"))
+                                             ? "Ativo" : reader.GetString(reader.GetOrdinal("status")),
+
+                                    nivel = reader.IsDBNull(reader.GetOrdinal("nivel"))
+                                             ? "Operador" : reader.GetString(reader.GetOrdinal("nivel"))
                                 });
                             }
                         }
@@ -75,14 +79,16 @@ namespace magal.Data.Repositories
                             nome,
                             email,
                             senha,
-                            status
+                            status,
+                            nivel
                         )
                         VALUES
                         (
                             @nome,
                             @email,
                             @senha,
-                            @status
+                            @status,
+                            @nivel
                         )";
 
                     using (var cmd = new MySqlCommand(sql, conn))
@@ -91,6 +97,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@email", usuario.email ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@senha", usuario.senha ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@status", usuario.status ?? "Ativo");
+                        cmd.Parameters.AddWithValue("@nivel", usuario.nivel ?? "Operador");
 
                         await cmd.ExecuteNonQueryAsync();
                     }
@@ -102,7 +109,7 @@ namespace magal.Data.Repositories
             }
         }
 
-        public async Task Atualizar(Usuario usuario)
+        public async Task @Atualizar(Usuario usuario)
         {
             try
             {
@@ -116,7 +123,8 @@ namespace magal.Data.Repositories
                             nome = @nome,
                             email = @email,
                             senha = @senha,
-                            status = @status
+                            status = @status,
+                            nivel = @nivel
                         WHERE id_usuario = @id";
 
                     using (var cmd = new MySqlCommand(sql, conn))
@@ -126,6 +134,7 @@ namespace magal.Data.Repositories
                         cmd.Parameters.AddWithValue("@email", usuario.email ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@senha", usuario.senha ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@status", usuario.status ?? "Ativo");
+                        cmd.Parameters.AddWithValue("@nivel", usuario.nivel ?? "Operador");
 
                         await cmd.ExecuteNonQueryAsync();
                     }

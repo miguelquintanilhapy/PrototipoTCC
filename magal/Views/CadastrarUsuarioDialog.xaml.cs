@@ -1,9 +1,9 @@
-﻿using magal.Data.Repositories;
-using magal.Models;
-using System;
-using System.Net.Mail;
-using System.Windows;
+﻿using System;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using magal.Data.Repositories;
+using magal.Models;
 
 namespace magal.Views
 {
@@ -14,29 +14,42 @@ namespace magal.Views
             InitializeComponent();
         }
 
-        private void BtnSalvar_Click(object sender, RoutedEventArgs e)
+        private async void BtnSalvar_Click(object sender, RoutedEventArgs e)
         {
-            // Verifica se os campos não estão em branco 
+            // Verifica se os campos não estão em branco (incluindo o ComboNivel)
             if (string.IsNullOrWhiteSpace(TxtNome.Text) ||
                 string.IsNullOrWhiteSpace(TxtEmail.Text) ||
                 string.IsNullOrWhiteSpace(TxtSenha.Password) ||
-                string.IsNullOrWhiteSpace(TxtConfirmarSenha.Password))
+                string.IsNullOrWhiteSpace(TxtConfirmarSenha.Password) ||
+                ComboNivel.SelectedItem == null)
             {
-                MessageBox.Show("Por favor, preencha todos os campos.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "Por favor, preencha todos os campos.",
+                    "Aero Concepts",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 return;
             }
 
             // Validação do formato do e-mail via Regex
             if (!ValidarEmail(TxtEmail.Text))
             {
-                MessageBox.Show("Por favor, insira um e-mail válido (exemplo@dominio.com).", "E-mail Inválido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "Por favor, insira um e-mail válido (exemplo@dominio.com).",
+                    "E-mail Inválido",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 return;
             }
 
             // Verifica se as senhas são iguais
             if (TxtSenha.Password != TxtConfirmarSenha.Password)
             {
-                MessageBox.Show("As senhas digitadas não coincidem. Por favor, verifique.", "Senhas Diferentes", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "As senhas digitadas não coincidem. Por favor, verifique.",
+                    "Senhas Diferentes",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 return;
             }
 
@@ -44,23 +57,33 @@ namespace magal.Views
             {
                 var novoUsuario = new Usuario
                 {
-                    nome = TxtNome.Text,
-                    email = TxtEmail.Text,
+                    nome = TxtNome.Text.Trim(),
+                    email = TxtEmail.Text.Trim(),
                     senha = TxtSenha.Password,
-                    status = "Ativo"
+                    status = "Ativo", // Todo usuário entra como ativo por padrão
+                    nivel = ((ComboBoxItem)ComboNivel.SelectedItem).Content.ToString()
                 };
 
                 var repo = new UsuarioRepository();
-                 repo.Inserir(novoUsuario);
+                // Chamada assíncrona utilizando o await com base no seu Repository
+                await repo.Inserir(novoUsuario);
 
-                MessageBox.Show("Usuário cadastrado com sucesso!", "Sucesso", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    "Usuário cadastrado com sucesso!",
+                    "Aero Concepts",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
 
                 this.DialogResult = true;
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro ao salvar no banco: " + ex.Message, "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Erro ao salvar no banco: " + ex.Message,
+                    "Aero Concepts",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 

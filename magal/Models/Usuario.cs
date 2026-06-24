@@ -12,5 +12,6 @@ namespace magal.Models
         public string email { get; set; }
         public string senha { get; set; }
         public string status { get; set; } //  "Ativo/Inativo"
+        public string nivel { get; set; } // "Administrador" ou "Operador"
     }
 }

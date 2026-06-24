@@ -179,6 +179,18 @@ namespace magal.ViewModels
 
         private void ExecutarCriar()
         {
+            // Bloqueia a criação de custos para quem não é Administrador
+            if (Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador")
+            {
+                MessageBox.Show(
+                    "Acesso Negado!\nApenas usuários com o nível 'Administrador' possuem permissão para cadastrar novos custos.",
+                    "Aero Concepts - Segurança",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return; // Interrompe o fluxo e impede a abertura da tela de cadastro
+            }
+
             var dialog = new magal.Views.CadastrarCustoDialog();
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
@@ -190,6 +202,19 @@ namespace magal.ViewModels
         private void ExecutarEdicao(CatalogoCusto custo)
         {
             if (custo == null) return;
+
+            // Bloqueia a edição de custos para quem não é Administrador
+            if (Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador")
+            {
+                MessageBox.Show(
+                    "Acesso Negado!\nApenas usuários com o nível 'Administrador' possuem permissão para alterar os custos operacionais.",
+                    "Aero Concepts - Segurança",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return; // Interrompe o fluxo e protege os dados de custos
+            }
+
             var dialog = new magal.Views.EditarCustoDialog(custo);
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)

@@ -227,6 +227,18 @@ namespace magal.ViewModels
         /// </summary>
         private void ExecutarCriar()
         {
+            //Bloqueia a criação de cargos para quem não é Administrador
+            if (Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador")
+            {
+                MessageBox.Show(
+                    "Acesso Negado!\nApenas usuários com o nível 'Administrador' possuem permissão para cadastrar novos cargos.",
+                    "Aero Concepts - Segurança",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return; // Interrompe o fluxo e impede a abertura da tela de cadastro
+            }
+
             var dialog = new magal.Views.CadastrarCargoDialog();
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)
@@ -239,6 +251,19 @@ namespace magal.ViewModels
         private void ExecutarEdicao(Cargo cargo)
         {
             if (cargo == null) return;
+
+            //Bloqueia a edição de cargos para quem não é Administrador
+            if (Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador")
+            {
+                MessageBox.Show(
+                    "Acesso Negado!\nApenas usuários com o nível 'Administrador' possuem permissão para alterar cargos e faixas salariais.",
+                    "Aero Concepts - Segurança",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return; // Interrompe o fluxo e protege a estrutura de cargos
+            }
+
             var dialog = new magal.Views.EditarCargoDialog(cargo);
             dialog.Owner = Application.Current.Windows.OfType<magal.MainWindow>().FirstOrDefault();
             if (dialog.ShowDialog() == true)

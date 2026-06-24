@@ -108,13 +108,27 @@ namespace magal.ViewModels
 
                 var lista = await _repository.ListarTodos();
                 Funcionarios.Clear();
+
+                // 🛡️ Verifica se o usuário NÃO é um Administrador
+                bool naoEAdmin = Sessao.UsuarioLogado == null || Sessao.UsuarioLogado.nivel != "Administrador";
+
                 foreach (var f in lista)
                 {
+                    if (naoEAdmin)
+                    {
+                        f.CustoHoraExibicao = "—"; // Exibe o traço para operadores
+                    }
+                    else
+                    {
+                        // Formata o decimal para dinheiro nativamente (R$ XX,XX) para o Admin
+                        f.CustoHoraExibicao = f.custo_hora.ToString("C", new System.Globalization.CultureInfo("pt-BR"));
+                    }
+
                     Funcionarios.Add(f);
                 }
 
                 FuncionariosView?.Refresh();
-                await Task.Delay(100); // Estabiliza a renderização visual do DataGrid
+                await Task.Delay(100);
             }
             catch (Exception ex)
             {

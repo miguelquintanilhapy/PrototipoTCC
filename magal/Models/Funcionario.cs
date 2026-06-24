@@ -35,6 +35,8 @@ namespace magal.Models
             return false;
         }
 
+        public string CustoHoraExibicao { get; set; }
+
         public override int GetHashCode() => id_funcionario.GetHashCode();
 
         public string Iniciais
